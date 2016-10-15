@@ -53,19 +53,22 @@ int main(int argc, char **argv) {
     // initial state's cost
     d = gap_heuristic(&state);
     open.Add(d, d, state);
+    state_map_add(map, &state, d);
 
     // search
     while (!open.Empty()){
+        // get current distance from goal; since operator costs are
+        // non-negative this distance is monotonically increasing
+        d = open.CurrentPriority();
+
         // remove top state from priority state
         state = open.Top();
         open.Pop();
-        d = open.CurrentPriority();
 
         if (is_goal(&state)) {
             // print the distance then the state
-            printf("%d  ", d);
-            print_state(stdout, &state);
-            printf(" \n");
+            printf("the cost of the path is: %d\n", d);
+            break;
         }
 
         // check if we already expanded this state.
@@ -74,14 +77,23 @@ int main(int argc, char **argv) {
         assert(best_dist != NULL);
         if( *best_dist < d ) continue;
 
+        // print state
+        printf("State: ");
+        print_state(stdout, &state);
+        printf("cost: %d\n", d);
+
         // expand node look at all sucessors of the state
         init_fwd_iter(&iter, &state);  // initialize the child iterator
         while( (ruleid = next_ruleid(&iter)) >= 0 ) {
             apply_fwd_rule(ruleid, &state, &child);
-            print_state(stdout, &child);
 
             // child's cost using the heuristic
-            const int child_d = d + get_bwd_rule_cost(ruleid) + gap_heuristic(&child);
+            const int child_d = d + get_fwd_rule_cost(ruleid) + gap_heuristic(&child);
+
+            // print state
+            printf("State: ");
+            print_state(stdout, &child);
+            printf("costc: %d\n", child_d);
 
             // check if either this child has not been seen yet or if
             // there is a new cheaper way to get to this child.

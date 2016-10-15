@@ -14,12 +14,13 @@ int gap_heuristic(state_t *state) {
 
     int cost = 0;
     int statei, statei1;
+
     //iterate through state's coordenates
     for (int i = 0; i < NUMVARS - 1; i++) {
-        print_state(stdout, state);
         statei = state -> vars[i]; //atoi(state -> vars[i]);
         statei1 = state -> vars[i + 1]; //atoi(state -> vars[i + 1]);
         if (abs(statei - statei1) > 1){
+            // printf("incremented cost with %d and %d \n", statei, statei1 );
             cost++;
         }
     }
