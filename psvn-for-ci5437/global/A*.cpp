@@ -105,43 +105,4 @@ int main(int argc, char **argv) {
             }
         }
     }
-
-    /*
-    while !q.empty() {
-        Node n = q.pop()
-        % check for goal
-        if n.state.is-goal() return n
-        % expand node
-        best-first-search-expansion(n, q)
-        set-color(n.state, Black)
-        return null
-    */
 }
-
-
-/*
-Node best-first-search-expansion(Node n, PriorityQueue q):
-    foreach <s,a> in n.state.successors()
-    if h(s) == ∞ continue
-    % assumes safe heuristic
-    g = n.g + c(n.state, a)
-    % first time encountered
-    if get-color(s) == White
-    set-color(s, Gray)
-    set-distance(s, g)
-    q.insert(n.make-node(s, a), g + h(s))
-
-    % a shorter path was found
-    else if g < get-distance(s)
-        set-distance(s, g)
-        if get-color(s) == Gray
-        % re-order and re-link parent
-        s.node.parent = n
-        s.node.action = a
-        s.node.g = g
-        q.decrease-priority(s.node, g+h(s))
-    else
-        % node is black: re-open state!
-        set-color(s, Gray)
-        q.insert(n.make-node(s, a), g + h(s))
-*/
