@@ -9,29 +9,53 @@
 */
 #include <vector>
 #include "priority_queue.hpp"
+#include "gap_heuristic.hpp"
+
+#define  MAX_LINE_LENGTH 999
 
 int main(int argc, char **argv) {
 
-    int d;
-    // Priority Queue ordered by f-value: f (n) = g(n) + h(s)
-    PriorityQueue<state_t> open;
+    // VARIABLES FOR INPUT
+    char str[MAX_LINE_LENGTH + 1];
+    ssize_t nchars;
+    state_t state; // state_t is defined by the PSVN API. It is the type used for individual states.
+
+    // VARIABLES FOR ITERATING THROUGH state's SUCCESSORS
+    state_t child;
+    ruleid_iterator_t iter; // ruleid_terator_t is the type defined by the PSVN API successor/predecessor iterators.
+    int ruleid; // an iterator returns a number identifying a rule
+
+    int d; //distance to a state
+
+    PriorityQueue<state_t> open; // Priority Queue ordered by f-value: f (n) = g(n) + h(s)
     state_map_t *map = new_state_map(); // contains the cost-to-goal for all states that have been generated
+
     /*
     set-color(init(), Gray)
     set-distance(init(), 0)
     q.insert(make-root-node(init()), h(init()))
     */
 
-    // add goal states
-    first_goal_state(&state, &d);
-    do {
-        state_map_add(map, &state, 0);
-        int cost = h(&state);
-        open.Add(cost, cost, state);
-    } while( next_goal_state(&state, &d) );
+    // READ A LINE OF INPUT FROM stdin
+    printf("Please enter a state followed by ENTER: ");
+    if( fgets(str, sizeof str, stdin) == NULL ) {
+        printf("Error: empty input line.\n");
+        return 0;
+    }
+
+    // CONVERT THE STRING TO A STATE
+    nchars = read_state(str, &state);
+    if( nchars <= 0 ) {
+        printf("Error: invalid state entered.\n");
+        return 0;
+    }
+
+    // initial state's cost
+    d = gap_heuristic(&state);
+    open.Add(d, d, state);
 
     // search
-    while (!open.empty()){
+    while (!open.Empty()){
         // remove top state from priority state
         state = open.Top();
         open.Pop();
@@ -50,11 +74,14 @@ int main(int argc, char **argv) {
         assert(best_dist != NULL);
         if( *best_dist < d ) continue;
 
-        // expand node look at all predecessors of the state
-        init_bwd_iter(&iter, &state);
-        while( (ruleid = next_ruleid(&iter) ) >= 0 ) {
-            apply_bwd_rule(ruleid, &state, &child);
-            const int child_d = d + get_bwd_rule_cost(ruleid) + h(&child);
+        // expand node look at all sucessors of the state
+        init_fwd_iter(&iter, &state);  // initialize the child iterator
+        while( (ruleid = next_ruleid(&iter)) >= 0 ) {
+            apply_fwd_rule(ruleid, &state, &child);
+            print_state(stdout, &child);
+
+            // child's cost using the heuristic
+            const int child_d = d + get_bwd_rule_cost(ruleid) + gap_heuristic(&child);
 
             // check if either this child has not been seen yet or if
             // there is a new cheaper way to get to this child.
@@ -66,6 +93,7 @@ int main(int argc, char **argv) {
             }
         }
     }
+
     /*
     while !q.empty() {
         Node n = q.pop()
