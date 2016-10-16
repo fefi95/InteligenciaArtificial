@@ -29,12 +29,7 @@ int main(int argc, char **argv) {
 
     PriorityQueue<state_t> open; // Priority Queue ordered by f-value: f (n) = g(n) + h(s)
     state_map_t *map = new_state_map(); // contains the cost-to-goal for all states that have been generated
-
-    /*
-    set-color(init(), Gray)
-    set-distance(init(), 0)
-    q.insert(make-root-node(init()), h(init()))
-    */
+    FILE *file; // the final state_map is written to this file if it is provided (command line argument)
 
     // READ A LINE OF INPUT FROM stdin
     printf("Please enter a state followed by ENTER: ");
@@ -52,6 +47,7 @@ int main(int argc, char **argv) {
 
     // initial state's cost
     d = gap_heuristic(&state);
+    int h0 = d;
     open.Add(d, d, state);
     state_map_add(map, &state, d);
 
@@ -104,5 +100,21 @@ int main(int argc, char **argv) {
                 open.Add(child_d, child_d, child);
             }
         }
+    }
+    // write the state map to a file
+    if( argc >= 3 ) {
+        file = fopen(argv[2], "w");
+        if( file == NULL ) {
+            fprintf(stderr, "could not open %s for writing\n", argv[2]);
+            exit(-1);
+        }
+        char buffer[MAX_LINE_LENGTH] = "grupo, algorithm, heuristic, domain, instance, cost, h0, generated, time, gen_per_sec\n";
+        fwrite (buffer , sizeof(char), sizeof(buffer), file);
+        strcpy(buffer, "X, A*, gap, pancake28,");
+        print_state(file, &state);
+        memset(buffer, 0, MAX_LINE_LENGTH);
+        sprintf(buffer, ", %d, %d, ", d, h0);
+        fwrite (buffer , sizeof(char), sizeof(buffer), file);
+        fclose(file);
     }
 }
