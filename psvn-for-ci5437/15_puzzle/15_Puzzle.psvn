@@ -1,0 +1,10 @@
+# 15-puzzle (4x4) 
+
+# Define a domain called 'tile' consisting of 16 constants 
+# B is for the blank 'tile' 
+DOMAIN tile 15
+       B 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+
+# number of state variables 
+15
+GOAL B 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
