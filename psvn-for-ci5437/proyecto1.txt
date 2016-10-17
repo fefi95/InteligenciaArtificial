@@ -56,7 +56,7 @@ Tower of Hanoi: 14-4 y 16-4 hasta profundidad 12 y con prefijos N=0 y N=1
 Actividad 2
 ---------------------------------------------------------------------------
 
-Para cada problema y cada árbol de búsqueda generarado anteriormente, 
+Para cada problema y cada árbol de búsqueda generarado anteriormente,
 calcule el factor de ramificación empírico y la primera profundidad para
 la cual el número de nodos a dicha profundidad supera el número de
 estados en el problema.
@@ -97,7 +97,7 @@ Problemas:
 
 Pancake: 16 panquecas
 Puzzle: 11-puzzle
-TopSpin: (compact encoding) 16-4 
+TopSpin: (compact encoding) 16-4
 Tower of Hanoi: 14-4
 
 
@@ -170,4 +170,3 @@ Pesos: 1.5 y 2.0
 
 
 ---------------------------------------------------------------------------
-

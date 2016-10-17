@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     ruleid_iterator_t iter; // ruleid_terator_t is the type defined by the PSVN API successor/predecessor iterators.
     int ruleid; // an iterator returns a number identifying a rule
 
-    int d; //distance to a state
+    int g = 0; //cost of path to a state
 
     PriorityQueue<state_t> open; // Priority Queue ordered by f-value: f (n) = g(n) + h(s)
     state_map_t *map = new_state_map(); // contains the cost-to-goal for all states that have been generated
@@ -46,24 +46,26 @@ int main(int argc, char **argv) {
     }
 
     // initial state's cost
-    d = gap_heuristic(&state);
-    int h0 = d;
-    open.Add(d, d, state);
-    state_map_add(map, &state, d);
+    // d = gap_heuristic(&state);
+    int h0 = gap_heuristic(&state);
+    open.Add(h0, h0, state);
+    state_map_add(map, &state, g);
 
     // search
     while (!open.Empty()){
         // get current distance from goal; since operator costs are
         // non-negative this distance is monotonically increasing
-        d = open.CurrentPriority();
+        // d = open.CurrentPriority();
 
         // remove top state from priority state
         state = open.Top();
         open.Pop();
+        const int *state_g = state_map_get(map, &state);
+        g = *state_g;
 
         if (is_goal(&state)) {
             // print the distance then the state
-            printf("the cost of the path is: %d\n", d);
+            printf("the cost of the path is: %d\n", g);
             break;
         }
 
@@ -71,33 +73,35 @@ int main(int argc, char **argv) {
         // (entries on the open list are not deleted if a cheaper path to a state is found)
         const int *best_dist = state_map_get(map, &state);
         assert(best_dist != NULL);
-        if( *best_dist < d ) continue;
+        if( *best_dist < g ) continue;
 
         // print state
         printf("State: ");
         print_state(stdout, &state);
-        printf("cost: %d\n", d);
+        printf("path's cost: %d\n", g);
 
-        // expand node look at all sucessors of the state
+        // break;
+        // expand node
         init_fwd_iter(&iter, &state);  // initialize the child iterator
         while( (ruleid = next_ruleid(&iter)) >= 0 ) {
             apply_fwd_rule(ruleid, &state, &child);
 
             // child's cost using the heuristic
-            const int child_d = d + get_fwd_rule_cost(ruleid) + gap_heuristic(&child);
+            const int child_g = g + get_fwd_rule_cost(ruleid);
+            const int child_f = child_g + gap_heuristic(&child);
 
             // print state
             printf("State: ");
             print_state(stdout, &child);
-            printf("costc: %d\n", child_d);
+            printf("cost: %d\n", child_f);
 
             // check if either this child has not been seen yet or if
             // there is a new cheaper way to get to this child.
-            const int *old_child_d = state_map_get(map, &child);
-            if( (old_child_d == NULL) || (*old_child_d > child_d) ) {
-                // add to open with the new distance
-                state_map_add(map, &child, child_d);
-                open.Add(child_d, child_d, child);
+            const int *old_child_g = state_map_get(map, &child);
+            if( (old_child_g == NULL) || (*old_child_g > child_g) ) {
+                // add to open with the new cost
+                state_map_add(map, &child, child_g);
+                open.Add(child_f, child_f, child);
             }
         }
     }
@@ -113,7 +117,7 @@ int main(int argc, char **argv) {
         strcpy(buffer, "X, A*, gap, pancake28,");
         print_state(file, &state);
         memset(buffer, 0, MAX_LINE_LENGTH);
-        sprintf(buffer, ", %d, %d, ", d, h0);
+        sprintf(buffer, ", %d, %d, ", g, h0);
         fwrite (buffer , sizeof(char), sizeof(buffer), file);
         fclose(file);
     }
