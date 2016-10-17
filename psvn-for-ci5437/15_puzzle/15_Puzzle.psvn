@@ -1,10 +1,67 @@
-# 15-puzzle (4x4) 
+# 15-puzzle (4x4)
 
-# Define a domain called 'tile' consisting of 16 constants 
-# B is for the blank 'tile' 
-DOMAIN tile 15
+# Define a domain called 'tile' consisting of 16 constants
+# B is for the blank 'tile'
+DOMAIN tile 16
        B 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
-# number of state variables 
-15
+# number of state variables
+16
+
+tile tile tile tile tile tile tile tile tile tile tile tile tile tile tile tile
+
+# CORNERS
+B X - - - - - - - - - - - - - - => X B - - - - - - - - - - - - - - LABEL RIGHT
+B - - - X - - - - - - - - - - - => X - - - B - - - - - - - - - - - LABEL DOWN
+- - X B - - - - - - - - - - - - => - - B X - - - - - - - - - - - - LABEL RIGHT
+- - - B - - - X - - - - - - - - => - - - X - - - B - - - - - - - - LABEL DOWN
+- - - - - - - - X - - - B - - - => - - - - - - - - B - - - X - - - LABEL UP
+- - - - - - - - - - - - B X - - => - - - - - - - - - - - - X B - - LABEL RIGHT
+- - - - - - - - - - - - - - X B => - - - - - - - - - - - - - - B X LABEL LEFT
+- - - - - - - - - - - X - - - B => - - - - - - - - - - - B - - - X LABEL UP
+
+# BORDERS
+X B - - - - - - - - - - - - - - => B X - - - - - - - - - - - - - - LABEL LEFT
+- B X - - - - - - - - - - - - - => - X B - - - - - - - - - - - - - LABEL RIGHT
+- B - - - X - - - - - - - - - - => - X - - - B - - - - - - - - - - LABEL DOWN
+- X B - - - - - - - - - - - - - => - B X - - - - - - - - - - - - - LABEL LEFT
+- - B X - - - - - - - - - - - - => - - X B - - - - - - - - - - - - LABEL RIGHT
+- - B - - - X - - - - - - - - - => - - X - - - B - - - - - - - - - LABEL DOWN
+X - - - B - - - - - - - - - - - => B - - - X - - - - - - - - - - - LABEL UP
+- - - - B X - - - - - - - - - - => - - - - X B - - - - - - - - - - LABEL RIGHT
+- - - - B - - - X - - - - - - - => - - - X - - - B - - - - - - - - LABEL DOWN
+- - - - - - - B - - - X - - - - => - - - - - - - X - - - B - - - - LABEL DOWN
+- - - - - - X B - - - - - - - - => - - - - - - B X - - - - - - - - LABEL LEFT
+- - - X - - - B - - - - - - - - => - - - B - - - X - - - - - - - - LABEL UP
+- - - - X - - - B - - - - - - - => - - - - B - - - X - - - - - - - LABEL UP
+- - - - - - - - B X - - - - - - => - - - - - - - - X B - - - - - - LABEL RIGHT
+- - - - - - - - B - - - X - - - => - - - - - - - - X - - - B - - - LABEL DOWN
+- - - - - - - X - - - B - - - - => - - - - - - - B - - - X - - - - LABEL UP
+- - - - - - - - - - X B - - - - => - - - - - - - - - - B X - - - - LABEL LEFT
+- - - - - - - - - - - B - - - X => - - - - - - - - - - - B - - - X LABEL DOWN
+- - - - - - - - - - - - X B - - => - - - - - - - - - - - - B X - - LABEL LEFT
+- - - - - - - - - X - - - B - - => - - - - - - - - - B - - - X - - LABEL UP
+- - - - - - - - - - - - - B X - => - - - - - - - - - - - - - X B - LABEL RIGHT
+- - - - - - - - - - - - - X B - => - - - - - - - - - - - - - B X - LABEL LEFT
+- - - - - - - - - - - - - - B X => - - - - - - - - - - - - - - X B LABEL RIGHT
+- - - - - - - - - - - X - - B - => - - - - - - - - - - - X - - B - LABEL UP
+
+# CENTER
+- X - - - B - - - - - - - - - - => - B - - - X - - - - - - - - - - LABEL UP
+- - - - X B - - - - - - - - - - => - - - - B X - - - - - - - - - - LABEL LEFT
+- - - - - B X - - - - - - - - - => - - - - - X B - - - - - - - - - LABEL RIGHT
+- - - - - B - - - X - - - - - - => - - - - - X - - - B - - - - - - LABEL DOWN
+- - - - - X B - - - - - - - - - => - - - - - B X - - - - - - - - - LABEL LEFT
+- - X - - - B - - - - - - - - - => - - B - - - X - - - - - - - - - LABEL UP
+- - - - - - B X - - - - - - - - => - - - - - - X B - - - - - - - - LABEL RIGHT
+- - - - - - B - - - X - - - - - => - - - - - - X - - - B - - - - - LABEL DOWN
+- - - - - X - - - B - - - - - - => - - - - - B - - - X - - - - - - LABEL UP
+- - - - - - - - X B - - - - - - => - - - - - - - - B X - - - - - - LABEL LEFT
+- - - - - - - - - B - - - X - - => - - - - - - - - - X - - - B - - LABEL DOWN
+- - - - - - - - - B X - - - - - => - - - - - - - - - X B - - - - - LABEL RIGHT
+- - - - - - X - - - B - - - - - => - - - - - - B - - - X - - - - - LABEL UP
+- - - - - - - - - X B - - - - - => - - - - - - - - - B X - - - - - LABEL LEFT
+- - - - - - - - - - B X - - - - => - - - - - - - - - - X B - - - - LABEL RIGHT
+- - - - - - - - - - B - - - X - => - - - - - - - - - - X - - - B - LABEL DOWN
+
 GOAL B 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
