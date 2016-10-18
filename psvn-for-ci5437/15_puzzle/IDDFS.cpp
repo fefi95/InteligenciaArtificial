@@ -46,14 +46,11 @@ void iterative_deepening_depth_first_search()
 {
   state_t state;                // Actual state.
   int goal_num;                 // ID of the goal condition.
-  int bound;                    // The deep bound.
+  int bound = 17;                    // The deep bound.
   int64_t totalNodes = 0;       // Total nodes on the actual bound.
   int64_t oldTotalNodes = 0;    // Total nodes on the last bound.
   int64_t *array;               // Array to contain the totals node in every label.
-
-  cout << "ENTER THE DEEP: ";
-  cin >> bound;
-  array = new int64_t[bound];
+  array = new int64_t[20];
 
   // Perform depth-bounded searches with increasing depth bounds.
   for (int i = bound + 1; i >= 0; i--){
@@ -72,6 +69,7 @@ void iterative_deepening_depth_first_search()
             convertInt(totalNodes - oldTotalNodes) + "\n";
     oldTotalNodes = totalNodes;
   }
+
 }
 
 int main(int argc, char **argv){
