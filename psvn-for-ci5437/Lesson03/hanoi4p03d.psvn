@@ -3,7 +3,7 @@
  12
 
 # All state variables are binary.
-2 2 2 2 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 2 2 2 2 2 2
 
  1 0 - - - - - - - - - - => 0 1 - - - - - - - - - -  LABEL Disk1_From1_To2
  1 - 0 - - - - - - - - - => 0 - 1 - - - - - - - - -  LABEL Disk1_From1_To3
