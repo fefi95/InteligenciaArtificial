@@ -30,6 +30,10 @@ psvn2c_abstraction.c:
 	$(CXX) $(OPT) ./IDDFS.cpp -include $< -o $@
 	rm -f $*.c
 
+%.IDDFS2: %.c ./IDDFS2.cpp
+	$(CXX) $(OPT) ./IDDFS2.cpp -include $< -o $@
+	rm -f $*.c
+
 
 .PHONY: clean
 clean:
