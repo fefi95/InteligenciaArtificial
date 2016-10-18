@@ -47,7 +47,7 @@ Genere tablas similares para los siguientes problemas hasta las
 profundidades especificadas:
 
 Pancake: 24 y 28 panquecas hasta profundidad 6
-Puzzle: 11-puzzle (4x4) hasta profundidad 20
+Puzzle: 11-puzzle (4x3) hasta profundidad 20
 TopSpin: (compact encoding) 22-4 y 26-4 hasta profundidad 7
 Tower of Hanoi: 14-4 y 16-4 hasta profundidad 12 y con prefijos N=0 y N=1
 
