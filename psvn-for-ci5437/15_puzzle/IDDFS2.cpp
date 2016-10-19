@@ -46,9 +46,13 @@ void iterative_deepening_depth_first_search()
 {
   state_t state;                // Actual state.
   int goal_num;                 // ID of the goal condition.
-  int bound = 17;                    // The deep bound.
+  int bound;                    // The deep bound.
   int64_t totalNodes = 0;       // Total nodes on the actual bound.
   int64_t oldTotalNodes = 0;    // Total nodes on the last bound.
+
+  cout << "ENTER THE BOUND DEEP: ";
+  cin >> bound;
+  cout << "\n";
 
   // Perform depth-bounded searches with increasing depth bounds.
   for (int i = 0; i <= bound; i++){
