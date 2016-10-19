@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 
     // initial state's cost
     // d = gap_heuristic(&state);
-    int h0 = gap_heuristic(&state);
+    int h0 = heuristic(&state);
     open.Add(h0, h0, state);
     state_map_add(map, &state, g);
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
             // child's cost using the heuristic
             const int child_g = g + get_fwd_rule_cost(ruleid);
-            const int child_f = child_g + gap_heuristic(&child);
+            const int child_f = child_g + heuristic(&child);
 
             // print state
             printf("State: ");

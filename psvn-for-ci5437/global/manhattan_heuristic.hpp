@@ -10,7 +10,7 @@
 
 #include <vector>
 
-int manhattan_heuristic(state_t *state) {
+int heuristic(state_t *state) {
 
     int cost = 0;
     int statei;
