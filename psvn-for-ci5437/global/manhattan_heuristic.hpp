@@ -14,13 +14,28 @@ int manhattan_heuristic(state_t *state) {
 
     int cost = 0;
     int statei;
-    div_t divresult;
-    divresult = div (i - statei,n);
 
-    //iterate through state's coordenates
-    for (int i = 0; i < NUMVARS - 1; i++) {
+    //15-puzzle (4x4)
+    int n = 4;
+    int m = 4;
+
+    div_t coordStatei; // coordenate where I wish to move the tile
+    div_t coordI;     // tile's coordenate
+    int tileCost;
+
+
+    for (int i = 0; i < NUMVARS; i++) {
         statei = state -> vars[i];
-        cost += divresult.quot + divresult.rem;
+        if (statei != 0) {
+            coordI = div (i, m);
+            coordStatei = div (statei, m);
+            tileCost = abs(coordI.quot - coordStatei.quot) + abs(coordI.rem - coordStatei.rem);
+            cost += tileCost;
+            printf("the state var is %d and it's tileCost: %d\n", statei, tileCost);
+        }
+
     }
+    printf("%d\n",cost);
     return cost;
+
 }
