@@ -36,13 +36,13 @@ int main(int argc, char **argv) {
         // remove top state from priority state
         state = open.Top();
         open.Pop();
-        
+
         // check if we already expanded this state.
         // (entries on the open list are not deleted if a cheaper path to a state is found)
         const int *best_dist = state_map_get(map, &state);
         assert(best_dist != NULL);
         if( *best_dist < d ) continue;
-        
+
         // print the distance then the state
         printf("%d  ",d);
         print_state(stdout,&state);
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    
+
     // write the state map to a file
     if( argc >= 2 ) {
         file = fopen(argv[1], "w");
@@ -75,7 +75,6 @@ int main(int argc, char **argv) {
         write_state_map(file, map);
         fclose(file);
     }
-    
+
     return 0;
 }
-
