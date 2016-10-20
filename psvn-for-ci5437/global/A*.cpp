@@ -57,33 +57,36 @@ int main(int argc, char **argv) {
     open.Add(h0, h0, state);
     state_map_add(map, &state, g);
 
-    // file handling
-    char nameFile[50];
-    sprintf(nameFile, "test.txt"); // argv[0]
+    /*******************************   file handling    ********************************/
+    char problemName[30];
+    char nameFile[30];
+    int k = 2;
+
+    //getting the name form the entry
+    while (argv[0][k] != '.') {
+        printf("%c\n", argv[0][k]);
+        problemName[k - 2] = argv[0][k];
+        k++;
+    }
+    problemName[k - 2] = '\0';
+    sprintf(nameFile, "%s.txt", problemName); // argv[0]
+
     file = fopen(nameFile, "a");
     char buffer[MAX_LINE_LENGTH] = "group, algorithm, heuristic, domain, instance, cost, h0, generated, time, gen_per_sec\n ";
 
     if( file == NULL ) {
-        // the file did not exist
-        fwrite (buffer , sizeof(char), sizeof(buffer), file);
-
-        if( file == NULL ) {
-            fprintf(stderr, "could not open %s for writing\n", argv[2]);
-            exit(-1);
-        }
+        fprintf(stderr, "could not open %s for writing\n", argv[2]);
+        exit(-1);
     }
 
     // write to file
     memset(buffer, 0, MAX_LINE_LENGTH);
-    sprintf(buffer, "X, A*, gap, %s, \" ", argv[0]);
+    sprintf(buffer, "X, A*, gap, %s, \" ", problemName);
     fwrite (buffer , sizeof(char), sizeof(buffer), file);
     print_state(file, &state);
 
-    // search
+    /**********************************   A* search   **********************************/
     while (!open.Empty()){
-        // get current distance from goal; since operator costs are
-        // non-negative this distance is monotonically increasing
-        // d = open.CurrentPriority();
 
         // remove top state from priority state
         state = open.Top();
