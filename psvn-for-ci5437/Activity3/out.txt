@@ -1,0 +1,1 @@
+grupo, algorithm, domain, instance, cost, generated, time, gen_per_sec

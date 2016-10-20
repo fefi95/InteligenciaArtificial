@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <fstream>
-
+#include <ctime>
 
 using namespace std;
 
@@ -17,94 +17,93 @@ string convertInt(int number){
 }
 
 // Let you obtain the total nodes on the actual label.
-unsigned long long int bounded_dfs_visit(state_t* state, int deep, int bound, int history){
+int bounded_dfs_visit(state_t* state, int deep, int bound, int history){
+
   int ruleid;
   state_t child;
-  unsigned long long int numNodoAct = 0;
   ruleid_iterator_t iter;
 
-  if (deep == bound) return 1;
-  else{
+  if (deep > bound) return -1;
+  if (is_goal(state)) return deep;
 
-    init_bwd_iter(&iter, state);
-
-    if (is_goal(state)) {
-        // print the distance then the state
-        //printf("the cost of the path is: %d\n",);
-        return numNodoAct + 1;
-    }
-
-    while( (ruleid = next_ruleid(&iter)) >= 0 ){
-
-      if (bwd_rule_valid_for_history(history, ruleid) != 0){
-        apply_bwd_rule(ruleid, state, &child);
-        int nextHistory = next_bwd_history(history, ruleid);
-
-        unsigned long long int totalAux = bounded_dfs_visit(&child, deep + 1, bound, nextHistory);
-        numNodoAct += totalAux;
-      }
+  init_bwd_iter(&iter, state);
+  while( (ruleid = next_ruleid(&iter)) >= 0 ){
+    if (bwd_rule_valid_for_history(history, ruleid) != 0){
+      apply_bwd_rule(ruleid, state, &child);
+      int nextHistory = next_bwd_history(history, ruleid);
+      int costAux = bounded_dfs_visit(&child, deep + 1, bound, nextHistory);
+      if (costAux != -1) return costAux;
     }
   }
 
-  return numNodoAct + 1;
+  return -1;
 }
 
 // Let you use the Iterative Deepening DFS.
-void iterative_deepening_depth_first_search(int bound, state_t* state)
+int iterative_deepening_depth_first_search(state_t* state)
 {
   //int goal_num;                               // ID of the goal condition.
   unsigned long long int totalNodes = 0;       // Total nodes on the actual bound.
   unsigned long long int oldTotalNodes = 0;    // Total nodes on the last bound.
-  int cost = 0;
+  int bound = 0;
+  int cost = -1;
 
+  time_t endwait;
+  time_t start = time(NULL);
+  time_t seconds = 600; // after 20s, end loop.
+  endwait = start + seconds;
 
   // Perform depth-bounded searches with increasing depth bounds.
-  for (int i = 0; i <= bound; i++){
+  while (start < endwait){
       int history = init_history;
-      totalNodes = bounded_dfs_visit(state, 0, i, history);
-      cout << "Deep " + convertInt(i) + ": ";
-      cout << convertInt(totalNodes - oldTotalNodes) + '\n';
-      oldTotalNodes = totalNodes;
+      cost = bounded_dfs_visit(state, 0, bound, history);
+      if (cost != -1) return cost;
+      bound += 1;
+      start = time(NULL);
+      printf("loop time is : %s", ctime(&start));
   }
 
-  // Print the total nodes of every label.
-
+  return -1;
 }
 
 int main(int argc, char **argv){
 
+  // Input file.
   char const* const fileName = argv[1]; /* should check that argc > 1 */
-  FILE* fileIn = fopen(fileName, "r"); /* should check the result */
-  char state_line[500];
+  FILE* fileIn = fopen(fileName, "r");
+  char state_line[500];                 /* The state to use. */
 
   // Output file
   ofstream fileOut;
   fileOut.open(argv[2]);
 
-  ssize_t nchars;
-  state_t state; // state_t is defined by the PSVN API. It is the type used for individual states.
+  ssize_t nchars;     /* Char amount readed */
+  state_t state;      /* Initial State. */
 
-  // Perform depth-bounded searches with increasing depth bounds.
+  int bound;          /* Limit deep. */
+  char buffer[1000];  /* FOR TESTING. */
+  int cost;
 
-  int bound = 0;
-  char buffer[1000];
-  fileOut << "grupo, algorithm, domain, instance, cost, generated, time, gen_per_sec";
+  /* Header for the out file. */
+  fileOut << "grupo, algorithm, domain, instance, cost, generated, time, gen_per_sec\n";
+
+  /* While exist states to read... */
   while (fgets(state_line, sizeof(state_line), fileIn))  {
-      bound = 0;
-      sprintf(buffer, "El estado inicial es: %s \n", state_line);
+      sprintf(buffer, "%s", state_line);
       cout << buffer;
+
+      /* Convert the string to an actual state. */
       nchars = read_state(state_line, &state);
-      while(1){
-        if (is_goal(&state)) {
-            // print the distance then the state
-            //printf("the cost of the path is: %d\n",);
-            cout << "SALI!";
-            break;
-        }
-        iterative_deepening_depth_first_search(bound, &state);
-        bound++;
-      }
+      bound = 0;
+
+      // fileOut << "X, dfid, pancake16, \"";
+      // fileOut << buffer;
+      // fileOut << "\",";
+
+      cost = iterative_deepening_depth_first_search(&state);
+      cout << "cost: " + convertInt(cost) + "\n";
   }
 
   fclose(fileIn);
+  fileOut.close();
 }
