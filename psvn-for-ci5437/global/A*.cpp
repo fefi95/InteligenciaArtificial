@@ -10,7 +10,7 @@
 #include <vector>
 #include <time.h>
 #include "priority_queue.hpp"
-#include "gap_heuristic.hpp"
+#include "heuristic.hpp"
 
 #define  MAX_LINE_LENGTH 999
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
     //getting the name form the entry
     while (argv[0][k] != '.') {
-        printf("%c\n", argv[0][k]);
+        // printf("%c\n", argv[0][k]);
         problemName[k - 2] = argv[0][k];
         k++;
     }
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 
         if (is_goal(&state)) {
             // print the distance then the state
-            printf("the cost of the path is: %d\n", g);
+            printf("the cost of the path is: %d and h0 is: %d\n", g, h0);
             memset(buffer, 0, MAX_LINE_LENGTH);
             sprintf(buffer, "\", %d, ", g);
             fwrite (buffer , sizeof(char), sizeof(buffer), file);
@@ -118,9 +118,9 @@ int main(int argc, char **argv) {
         // expand node
         init_fwd_iter(&iter, &state);  // initialize the child iterator
         while( (ruleid = next_ruleid(&iter)) >= 0 ) {
-            if (fwd_rule_valid_for_history(history, ruleid) != 0){
+            // if (fwd_rule_valid_for_history(history, ruleid) != 0){
                 apply_fwd_rule(ruleid, &state, &child);
-                history = next_fwd_history(history, ruleid);
+                // history = next_fwd_history(history, ruleid);
 
                 // child's cost using the heuristic
                 const int child_g = g + get_fwd_rule_cost(ruleid);
@@ -140,11 +140,11 @@ int main(int argc, char **argv) {
                     open.Add(child_f, child_f, child);
                 }
                 generated++;
-            }
+            // }
         }
         generated++;
     }
-    
+
     memset(buffer, 0, MAX_LINE_LENGTH);
     double timeElapsed = (double)(clock() - timeC)/CLOCKS_PER_SEC;
     sprintf(buffer, "%d, %d, %.7f, %.4f\n", h0, generated, timeElapsed, generated/timeElapsed);
