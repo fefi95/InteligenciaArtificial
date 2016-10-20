@@ -31,11 +31,11 @@ int heuristic(state_t *state) {
             coordStatei = div (statei, m);
             tileCost = abs(coordI.quot - coordStatei.quot) + abs(coordI.rem - coordStatei.rem);
             cost += tileCost;
-            printf("the state var is %d and it's tileCost: %d\n", statei, tileCost);
+            // printf("the state var is %d and it's tileCost: %d\n", statei, tileCost);
         }
 
     }
-    printf("Manhattan cost: %d\n",cost);
+    // printf("Manhattan cost: %d\n",cost);
     return cost;
 
 }
