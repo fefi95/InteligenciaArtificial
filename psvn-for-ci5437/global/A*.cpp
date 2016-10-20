@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
     char buffer[MAX_LINE_LENGTH] = "group, algorithm, heuristic, domain, instance, cost, h0, generated, time, gen_per_sec\n ";
 
     if( file == NULL ) {
-        fprintf(stderr, "could not open %s for writing\n", argv[2]);
+        fprintf(stderr, "could not open %s for writing\n", nameFile);
         exit(-1);
     }
 
@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
         }
         generated++;
     }
+    
     memset(buffer, 0, MAX_LINE_LENGTH);
     double timeElapsed = (double)(clock() - timeC)/CLOCKS_PER_SEC;
     sprintf(buffer, "%d, %d, %.7f, %.4f\n", h0, generated, timeElapsed, generated/timeElapsed);
