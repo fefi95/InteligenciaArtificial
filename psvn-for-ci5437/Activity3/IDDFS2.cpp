@@ -9,6 +9,8 @@
 
 using namespace std;
 
+int cost = -1;
+
 // Let you convert an integer to string.
 string convertInt(int number){
   ostringstream ss; // Create a stringstream.
@@ -17,53 +19,56 @@ string convertInt(int number){
 }
 
 // Let you obtain the total nodes on the actual label.
-int bounded_dfs_visit(state_t* state, int deep, int bound, int history){
+int64_t bounded_dfs_visit(state_t* state, int deep, int bound, int history){
 
   int ruleid;
   state_t child;
   ruleid_iterator_t iter;
+  int64_t numNodoAct = 0;
+  cost = -1;
 
-  if (deep > bound) return -1;
-  if (is_goal(state)) return deep;
+  if (deep > bound) return numNodoAct + 1;
+  if (is_goal(state)){
+    cost = deep;
+    return numNodoAct + 1;
+  }
 
   init_bwd_iter(&iter, state);
   while( (ruleid = next_ruleid(&iter)) >= 0 ){
     if (bwd_rule_valid_for_history(history, ruleid) != 0){
       apply_bwd_rule(ruleid, state, &child);
       int nextHistory = next_bwd_history(history, ruleid);
-      int costAux = bounded_dfs_visit(&child, deep + 1, bound, nextHistory);
-      if (costAux != -1) return costAux;
+      int64_t totalAux = bounded_dfs_visit(&child, deep + 1, bound, nextHistory);
+      numNodoAct += totalAux;
+      if (cost != -1) return numNodoAct + 1;
     }
   }
 
-  return -1;
+  return numNodoAct + 1;
 }
 
 // Let you use the Iterative Deepening DFS.
-int iterative_deepening_depth_first_search(state_t* state)
+int64_t iterative_deepening_depth_first_search(state_t* state)
 {
   //int goal_num;                               // ID of the goal condition.
-  unsigned long long int totalNodes = 0;       // Total nodes on the actual bound.
-  unsigned long long int oldTotalNodes = 0;    // Total nodes on the last bound.
   int bound = 0;
-  int cost = -1;
+  //int cost = -1;
+  clock_t start_t, end_t, total_t;
 
-  time_t endwait;
-  time_t start = time(NULL);
-  time_t seconds = 600; // after 20s, end loop.
-  endwait = start + seconds;
+  start_t = clock();
+  end_t = clock() + 30;
+
+  int64_t totalNodes = 0;
 
   // Perform depth-bounded searches with increasing depth bounds.
-  while (start < endwait){
+  while (start_t < end_t){
       int history = init_history;
-      cost = bounded_dfs_visit(state, 0, bound, history);
-      if (cost != -1) return cost;
+      totalNodes += bounded_dfs_visit(state, 0, bound, history);
+      if (cost != -1) return totalNodes;
       bound += 1;
-      start = time(NULL);
-      printf("loop time is : %s", ctime(&start));
   }
 
-  return -1;
+  return totalNodes;
 }
 
 int main(int argc, char **argv){
@@ -82,13 +87,14 @@ int main(int argc, char **argv){
 
   int bound;          /* Limit deep. */
   char buffer[1000];  /* FOR TESTING. */
-  int cost;
+  //int cost;
 
   /* Header for the out file. */
   fileOut << "grupo, algorithm, domain, instance, cost, generated, time, gen_per_sec\n";
 
   /* While exist states to read... */
   while (fgets(state_line, sizeof(state_line), fileIn))  {
+      cost = 0;
       sprintf(buffer, "%s", state_line);
       cout << buffer;
 
@@ -100,8 +106,10 @@ int main(int argc, char **argv){
       // fileOut << buffer;
       // fileOut << "\",";
 
-      cost = iterative_deepening_depth_first_search(&state);
+      cout << "------------------------------------------------ \n";
+      int64_t totalNodes = iterative_deepening_depth_first_search(&state);
       cout << "cost: " + convertInt(cost) + "\n";
+      cout << "totalNodes: " + convertInt(totalNodes) + "\n";
   }
 
   fclose(fileIn);
