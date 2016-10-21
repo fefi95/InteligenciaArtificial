@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
         k++;
     }
     problemName[k - 2] = '\0';
-    sprintf(nameFile, "%s_A*_result.txt", problemName); // argv[0]
+    sprintf(nameFile, "%s_A*_result.csv", problemName); // argv[0]
 
     file = fopen(nameFile, "a");
     char buffer[MAX_LINE_LENGTH];
