@@ -52,8 +52,10 @@ int main(int argc, char **argv) {
 
     // variables needed for information in output file
     int generated = 1;
-    clock_t timeStart = clock();
-    clock_t timeEnd;
+    clock_t clockStart;
+    clock_t clockEnd;
+    time_t timeStart;
+    time_t timeEnd;
     double timeElapsed;
 
     // initial state's cost
@@ -91,6 +93,9 @@ int main(int argc, char **argv) {
     print_state(file, &state);
 
     /**********************************   A* search   **********************************/
+    clockStart = clock();
+    timeStart = time(0);
+
     while (!open.Empty()){
 
         // remove top state from priority state
@@ -101,9 +106,6 @@ int main(int argc, char **argv) {
         const int *state_hist = state_map_get(historyMap, &state);
         history = *state_hist;
 
-        timeEnd = clock();
-        timeElapsed = double(timeEnd - timeStart) / CLOCKS_PER_SEC;
-
         if (is_goal(&state)) {
             // print the distance then the state
             printf("the cost of the path is: %d and h0 is: %d\n", g, h0);
@@ -112,20 +114,6 @@ int main(int argc, char **argv) {
             fwrite (buffer , sizeof(char), sizeof(buffer), file);
             break;
         }
-
-        // 300 seconds limit (5 min)
-        else if (timeElapsed > 300){
-            printf("Time limit exceeded. Aborted...\n");
-            strcpy(buffer, "na, na, na, na\n");
-            fwrite (buffer , sizeof(char), sizeof(buffer), file);
-            fclose(file);
-        }
-
-        // check if we already expanded this state.
-        // (entries on the open list are not deleted if a cheaper path to a state is found)
-        const int *best_dist = state_map_get(map, &state);
-        assert(best_dist != NULL);
-        if( *best_dist < g ) continue;
 
         // print state
         // printf("State: ");
@@ -136,6 +124,17 @@ int main(int argc, char **argv) {
         // expand node
         init_fwd_iter(&iter, &state);  // initialize the child iterator
         while( (ruleid = next_ruleid(&iter)) >= 0 ) {
+            // 300 seconds limit (5 min)
+            timeEnd = time(0);
+            timeElapsed = difftime(timeEnd, timeStart);
+            if (timeElapsed > 300){
+                printf("Time limit exceeded. Aborted...\n");
+                strcpy(buffer, "na, na, na, na\n");
+                fwrite (buffer , sizeof(char), sizeof(buffer), file);
+                fclose(file);
+                exit(-1);
+            }
+
             if (fwd_rule_valid_for_history(history, ruleid) != 0){
                 apply_fwd_rule(ruleid, &state, &child);
                 int child_history = next_fwd_history(history, ruleid);
@@ -162,7 +161,9 @@ int main(int argc, char **argv) {
             }
         }
     }
-
+    
+    clockEnd = clock();
+    timeElapsed = double(clockEnd - clockStart) / CLOCKS_PER_SEC;
     memset(buffer, 0, MAX_LINE_LENGTH);
     sprintf(buffer, "%d, %d, %.7f, %.4f\n", h0, generated, timeElapsed, generated/timeElapsed);
     fwrite (buffer , sizeof(char), sizeof(buffer), file);
