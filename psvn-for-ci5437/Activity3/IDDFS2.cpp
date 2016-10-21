@@ -21,7 +21,9 @@
 using namespace std;
 
 int cost = -1;  /* Contain the cost to find the goal. */
-clock_t start_t, end_t, aux_t;
+time_t start;
+time_t aux_time;
+time_t endwait;
 
 // Let you convert an integer to string.
 string convertInt(int number){
@@ -64,20 +66,22 @@ int64_t iterative_deepening_depth_first_search(state_t* state)
 {
   int bound = 0;
 
-  start_t = clock();
-  aux_t = start_t;
-  end_t = clock() + 600; /* 10min to stop the loop. */
+  start = time(NULL);
+  aux_time = start;
+
+  time_t seconds = 600; // after 10min, end loop.
+  endwait = start + seconds;
 
   int64_t totalNodes = 0;
 
   // Perform depth-bounded searches with increasing depth bounds.
-  while (start_t < end_t){
+  while (start < endwait){
       int history = init_history;
       totalNodes += bounded_dfs_visit(state, 0, bound, history);
       if (cost != -1) return totalNodes;
 
       bound += 1;
-      start_t = clock();
+      start = time(NULL);
   }
 
   return totalNodes;
@@ -118,7 +122,7 @@ int main(int argc, char **argv){
       int64_t totalNodes = iterative_deepening_depth_first_search(&state);
 
       /* Time when find the goal. */
-      goalTime = (float)(end_t - aux_t)/CLOCKS_PER_SEC;
+      goalTime = (float)(endwait - aux_time)/CLOCKS_PER_SEC;
 
       strtok(state_line, "\n");
       if (cost != -1)
