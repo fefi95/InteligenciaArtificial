@@ -33,10 +33,28 @@ psvn2c_abstraction.c:
 	$(CXX) $(OPT) ../../global/distSummary.cpp -include $< -o $@
 	rm -f $*.c
 
+%.IDDFS2: %.c ../../global/IDDFS2.cpp
+	$(CXX) $(OPT) ../../global/IDDFS2.cpp -include $< -o $@
+	rm -f $*.c
+
 %.A*: %.c heuristic.hpp ../../global/A*.cpp
 	$(CXX) $(OPT) ../../global/A*.cpp -include $< -o $@
 	rm -f $*.c ../../global/heuristic.hpp
 
+abstractor:
+	$(CXX) $(OPT) ../../src/abstractor.cpp ../../src/psvn.cpp -o $@
+
+%.pdb: abstractor
+	@rm -f `basename $*`.abst `basename $*`.pdb `basename $*`.psvn
+	./abstractor `dirname $*`.psvn `basename $*` < `basename $*`.txt
+	make `basename $*`.distSummary
+	echo Calculating `basename $*.pdb` ...
+	@./`basename $*`.distSummary `basename $*`.pdb
+
+%.dist_pdb: %.c ../../global/dist_pdb.cpp
+	$(CXX) $(OPT) ../../global/dist_pdb.cpp -include $< -o $@
+	rm -f $*.c
+
 .PHONY: clean
 clean:
-	rm -fr *.succ *.dist *.distSummary *.A* psvn2c_core.c psvn2c_state_map.c psvn2c_abstraction.c *.dSYM *.o *~
+	rm -fr *.succ *.dist *.distSummary *.A* *.dist_pdb psvn2c_core.c psvn2c_state_map.c psvn2c_abstraction.c abstractor *.dSYM *.o *~

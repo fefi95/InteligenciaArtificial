@@ -161,11 +161,11 @@ int main(int argc, char **argv) {
             }
         }
     }
-    
+
     clockEnd = clock();
     timeElapsed = double(clockEnd - clockStart) / CLOCKS_PER_SEC;
     memset(buffer, 0, MAX_LINE_LENGTH);
-    sprintf(buffer, "%d, %d, %.7f, %.4f\n", h0, generated, timeElapsed, generated/timeElapsed);
+    sprintf(buffer, "%d, %d, %.6f, %.5e\n", h0, generated, timeElapsed, generated/timeElapsed);
     fwrite (buffer , sizeof(char), sizeof(buffer), file);
     fclose(file);
 }

@@ -33,6 +33,10 @@ psvn2c_abstraction.c:
 	$(CXX) $(OPT) ../../global/distSummary.cpp -include $< -o $@
 	rm -f $*.c
 
+%.IDDFS2: %.c ../../global/IDDFS2.cpp
+	$(CXX) $(OPT) ../../global/IDDFS2.cpp -include $< -o $@
+	rm -f $*.c
+
 %.A*: %.c heuristic.hpp ../../global/A*.cpp
 	$(CXX) $(OPT) ../../global/A*.cpp -include $< -o $@
 	rm -f $*.c ../../global/heuristic.hpp
