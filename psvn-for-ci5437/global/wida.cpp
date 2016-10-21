@@ -5,8 +5,7 @@
     Jirlfe ...
     Stefani Castellanos 11-11394
 
-    This file contains the implementation for Iterative Deepening DFS algorithm
-    for the activity 3.
+    This file contains the implementation for WIDA*
 */
 
 #include <stdio.h>
@@ -48,8 +47,9 @@ pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, in
 
     int f = g + weight*heuristic(state);
 
-    timeEnd = time(0);
+    timeEnd = time(NULL);
     timeElapsed = difftime(timeEnd, timeStart);
+    // printf("%f\n", timeElapsed);
     if (timeElapsed > 300){
         assert("timeout");
     }
@@ -72,8 +72,7 @@ pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, in
         if (fwd_rule_valid_for_history(history, ruleid) != 0){
             apply_fwd_rule(ruleid, state, &child);
             int nextHistory = next_fwd_history(history, ruleid);
-            g++;
-            f_totalnodes = f_bounded_dfs_visit(&child, bound, nextHistory, g);
+            f_totalnodes = f_bounded_dfs_visit(&child, bound, nextHistory, g+1);
             numNodoAct += f_totalnodes.second; //amount of nodes
             f_totalnodes.second = numNodoAct;
             if (cost != -1) return f_totalnodes;
@@ -118,7 +117,6 @@ int main(int argc, char **argv){
     float goalTime;
 
     weight = atof(argv[5]);
-    printf("%.1f\n", weight);
 
     if (argc != 7)
     {
@@ -135,7 +133,7 @@ int main(int argc, char **argv){
 
         cost = 0;   /* On the beginning, the cost will be 0. */
         clockStart = clock();
-        timeStart = time(0);
+        timeStart = time(NULL);
         /* Convert the string to an actual state. */
         read_state(state_line, &state);
 
@@ -161,7 +159,6 @@ int main(int argc, char **argv){
         else
         fprintf(fileOut, "X, %s, %s, %.1f, %s, \"%s\", na, na, na, na\n", argv[3], argv[4], weight, argv[6], state_line);
     }
-
     fclose(fileIn);
     fclose(fileOut);
 }
