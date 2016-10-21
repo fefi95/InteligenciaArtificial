@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 OPT = -g -Wall -O3 -Wno-unused-function -Wno-unused-variable
-PSVNOPT = --state_map --no_abstraction --backwards_moves --history_len=1
+PSVNOPT = --state_map --no_abstraction --backwards_moves --history_len=2
 
 heuristic.hpp:
 	cp ./gap_heuristic.hpp ../../global/heuristic.hpp
@@ -41,6 +41,10 @@ psvn2c_abstraction.c:
 	$(CXX) $(OPT) ../../global/A*.cpp -include $< -o $@
 	rm -f $*.c ../../global/heuristic.hpp
 
+%.WIDA: %.c heuristic.hpp ../../global/wida.cpp
+	$(CXX) $(OPT) ../../global/wida*.cpp -include $< -o $@
+	rm -f $*.c ../../global/heuristic.hpp
+	
 .PHONY: clean
 clean:
 	rm -fr *.succ *.dist *.distSummary *.A* psvn2c_core.c psvn2c_state_map.c psvn2c_abstraction.c *.dSYM *.o *~

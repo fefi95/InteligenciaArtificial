@@ -157,9 +157,6 @@ int main(int argc, char **argv) {
     fwrite (buffer , sizeof(char), sizeof(buffer), fileOut);
 
     /**********************************   A* search   **********************************/
-    clockStart = clock();
-    timeStart = time(0);
-
     while (fgets(state_line, sizeof(state_line), fileIn))  {
 
         /* Convert the string to an actual state. */
@@ -169,7 +166,27 @@ int main(int argc, char **argv) {
         print_state(stdout, &state);
         printf("...\n");
 
-        g = A_star(&state);
+        clockStart = clock();
+        timeStart = time(0);
+
+        try {
+            g = A_star(&state);
+        }
+        catch (std::exception& e) {
+            // write to file
+            memset(buffer, 0, MAX_LINE_LENGTH);
+            sprintf(buffer, "X, A*, %s, %s, \" ", argv[3], problemName);
+            fwrite (buffer , sizeof(char), sizeof(buffer), fileOut);
+            print_state(fileOut, &state);
+            memset(buffer, 0, MAX_LINE_LENGTH);
+
+            if (g == -1){ //timeout
+                strcpy(buffer, "na, na, na, na\n");
+                fwrite (buffer , sizeof(char), sizeof(buffer), fileOut);
+            }
+            continue;
+        }
+
 
         clockEnd = clock();
 

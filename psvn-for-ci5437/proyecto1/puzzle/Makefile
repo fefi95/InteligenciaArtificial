@@ -41,6 +41,10 @@ psvn2c_abstraction.c:
 	$(CXX) $(OPT) ../../global/A*.cpp -include $< -o $@
 	rm -f $*.c ../../global/heuristic.hpp
 
+%.WIDA: %.c heuristic.hpp ../../global/wida.cpp
+	$(CXX) $(OPT) ../../global/wida.cpp -include $< -o $@
+	rm -f $*.c ../../global/heuristic.hpp
+
 abstractor:
 	$(CXX) $(OPT) ../../src/abstractor.cpp ../../src/psvn.cpp -o $@
 

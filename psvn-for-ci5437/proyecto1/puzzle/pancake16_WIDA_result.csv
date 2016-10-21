@@ -1,0 +1,2 @@
+grupo, algorithm, heuristic, weight, domain, instance, cost, h0, generated, time, gen_per_sec
+X, WIDA, manhattan, 1.5, 15puzzle "3 14 9 11 5 4 8 2 13 12 6 7 10 1 15 B", 96, 48, 640874, 0.42094, 1.52248e+06
