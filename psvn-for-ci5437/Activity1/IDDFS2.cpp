@@ -16,10 +16,10 @@ string convertInt(int number){
 }
 
 // Let you obtain the total nodes on the actual label.
-int64_t bounded_dfs_visit(state_t state, int deep, int bound, int history){
+unsigned long long int bounded_dfs_visit(state_t state, int deep, int bound, int history){
   int ruleid;
   state_t child;
-  int64_t numNodoAct = 0;
+  unsigned long long int numNodoAct = 0;
   ruleid_iterator_t iter;
 
   if (deep == bound) return 1;
@@ -32,7 +32,7 @@ int64_t bounded_dfs_visit(state_t state, int deep, int bound, int history){
       if (bwd_rule_valid_for_history(history, ruleid) != 0){
         apply_bwd_rule(ruleid, &state, &child);
         int nextHistory = next_bwd_history(history, ruleid);
-        int64_t totalAux = bounded_dfs_visit(child, deep + 1, bound, nextHistory);
+        unsigned long long int totalAux = bounded_dfs_visit(child, deep + 1, bound, nextHistory);
         numNodoAct += totalAux;
       }
     }
@@ -47,8 +47,8 @@ void iterative_deepening_depth_first_search()
   state_t state;                // Actual state.
   int goal_num;                 // ID of the goal condition.
   int bound;                    // The deep bound.
-  int64_t totalNodes = 0;       // Total nodes on the actual bound.
-  int64_t oldTotalNodes = 0;    // Total nodes on the last bound.
+  unsigned long long int totalNodes = 0;       // Total nodes on the actual bound.
+  unsigned long long int oldTotalNodes = 0;    // Total nodes on the last bound.
 
   cout << "ENTER THE BOUND DEEP: ";
   cin >> bound;
