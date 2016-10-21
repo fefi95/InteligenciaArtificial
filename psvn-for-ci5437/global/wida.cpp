@@ -36,6 +36,42 @@ string convertInt(int number){
   return ss.str();  // Return a string with the content of the stream.
 }
 
+int idaVisit(state_t state, int bound, int maxBound,int hist){
+
+	int ruleID, nextHist, aux;
+	ruleid_iterator_t iter;
+	state_t child;
+
+	endt = time(NULL);
+	secs = difftime(endt,begint);
+	if(secs > 300 || limit){	// 5 minutes
+		limit = true;
+		return 0;
+	}
+	int f = bound + manhatan(state);
+	if ( f > maxBound){
+		return -f;
+	}
+	if (is_goal(&state)){
+		return bound;
+	}
+
+	init_fwd_iter(&iter,&state);
+	int t = 300000;
+	while ((ruleID = next_ruleid(&iter)) >= 0){
+		if (!fwd_rule_valid_for_history(hist,ruleID)) continue;
+
+		nextHist = next_fwd_history(hist,ruleID);
+		apply_fwd_rule(ruleID, &state, &child);
+		nodes_generated++;
+
+		aux = idaVisit(child,bound+1,maxBound,nextHist);
+		if (aux > -1) return aux;
+		t = min(t,-aux);
+	}
+	return -t;
+}
+
 // Let you obtain the total nodes on the actual label.
 pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, int g){
 
@@ -57,7 +93,6 @@ pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, in
     if (f > bound) {
         f_totalnodes.first = f;
         f_totalnodes.second = numNodoAct + 1;
-        cost = -1;
         return f_totalnodes;
     }
     if (is_goal(state)){
@@ -67,8 +102,10 @@ pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, in
         return f_totalnodes;
     }
 
+    int min = 200000; //infinity
     init_fwd_iter(&iter, state);
     while( (ruleid = next_ruleid(&iter)) >= 0 ){
+
         if (fwd_rule_valid_for_history(history, ruleid) != 0){
             apply_fwd_rule(ruleid, state, &child);
             int nextHistory = next_fwd_history(history, ruleid);
@@ -76,6 +113,10 @@ pair<int,int64_t> f_bounded_dfs_visit(state_t* state, int bound, int history, in
             numNodoAct += f_totalnodes.second; //amount of nodes
             f_totalnodes.second = numNodoAct;
             if (cost != -1) return f_totalnodes;
+
+            if (f_totalnodes.first < min) {
+                min = f_totalnodes.first;
+            }
         }
     }
     return f_totalnodes;
