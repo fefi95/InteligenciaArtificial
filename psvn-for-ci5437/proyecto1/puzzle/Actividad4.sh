@@ -2,11 +2,5 @@
 
 filename="../../instances/15puzzle_korf.txt"
 
-make 15Puzzle.A*
-echo "group, algorithm, heuristic, domain, instance, cost, h0, generated, time, gen_per_sec" > 15Puzzle_A*_result.csv
-
-while read -r line
-do
-    ./15Puzzle.A* manhattan "$line"
-    printf "$line\n"
-done < "$filename"
+make 15Puzzle.WIDA
+./15Puzzle.WIDA $filename "15puzzle_IDA_Actividad4.csv" IDA manhattan 1.0 15puzzle
