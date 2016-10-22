@@ -42,9 +42,9 @@ psvn2c_abstraction.c:
 	rm -f $*.c ../../global/heuristic.hpp
 
 %.WIDA: %.c heuristic.hpp ../../global/wida.cpp
-	$(CXX) $(OPT) ../../global/wida*.cpp -include $< -o $@
+	$(CXX) $(OPT) ../../global/wida.cpp -include $< -o $@
 	rm -f $*.c ../../global/heuristic.hpp
-	
+
 .PHONY: clean
 clean:
 	rm -fr *.succ *.dist *.distSummary *.A* psvn2c_core.c psvn2c_state_map.c psvn2c_abstraction.c *.dSYM *.o *~
