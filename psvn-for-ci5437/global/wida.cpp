@@ -17,34 +17,42 @@
 #include <fstream>
 #include <ctime>
 #include "heuristic.hpp"
+#include <algorithm>
 
 using namespace std;
 
+unsigned long long int totalNodes;
+unsigned long long int lqs;
+
+int cost = -1;  /* Contains the cost to find the goal. */
+int h0;  /* Contains the cost to find the goal. */
 clock_t clockStart;
 clock_t clockEnd;
 time_t timeStart;
 time_t timeEnd;
 double timeElapsed;
 float weight;
-int64_t totalNodes;
 
-// Let you convert an integer to string.
+// Lets you convert an integer to string.
 string convertInt(int number){
   ostringstream ss; // Create a stringstream.
   ss << number;     // Add number to the stream
   return ss.str();  // Return a string with the content of the stream.
 }
 
-// Let you obtain the total nodes on the actual label.
-std::pair<int,int> f_bounded_dfs_visit(state_t state, int bound, int history, int g){
+
+pair<int,int> bounded_dfs_visit(state_t* state, int history, int g, int bound){
 
     int ruleid;
     state_t child;
     ruleid_iterator_t iter;
-    int64_t numNodoAct = 0;
-    std::pair<int,int> n;
 
-    int f = g + weight*heuristic(&state);
+    pair<int,int>act_node;
+    pair<int,int>result;
+
+    int nextHistory;
+
+    int f = g + weight*heuristic(state);
 
     timeEnd = time(NULL);
     timeElapsed = difftime(timeEnd, timeStart);
@@ -54,31 +62,55 @@ std::pair<int,int> f_bounded_dfs_visit(state_t state, int bound, int history, in
     }
 
     if (f > bound) {
-        n.first = -1;
-        n.second = f;
-        return n;
+        act_node.first = -1;
+        act_node.second = f;
+        return act_node;
     }
-    if (is_goal(&state)){
-        n.first = 0;
-        n.second = g;
-        return n;
+    if (is_goal(state)){
+        act_node.first = 0;
+        act_node.second = g;
+        return act_node;
     }
 
-    int t = 2000000; //infinity
-    init_fwd_iter(&iter, &state);
-    while( (ruleid = next_ruleid(&iter)) >= 0 ){
+    int mint = 200000; /* infinity */
+    init_fwd_iter(&iter, state);
+    while ( (ruleid = next_ruleid(&iter)) >= 0 ){
         if (fwd_rule_valid_for_history(history, ruleid) != 0){
-            apply_fwd_rule(ruleid, &state, &child);
-            int nextHistory = next_fwd_history(history, ruleid);
-            totalNodes++;
-            std::pair<int,int> p = f_bounded_dfs_visit(child, bound, nextHistory, g+1);
-            if (p.first != -1) return p;
-            t = min(t, p.second);
+
+            nextHistory = next_fwd_history(history, ruleid);
+            apply_fwd_rule(ruleid, state, &child);
+            ++totalNodes;
+            result = bounded_dfs_visit(&child, nextHistory, g+1, bound);
+            if (result.first >=  0) {result.first = result.first + 1; return result;};
+            mint = min(mint, result.second);
+
         }
     }
-    n.first = -1;
-    n.second = t;
-    return n;
+
+    act_node.first = -1;
+    act_node.second = mint;
+    return act_node;
+}
+
+// Lets you use the Iterative Deepening DFS.
+pair<int,int> IDA_search(state_t* state)
+{
+
+  pair<int,int> result;
+  int bound = weight*heuristic(state);
+  h0 = bound;
+
+  ++totalNodes;
+
+  // Performs depth-bounded searches with increasing depth bounds.
+  while (true){
+      int history = init_history;
+      result = bounded_dfs_visit(state, history, 0, bound);
+      if (result.first >=  0) return result;
+      bound = result.second;
+  }
+
+  return result;
 }
 
 
@@ -96,8 +128,7 @@ int main(int argc, char **argv){
     char buffer[1000];
     float goalTime;
 
-    int cost = 0;  /* Contain the cost to find the goal. */
-    int h0;  /* Contain the cost to find the goal. */
+    std::pair<int,int> result;
 
     weight = atof(argv[5]);
 
@@ -113,10 +144,12 @@ int main(int argc, char **argv){
 
     /* While exist states to read... */
     while (fgets(state_line, sizeof(state_line), fileIn))  {
-
+        totalNodes = 0;
+        cost = 0;   /* On the beginning, the cost will be 0. */
         clockStart = clock();
         timeStart = time(NULL);
         /* Convert the string to an actual state. */
+        ++totalNodes;
         read_state(state_line, &state);
 
         printf("Solving :");
@@ -124,23 +157,11 @@ int main(int argc, char **argv){
         printf("...\n");
 
         try {
-            int bound = weight*heuristic(&state);
-            h0 = bound;
-            totalNodes = 0;
-            // Perform depth-bounded searches with increasing depth bounds.
-            while (true){
-                int history = init_history;
-                std::pair<int,int> p = f_bounded_dfs_visit(state, bound, history, 0);
-                if (p.first != -1) {
-                    cost = p.second;
-                    break; //costo
-                }
-                bound += p.second;
-            }
+            result = IDA_search(&state);
+            cost   = result.first;
         }
         catch (std::exception& e) {
             fprintf(fileOut, "X, %s, %s, %.1f, %s, \"%s\", na, na, na, na\n", argv[3], argv[4], weight, argv[6], state_line);
-            continue;
         }
 
         /* Time when find the goal. */
