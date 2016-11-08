@@ -172,3 +172,51 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
 
     return alpha;
 }
+
+/**
+* Negamax with alpha-beta prunning
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param alpha: represents the maximum value for Max nodes
+* @param beta: represents the minimum value for Min nodes
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_tt) {
+
+    state_t child;
+    bool player = color > 0; // black = even numbers
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return color * state.value();
+    }
+
+    int score = -INFINITY;
+    int val;
+    bool pass = true;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            // child.print(cout, depth);
+            // std::cout << "depth = " << depth << std::endl;
+            pass = false; // some child was generated hence player did not pass
+            val = -negamax(child, depth + 1, -beta, -alpha, -color, use_tt);
+            score = max(score, val);
+            alpha = max(alpha, val);
+            if (alpha >= beta) break; // alpha-beta cut-off
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
+        val = -negamax(state, depth + 1, -beta, -alpha, -color, use_tt);
+        score = max(score, val);
+    }
+
+    return score;
+}
