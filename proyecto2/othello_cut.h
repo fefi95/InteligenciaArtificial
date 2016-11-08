@@ -1,17 +1,17 @@
 /*
  *  Copyright (C) 2012 Universidad Simon Bolivar
- * 
+ *
  *  Permission is hereby granted to distribute this software for
  *  non-commercial research purposes, provided that this copyright
  *  notice is included with any such distribution.
- *  
+ *
  *  THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
  *  EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
  *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
  *  PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
  *  SOFTWARE IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
  *  ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
- *  
+ *
  *  Blai Bonet, bonet@ldc.usb.ve
  *
  *  Last revision: 1/11/2016
@@ -26,6 +26,23 @@
 #define DIM           36
 #define N             6
 
+
+/*
+    Othello's board representation: (-1 positions are not valid)
+
+                            || 4 | 5 | 6 | 7 | 8 | 9 || -1|
+                        | -1|| 10| 11| 12| 13| 14| 15|| -1|
+                    | -1| -1|| 16| 17| 0 | 1 | 18| 19|| -1| -1|
+                | -1| -1| -1|| 20| 21| 2 | 3 | 22| 23|| -1| -1| -1|
+            | -1| -1| -1| -1|| 24| 25| 26| 27| 28| 29|| -1| -1| -1| -1|
+        | -1| -1| -1| -1| -1|| 30| 31| 32| 28| 34| 35|| -1| -1| -1| -1| -1|
+    | -1| -1| -1| -1| -1| -1 | -1| -1| -1| -1| -1| -1 | -1| -1| -1| -1| -1| -1|
+                        | -1 | -1| -1| -1| -1| -1| -1 | -1|
+                        | -1 | -1| -1| -1| -1| -1| -1 | -1|
+                        | -1 | -1| -1|       | -1| -1 | -1|
+                        | -1 | -1|               | -1 | -1|
+                        | -1 |                        | -1|
+*/
 const int rows[][7] = {
     { 4, 5, 6, 7, 8, 9,-1 }, { 4, 5, 6, 7, 8, 9,-1 }, { 4, 5, 6, 7, 8, 9,-1 },
     { 4, 5, 6, 7, 8, 9,-1 }, { 4, 5, 6, 7, 8, 9,-1 }, { 4, 5, 6, 7, 8, 9,-1 },
@@ -84,6 +101,8 @@ const int dia2[][7] = {
 };
 
 // moves on the principal variation
+// odd positions represents the black player move in the board
+// even positions represents the white player move in the board
 static int PV[] = {
     12, 21, 26, 13, 22, 18,  7,  6,  5, 27, 33, 23, 17, 11, 19, 15,
     14, 31, 20, 32, 30, 10, 25, 24, 34, 28, 16,  4, 29, 35, 36,  8,
@@ -91,8 +110,8 @@ static int PV[] = {
 };
 
 class state_t {
-    unsigned char t_; 
-    unsigned free_;
+    unsigned char t_;
+    unsigned free_; //bit representation of the grid's free spaces.
     unsigned pos_;
 
   public:
@@ -198,7 +217,29 @@ inline bool state_t::outflank(bool color, int pos) const {
         if( (p < x - 1) && (p >= cols[pos - 4]) && !is_free(*p) ) return true;
     }
 
-    // [CHECK OVER DIAGONALS REMOVED]
+    // Check diagonal 1
+    x = dia1[pos - 4];
+    while( *x != pos ) ++x;
+    if( *(x+1) != -1 ) {
+        for( p = x + 1; (*p != -1) && !is_free(*p) && (color ^ is_black(*p)); ++p );
+        if( (p > x + 1) && (*p != -1) && !is_free(*p) ) return true;
+    }
+    if( x != dia1[pos - 4] ) {
+        for( p = x - 1; (p >= dia1[pos - 4]) && !is_free(*p) && (color ^ is_black(*p)); --p );
+        if( (p < x - 1) && (p >= dia1[pos - 4]) && !is_free(*p) ) return true;
+    }
+
+    // Check diagonal 2
+    x = dia2[pos - 4];
+    while( *x != pos ) ++x;
+    if( *(x+1) != -1 ) {
+        for( p = x + 1; (*p != -1) && !is_free(*p) && (color ^ is_black(*p)); ++p );
+        if( (p > x + 1) && (*p != -1) && !is_free(*p) ) return true;
+    }
+    if( x != dia2[pos - 4] ) {
+        for( p = x - 1; (p >= dia2[pos - 4]) && !is_free(*p) && (color ^ is_black(*p)); --p );
+        if( (p < x - 1) && (p >= dia2[pos - 4]) && !is_free(*p) ) return true;
+    }
 
     return false;
 }
@@ -225,7 +266,10 @@ inline state_t state_t::move(bool color, int pos) const {
     state_t s(*this);
     if( pos >= DIM ) return s;
 
-    assert(outflank(color, pos));
+    // assert(outflank(color, pos));
+    if (!outflank(color, pos)) {
+        throw false;
+    }
     s.set_color(color, pos);
 
     // Flip color of outflanked stones
@@ -262,7 +306,37 @@ inline state_t state_t::move(bool color, int pos) const {
         }
     }
 
-    // [PROCESS OF DIAGONALS REMOVED]
+    // Process diagonal 1
+    x = dia1[pos - 4];
+    while( *x != pos ) ++x;
+    if( *(x+1) != -1 ) {
+        for( p = x + 1; (*p != -1) && !is_free(*p) && (color ^ is_black(*p)); ++p );
+        if( (p > x + 1) && (*p != -1) && !is_free(*p) ) {
+            for( const int *q = x + 1; q < p; ++q ) s.set_color(color, *q);
+        }
+    }
+    if( x != dia1[pos - 4] ) {
+        for( p = x - 1; (p >= dia1[pos - 4]) && !is_free(*p) && (color ^ is_black(*p)); --p );
+        if( (p < x - 1) && (p >= dia1[pos - 4]) && !is_free(*p) ) {
+            for( const int *q = x - 1; q > p; --q ) s.set_color(color, *q);
+        }
+    }
+
+    // Process diagonal 2
+    x = dia2[pos - 4];
+    while( *x != pos ) ++x;
+    if( *(x+1) != -1 ) {
+        for( p = x + 1; (*p != -1) && !is_free(*p) && (color ^ is_black(*p)); ++p );
+        if( (p > x + 1) && (*p != -1) && !is_free(*p) ) {
+            for( const int *q = x + 1; q < p; ++q ) s.set_color(color, *q);
+        }
+    }
+    if( x != dia2[pos - 4] ) {
+        for( p = x - 1; (p >= dia2[pos - 4]) && !is_free(*p) && (color ^ is_black(*p)); --p );
+        if( (p < x - 1) && (p >= dia2[pos - 4]) && !is_free(*p) ) {
+            for( const int *q = x - 1; q > p; --q ) s.set_color(color, *q);
+        }
+    }
 
     return s;
 }
@@ -305,4 +379,3 @@ inline std::ostream& operator<<(std::ostream &os, const state_t &state) {
     state.print(os);
     return os;
 }
-
