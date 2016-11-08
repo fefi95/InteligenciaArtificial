@@ -156,8 +156,8 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            child.print(cout, depth);
-            std::cout << "depth = " << depth << std::endl;
+            // child.print(cout, depth);
+            // std::cout << "depth = " << depth << std::endl;
             // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
             alpha = max(alpha, -negamax(child, depth + 1, -color, use_tt));
