@@ -2,7 +2,7 @@
 // Universidad Simon Bolivar, 2012.
 // Author: Blai Bonet
 // Last Revision: 1/11/16
-// Modified by: 
+// Modified by:
 
 #include <iostream>
 #include <limits>
@@ -16,6 +16,7 @@ using namespace std;
 unsigned expanded = 0;
 unsigned generated = 0;
 int tt_threshold = 32; // threshold to save entries in TT
+int INFINITY = std::numeric_limits<int>::max();
 
 // Transposition table
 struct stored_info_t {
@@ -102,7 +103,7 @@ int main(int argc, const char **argv) {
             if( algorithm == 0 ) {
                 //value = color * (color == 1 ? maxmin(pv[i], 0, use_tt) : minmax(pv[i], 0, use_tt));
             } else if( algorithm == 1 ) {
-                //value = negamax(pv[i], 0, color, use_tt);
+                value = negamax(pv[i], 0, color, use_tt);
             } else if( algorithm == 2 ) {
                 //value = negamax(pv[i], 0, -200, 200, color, use_tt);
             } else if( algorithm == 3 ) {
@@ -130,3 +131,44 @@ int main(int argc, const char **argv) {
     return 0;
 }
 
+/**
+* Negamax without alpha-beta prunning
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int negamax(state_t state, int depth, int color, bool use_tt) {
+
+    state_t child;
+    bool player = color > 0; // black = even numbers
+
+    // std::cout << "holis" << std::endl;
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return color * state.value();
+    }
+
+    int alpha = -INFINITY;
+    bool pass = true;
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            child.print(cout, depth);
+            std::cout << "depth = " << depth << std::endl;
+            // std::cout << "booo" << std::endl;
+            pass = false; // some child was generated hence player did not pass
+            alpha = max(alpha, -negamax(child, depth + 1, -color, use_tt));
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
+        alpha = max(alpha, -negamax(state, depth + 1, -color, use_tt));
+    }
+
+    return alpha;
+}

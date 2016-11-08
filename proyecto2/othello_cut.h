@@ -266,10 +266,7 @@ inline state_t state_t::move(bool color, int pos) const {
     state_t s(*this);
     if( pos >= DIM ) return s;
 
-    // assert(outflank(color, pos));
-    if (!outflank(color, pos)) {
-        throw false;
-    }
+    assert(outflank(color, pos));
     s.set_color(color, pos);
 
     // Flip color of outflanked stones
