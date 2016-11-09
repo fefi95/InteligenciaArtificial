@@ -153,13 +153,11 @@ int minmax(state_t state, int depth, bool use_tt) {
     int score = INFINITY;
     bool pass = true;
 
+    ++expanded;
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
-            // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
             ++generated;
             score = min(score, maxmin(child, depth + 1, use_tt));
@@ -168,7 +166,6 @@ int minmax(state_t state, int depth, bool use_tt) {
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         score = min(score, maxmin(state, depth + 1, use_tt));
     }
 
@@ -195,13 +192,11 @@ int maxmin(state_t state, int depth, bool use_tt) {
     int score = -INFINITY;
     bool pass = true;
 
+    ++expanded;
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
-            // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
             ++generated;
             score = max(score, minmax(child, depth + 1, use_tt));
@@ -210,7 +205,6 @@ int maxmin(state_t state, int depth, bool use_tt) {
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         score = max(score, minmax(state, depth + 1, use_tt));
     }
 
@@ -238,13 +232,12 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
 
     int alpha = -INFINITY;
     bool pass = true;
+
+    ++expanded;
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
-            // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
             ++generated;
             alpha = max(alpha, -negamax(child, depth + 1, -color, use_tt));
@@ -253,7 +246,6 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         alpha = max(alpha, -negamax(state, depth + 1, -color, use_tt));
     }
 
@@ -283,13 +275,12 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
     int score = -INFINITY;
     int val;
     bool pass = true;
+    ++expanded;
 
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
             pass = false; // some child was generated hence player did not pass
             ++generated;
             val = -negamax(child, depth + 1, -beta, -alpha, -color, use_tt);
@@ -301,7 +292,6 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         val = -negamax(state, depth + 1, -beta, -alpha, -color, use_tt);
         score = max(score, val);
     }
@@ -332,13 +322,12 @@ int negascout(state_t state, int depth, int alpha, int beta, int color, bool use
     int score = -INFINITY;
     bool pass = true;
     bool firstChild = true;
+    ++expanded;
 
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
             pass = false; // some child was generated hence player did not pass
             ++generated;
             if (firstChild) {
@@ -358,7 +347,6 @@ int negascout(state_t state, int depth, int alpha, int beta, int color, bool use
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         score = -negascout(state, depth + 1, -beta, -score, -color, use_tt);
         alpha = max(alpha, score);
     }

@@ -1,0 +1,24 @@
+Extracting principal variation (PV) with 33 plays ... done!
+Algorithm: Negamax (alpha-beta version)
+Moving along PV:
+34. White moves: value=-4, #expanded=0, #generated=0, seconds=0, #generated/second=-nan
+33. Black moves: value=-4, #expanded=1, #generated=1, seconds=0, #generated/second=inf
+32. White moves: value=-4, #expanded=3, #generated=4, seconds=0, #generated/second=inf
+31. Black moves: value=-4, #expanded=4, #generated=4, seconds=0, #generated/second=inf
+30. White moves: value=-4, #expanded=9, #generated=11, seconds=0, #generated/second=inf
+29. Black moves: value=-4, #expanded=10, #generated=12, seconds=0, #generated/second=inf
+28. White moves: value=-4, #expanded=21, #generated=23, seconds=0, #generated/second=inf
+27. Black moves: value=-4, #expanded=62, #generated=74, seconds=0, #generated/second=inf
+26. White moves: value=-4, #expanded=186, #generated=210, seconds=0, #generated/second=inf
+25. Black moves: value=-4, #expanded=769, #generated=894, seconds=0, #generated/second=inf
+24. White moves: value=-4, #expanded=1152, #generated=1338, seconds=0.004084, #generated/second=327620
+23. Black moves: value=-4, #expanded=3168, #generated=3578, seconds=0, #generated/second=inf
+22. White moves: value=-4, #expanded=7031, #generated=8095, seconds=0.008349, #generated/second=969577
+21. Black moves: value=-4, #expanded=76021, #generated=87283, seconds=0.059229, #generated/second=1.47365e+06
+20. White moves: value=-4, #expanded=98129, #generated=112358, seconds=0.076455, #generated/second=1.4696e+06
+19. Black moves: value=-4, #expanded=205017, #generated=234268, seconds=0.159662, #generated/second=1.46727e+06
+18. White moves: value=-4, #expanded=960343, #generated=1124390, seconds=0.75749, #generated/second=1.48436e+06
+17. Black moves: value=-4, #expanded=1549785, #generated=1811274, seconds=1.22809, #generated/second=1.47487e+06
+16. White moves: value=-4, #expanded=22325108, #generated=26557311, seconds=19.7252, #generated/second=1.34637e+06
+15. Black moves: value=-4, #expanded=32949019, #generated=39439080, seconds=30.9663, #generated/second=1.27361e+06
+14. White moves: value=-4, #expanded=82016158, #generated=97517568, seconds=72.5805, #generated/second=1.34358e+06
