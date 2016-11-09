@@ -101,7 +101,7 @@ int main(int argc, const char **argv) {
 
         try {
             if( algorithm == 0 ) {
-                //value = color * (color == 1 ? maxmin(pv[i], 0, use_tt) : minmax(pv[i], 0, use_tt));
+                value = color * (color == 1 ? maxmin(pv[i], 0, use_tt) : minmax(pv[i], 0, use_tt));
             } else if( algorithm == 1 ) {
                 value = negamax(pv[i], 0, color, use_tt);
             } else if( algorithm == 2 ) {
@@ -129,6 +129,92 @@ int main(int argc, const char **argv) {
     }
 
     return 0;
+}
+
+/************************ MUTUALLY RECURSIVE MINIMAX ***************************/
+
+/**
+* maxmin
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int minmax(state_t state, int depth, bool use_tt) {
+
+    state_t child;
+    bool player = false; // white = min
+
+    if (/*depth == 0 ||*/ state.terminal()) {
+        return state.value();
+    }
+
+    int score = INFINITY;
+    bool pass = true;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            // child.print(cout, depth);
+            // std::cout << "depth = " << depth << std::endl;
+            // std::cout << "booo" << std::endl;
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            score = min(score, maxmin(child, depth + 1, use_tt));
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
+        score = min(score, maxmin(state, depth + 1, use_tt));
+    }
+
+    return score;
+}
+
+/**
+* minmax
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int maxmin(state_t state, int depth, bool use_tt) {
+
+    state_t child;
+    bool player = true; // black = max
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return state.value();
+    }
+
+    int score = -INFINITY;
+    bool pass = true;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            // child.print(cout, depth);
+            // std::cout << "depth = " << depth << std::endl;
+            // std::cout << "booo" << std::endl;
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            score = max(score, minmax(child, depth + 1, use_tt));
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
+        score = max(score, minmax(state, depth + 1, use_tt));
+    }
+
+    return score;
 }
 
 /**
