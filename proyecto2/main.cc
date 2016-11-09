@@ -105,11 +105,11 @@ int main(int argc, const char **argv) {
             } else if( algorithm == 1 ) {
                 value = negamax(pv[i], 0, color, use_tt);
             } else if( algorithm == 2 ) {
-                //value = negamax(pv[i], 0, -200, 200, color, use_tt);
+                value = negamax(pv[i], 0, -200, 200, color, use_tt);
             } else if( algorithm == 3 ) {
                 //value = scout(pv[i], 0, color, use_tt);
             } else if( algorithm == 4 ) {
-                //value = negascout(pv[i], 0, -200, 200, color, use_tt);
+                value = negascout(pv[i], 0, -200, 200, color, use_tt);
             }
         } catch( const bad_alloc &e ) {
             cout << "size TT[0]: size=" << TTable[0].size() << ", #buckets=" << TTable[0].bucket_count() << endl;
@@ -219,4 +219,60 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
     }
 
     return score;
+}
+
+/**
+* Negascout with alpha-beta prunning and scout
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param alpha: represents the maximum value for Max nodes
+* @param beta: represents the minimum value for Min nodes
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int negascout(state_t state, int depth, int alpha, int beta, int color, bool use_tt) {
+
+    state_t child;
+    bool player = color > 0; // black = even numbers
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return color * state.value();
+    }
+
+    int score = -INFINITY;
+    bool pass = true;
+    bool firstChild = true;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            // child.print(cout, depth);
+            // std::cout << "depth = " << depth << std::endl;
+            pass = false; // some child was generated hence player did not pass
+            if (firstChild) {
+                firstChild = false;
+                score = -negascout(child, depth + 1, -beta, -alpha, -color, use_tt);
+            }
+            else {
+                score = -negascout(child, depth + 1, -alpha - 1, -alpha, -color, use_tt); // search with a null window
+                if (alpha < score  &&  score < beta) {
+                    score = -negascout(child, depth + 1, -beta, -score, -color, use_tt); // full search
+                }
+            }
+            alpha = max(alpha, score);
+            if (alpha >= beta) break; // alpha-beta cut-off
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
+        score = -negascout(state, depth + 1, -beta, -score, -color, use_tt);
+        alpha = max(alpha, score);
+    }
+
+    return alpha;
 }
