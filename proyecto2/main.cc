@@ -160,6 +160,7 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
             // std::cout << "depth = " << depth << std::endl;
             // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
+            ++generated;
             alpha = max(alpha, -negamax(child, depth + 1, -color, use_tt));
         }
     }
@@ -204,6 +205,7 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
             // child.print(cout, depth);
             // std::cout << "depth = " << depth << std::endl;
             pass = false; // some child was generated hence player did not pass
+            ++generated;
             val = -negamax(child, depth + 1, -beta, -alpha, -color, use_tt);
             score = max(score, val);
             alpha = max(alpha, val);
@@ -252,6 +254,7 @@ int negascout(state_t state, int depth, int alpha, int beta, int color, bool use
             // child.print(cout, depth);
             // std::cout << "depth = " << depth << std::endl;
             pass = false; // some child was generated hence player did not pass
+            ++generated;
             if (firstChild) {
                 firstChild = false;
                 score = -negascout(child, depth + 1, -beta, -alpha, -color, use_tt);
