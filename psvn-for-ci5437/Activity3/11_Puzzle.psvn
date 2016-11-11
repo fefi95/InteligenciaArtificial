@@ -1,0 +1,61 @@
+# 11-puzzle (4x3)
+
+# Define a domain called 'tile' consisting of 16 constants
+# B is for the blank 'tile'
+DOMAIN tile 12
+       B 1 2 3 4 5 6 7 8 9 10 11
+
+# number of state variables
+12
+
+tile tile tile tile tile tile tile tile tile tile tile tile
+
+# Moving blank in the first row.
+B X - - - - - - - - - - => X B - - - - - - - - - - LABEL Blank_B0_toB1
+X B - - - - - - - - - - => B X - - - - - - - - - - LABEL Blank_B1_toB0
+- B X - - - - - - - - - => - X B - - - - - - - - - LABEL Blank_B1_toB2
+- X B - - - - - - - - - => - B X - - - - - - - - - LABEL Blank_B2_toB1
+
+# Moving blank in the second row.
+- - - B X - - - - - - - => - - - X B - - - - - - - LABEL Blank_B3_toB4
+- - - X B - - - - - - - => - - - B X - - - - - - - LABEL Blank_B4_toB3
+- - - - B X - - - - - - => - - - - X B - - - - - - LABEL Blank_B4_toB5
+- - - - X B - - - - - - => - - - - B X - - - - - - LABEL Blank_B5_toB4
+
+# Moving blank in the third row.
+- - - - - - B X - - - - => - - - - - - X B - - - - LABEL Blank_B6_toB7
+- - - - - - X B - - - - => - - - - - - B X - - - - LABEL Blank_B7_toB6
+- - - - - - - B X - - - => - - - - - - - X B - - - LABEL Blank_B7_toB8
+- - - - - - - X B - - - => - - - - - - - B X - - - LABEL Blank_B8_toB7
+
+# Moving blank in the fourth row.
+- - - - - - - - - B X - => - - - - - - - - - X B - LABEL Blank_B9_toB10
+- - - - - - - - - X B - => - - - - - - - - - B X - LABEL Blank_B10_toB9
+- - - - - - - - - - B X => - - - - - - - - - - X B LABEL Blank_B10_toB11
+- - - - - - - - - - X B => - - - - - - - - - - B X LABEL Blank_B11_toB10
+
+# Moving blank in the first column.
+B - - X - - - - - - - - => X - - B - - - - - - - - LABEL Blank_B0_toB3
+X - - B - - - - - - - - => B - - X - - - - - - - - LABEL Blank_B3_toB0
+- - - B - - X - - - - - => - - - X - - B - - - - - LABEL Blank_B3_toB6
+- - - X - - B - - - - - => - - - B - - X - - - - - LABEL Blank_B6_toB3
+- - - - - - B - - X - - => - - - - - - X - - B - - LABEL Blank_B6_toB9
+- - - - - - X - - B - - => - - - - - - B - - X - - LABEL Blank_B9_toB6
+
+# Moving blank in the second column.
+- B - - X - - - - - - - => - X - - B - - - - - - - LABEL Blank_B1_toB4
+- X - - B - - - - - - - => - B - - X - - - - - - - LABEL Blank_B4_toB1
+- - - - B - - X - - - - => - - - - X - - B - - - - LABEL Blank_B4_toB7
+- - - - X - - B - - - - => - - - - B - - X - - - - LABEL Blank_B7_toB4
+- - - - - - - B - - X - => - - - - - - - X - - B - LABEL Blank_B7_toB10
+- - - - - - - X - - B - => - - - - - - - B - - X - LABEL Blank_B10_toB7
+
+# Moving blank in the third column.
+- - B - - X - - - - - - => - - X - - B - - - - - - LABEL Blank_B2_toB5
+- - X - - B - - - - - - => - - B - - X - - - - - - LABEL Blank_B5_toB2
+- - - - - B - - X - - - => - - - - - X - - B - - - LABEL Blank_B5_toB8
+- - - - - X - - B - - - => - - - - - B - - X - - - LABEL Blank_B8_toB5
+- - - - - - - - B - - X => - - - - - - - - X - - B LABEL Blank_B8_toB11
+- - - - - - - - X - - B => - - - - - - - - B - - X LABEL Blank_B11_toB8
+
+GOAL B 1 2 3 4 5 6 7 8 9 10 11
