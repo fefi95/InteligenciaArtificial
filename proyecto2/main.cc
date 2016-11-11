@@ -341,10 +341,12 @@ bool TEST(state_t state, int depth, int score, int color, int condition){
     vector<state_t> children = get_children(state, player);
     int nchildren = children.size(); // We get the number of children.
     state_t child;                   // The actual children.
+    ++expanded;
 
     for (int i = 0; i < nchildren; ++i) {
         // We set who is the actual children.
         child = children[i];
+        ++generated;
 
         // If the node is a Max node (aka the player's turn)...
         if (color == 1 && TEST(child, depth - 1, score, -color, condition)){
