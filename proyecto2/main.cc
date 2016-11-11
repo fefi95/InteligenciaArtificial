@@ -232,6 +232,19 @@ bool TEST(state_t state, int depth, int score, int color, int condition){
         }
     }
 
+    if (nchildren == 0) {
+      // If the node is a Max node (aka the player's turn)...
+      if (color == 1 && TEST(state, depth - 1, score, -color, condition)){
+          return true;
+      }
+
+      // If the node is a Min node (aka the enemy's turn).
+      if (color == -1 && !TEST(state, depth - 1, score, -color, condition)){
+          return false;
+      }
+
+    }
+
     return color == 1 ? false : true;
 }
 
@@ -247,7 +260,7 @@ bool TEST(state_t state, int depth, int score, int color, int condition){
 int scout(state_t state, int depth, int color, bool use_tt) {
 
     if (state.terminal()){
-        return color * state.value();
+        return state.value();
     }
 
     int  score = 0;
