@@ -101,16 +101,15 @@ int main(int argc, const char **argv) {
 
         try {
             if( algorithm == 0 ) {
-                //value = color * (color == 1 ? maxmin(pv[i], 0, use_tt) : minmax(pv[i], 0, use_tt));
+                value = color * (color == 1 ? maxmin(pv[i], 0, use_tt) : minmax(pv[i], 0, use_tt));
             } else if( algorithm == 1 ) {
                 value = negamax(pv[i], 0, color, use_tt);
             } else if( algorithm == 2 ) {
-                //value = negamax(pv[i], 0, -200, 200, color, use_tt);
+                value = negamax(pv[i], 0, -200, 200, color, use_tt);
             } else if( algorithm == 3 ) {
-                printf("COLOR: %d\n", color);
-                value = scout(pv[i], 0, color, use_tt);
+                value = color * scout(pv[i], 0, color, use_tt);
             } else if( algorithm == 4 ) {
-                //value = negascout(pv[i], 0, -200, 200, color, use_tt);
+                value = negascout(pv[i], 0, -200, 200, color, use_tt);
             }
         } catch( const bad_alloc &e ) {
             cout << "size TT[0]: size=" << TTable[0].size() << ", #buckets=" << TTable[0].bucket_count() << endl;
@@ -132,19 +131,84 @@ int main(int argc, const char **argv) {
     return 0;
 }
 
-vector<state_t> get_children(state_t state, bool player) {
+/************************ MUTUALLY RECURSIVE MINIMAX ***************************/
 
-    vector<state_t> children;
-    state_t new_state;
+/**
+* maxmin
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int minmax(state_t state, int depth, bool use_tt) {
 
-    for( int pos = 0; pos < DIM; ++pos ) {
+    state_t child;
+    bool player = false; // white = min
+
+    if (/*depth == 0 ||*/ state.terminal()) {
+        return state.value();
+    }
+
+    int score = INFINITY;
+    bool pass = true;
+
+    ++expanded;
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
         if (state.outflank(player, pos)) {
-            new_state = state.move(player, pos);
-            children.push_back(new_state);
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            score = min(score, maxmin(child, depth + 1, use_tt));
         }
     }
 
-    return children;
+    // Passing the turn
+    if (pass) {
+        score = min(score, maxmin(state, depth + 1, use_tt));
+    }
+
+    return score;
+}
+
+/**
+* minmax
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int maxmin(state_t state, int depth, bool use_tt) {
+
+    state_t child;
+    bool player = true; // black = max
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return state.value();
+    }
+
+    int score = -INFINITY;
+    bool pass = true;
+
+    ++expanded;
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            score = max(score, minmax(child, depth + 1, use_tt));
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        score = max(score, minmax(state, depth + 1, use_tt));
+    }
+
+    return score;
 }
 
 /**
@@ -168,25 +232,86 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
 
     int alpha = -INFINITY;
     bool pass = true;
+
+    ++expanded;
     for (int pos = 0; pos < DIM; pos++) {
         // Generate child
         if (state.outflank(player, pos)) {
             child = state.move(player, pos);
-            // child.print(cout, depth);
-            // std::cout << "depth = " << depth << std::endl;
-            // std::cout << "booo" << std::endl;
             pass = false; // some child was generated hence player did not pass
+            ++generated;
             alpha = max(alpha, -negamax(child, depth + 1, -color, use_tt));
         }
     }
 
     // Passing the turn
     if (pass) {
-        // std::cout << (color == 1 ? "Black" : "White") <<  " passed" << std::endl;
         alpha = max(alpha, -negamax(state, depth + 1, -color, use_tt));
     }
 
     return alpha;
+}
+
+/**
+* Negamax with alpha-beta prunning
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param alpha: represents the maximum value for Max nodes
+* @param beta: represents the minimum value for Min nodes
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_tt) {
+
+    state_t child;
+    bool player = color > 0; // black = even numbers
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return color * state.value();
+    }
+
+    int score = -INFINITY;
+    int val;
+    bool pass = true;
+    ++expanded;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            val = -negamax(child, depth + 1, -beta, -alpha, -color, use_tt);
+            score = max(score, val);
+            alpha = max(alpha, val);
+            if (alpha >= beta) break; // alpha-beta cut-off
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        val = -negamax(state, depth + 1, -beta, -alpha, -color, use_tt);
+        score = max(score, val);
+    }
+
+    return score;
+}
+
+vector<state_t> get_children(state_t state, bool player) {
+
+    vector<state_t> children;
+    state_t new_state;
+
+    for( int pos = 0; pos < DIM; ++pos ) {
+        if (state.outflank(player, pos)) {
+            new_state = state.move(player, pos);
+            children.push_back(new_state);
+        }
+    }
+
+    return children;
 }
 
 /**
@@ -299,4 +424,59 @@ int scout(state_t state, int depth, int color, bool use_tt) {
     }
 
     return score;
+}
+
+/**
+* Negascout with alpha-beta prunning and scout
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param alpha: represents the maximum value for Max nodes
+* @param beta: represents the minimum value for Min nodes
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int negascout(state_t state, int depth, int alpha, int beta, int color, bool use_tt) {
+
+    state_t child;
+    bool player = color > 0; // black = even numbers
+
+    if (/*depth == 0 ||*/ state.terminal() ) {
+        return color * state.value();
+    }
+
+    int score = -INFINITY;
+    bool pass = true;
+    bool firstChild = true;
+    ++expanded;
+
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            if (firstChild) {
+                firstChild = false;
+                score = -negascout(child, depth + 1, -beta, -alpha, -color, use_tt);
+            }
+            else {
+                score = -negascout(child, depth + 1, -alpha - 1, -alpha, -color, use_tt); // search with a null window
+                if (alpha < score  &&  score < beta) {
+                    score = -negascout(child, depth + 1, -beta, -score, -color, use_tt); // full search
+                }
+            }
+            alpha = max(alpha, score);
+            if (alpha >= beta) break; // alpha-beta cut-off
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        score = -negascout(state, depth + 1, -beta, -score, -color, use_tt);
+        alpha = max(alpha, score);
+    }
+
+    return alpha;
 }
