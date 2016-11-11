@@ -53,9 +53,10 @@ int64_t bounded_dfs_visit(state_t* state, int deep, int bound, int history){
       if (bwd_rule_valid_for_history(history, ruleid) != 0){
         apply_bwd_rule(ruleid, state, &child);
         int nextHistory = next_bwd_history(history, ruleid);
+        start = time(NULL);
         int64_t totalAux = bounded_dfs_visit(&child, deep + 1, bound, nextHistory);
         numNodoAct += totalAux;
-        start = time(NULL);
+
 
         if (cost != -1) return numNodoAct + 1;
       }
