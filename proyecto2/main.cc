@@ -107,7 +107,7 @@ int main(int argc, const char **argv) {
             } else if( algorithm == 2 ) {
                 value = negamax(pv[i], 0, -200, 200, color, use_tt);
             } else if( algorithm == 3 ) {
-                //value = scout(pv[i], 0, color, use_tt);
+                value = color * scout(pv[i], 0, color, use_tt);
             } else if( algorithm == 4 ) {
                 value = negascout(pv[i], 0, -200, 200, color, use_tt);
             }
@@ -294,6 +294,133 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
     if (pass) {
         val = -negamax(state, depth + 1, -beta, -alpha, -color, use_tt);
         score = max(score, val);
+    }
+
+    return score;
+}
+
+vector<state_t> get_children(state_t state, bool player) {
+
+    vector<state_t> children;
+    state_t new_state;
+
+    for( int pos = 0; pos < DIM; ++pos ) {
+        if (state.outflank(player, pos)) {
+            new_state = state.move(player, pos);
+            children.push_back(new_state);
+        }
+    }
+
+    return children;
+}
+
+/**
+* TEST FUNCTION for Scout
+*
+* @param state: the state to evaluate the strategy
+* @param depth: depth of the recursion
+* @param color: which player represents
+* @param condition: indicates the condition to use.
+*
+*/
+bool TEST(state_t state, int depth, int score, int color, int condition){
+    if (state.terminal()){
+
+        // If the condition is 0 then we use >.
+        if (condition == 0){
+            return state.value() > score ? true : false;
+        }
+        // If the condition is 0 then we use >=.
+        else if(condition == 1){
+            return state.value() >= score ? true : false;
+        }
+    }
+
+    // We get the clindren states of the actual state
+    bool player = color == 1;
+    vector<state_t> children = get_children(state, player);
+    int nchildren = children.size(); // We get the number of children.
+    state_t child;                   // The actual children.
+
+    for (int i = 0; i < nchildren; ++i) {
+        // We set who is the actual children.
+        child = children[i];
+
+        // If the node is a Max node (aka the player's turn)...
+        if (color == 1 && TEST(child, depth - 1, score, -color, condition)){
+            return true;
+        }
+
+        // If the node is a Min node (aka the enemy's turn).
+        if (color == -1 && !TEST(child, depth - 1, score, -color, condition)){
+            return false;
+        }
+    }
+
+    if (nchildren == 0) {
+      // If the node is a Max node (aka the player's turn)...
+      if (color == 1 && TEST(state, depth - 1, score, -color, condition)){
+          return true;
+      }
+
+      // If the node is a Min node (aka the enemy's turn).
+      if (color == -1 && !TEST(state, depth - 1, score, -color, condition)){
+          return false;
+      }
+
+    }
+
+    return color == 1 ? false : true;
+}
+
+/**
+* Scout
+*
+* @param state: the state to evaluate best strategy
+* @param depth: depth of the recursion
+* @param color: which player represents
+* @param use_tt: indicates whether you are using the transposition table or not
+*
+*/
+int scout(state_t state, int depth, int color, bool use_tt) {
+
+    if (state.terminal()){
+        return state.value();
+    }
+
+    int  score = 0;
+    ++expanded;
+
+    // We get the clindren states of the actual state.
+    bool player = color == 1;
+    vector<state_t> children = get_children(state, player);
+    int nchildren = children.size(); // We get the number of children.
+    state_t child;                   // The actual children.
+
+    for (int i = 0; i < nchildren; ++i) {
+        // We set who is the actual children.
+        child = children[i];
+        ++generated;
+
+        // If it is the first child...
+        if (i == 0){
+            score = scout(child, depth - 1, -color, false);
+        }else{
+            // If the node is a Max node (aka the player's turn)...
+            if (color == 1 && TEST(child, depth - 1, score, -color, 0)){
+                score = scout(child, depth - 1, -color, false);
+            }
+
+            // If the node is a Min node (aka the enemy's turn)...
+            if (color == -1 && !TEST(child, depth - 1, score,-color, 1)){
+                score = scout(child, depth - 1, -color, false);
+            }
+        }
+    }
+
+    // If I pass...
+    if (nchildren == 0){
+      score = scout(state, depth - 1, -color, false);
     }
 
     return score;
