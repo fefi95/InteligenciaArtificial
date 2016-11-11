@@ -110,9 +110,9 @@ static int PV[] = {
 };
 
 class state_t {
-    unsigned char t_;
-    unsigned free_; //bit representation of the grid's free spaces.
-    unsigned pos_;
+    unsigned char t_; // bit representation of the grid's center. positions 0-3
+    unsigned free_; // bit representation of the grid's free spaces.
+    unsigned pos_;  // bit representation of the grid's tile color in every position.
 
   public:
     explicit state_t(unsigned char t = 6) : t_(t), free_(0), pos_(0) { }
