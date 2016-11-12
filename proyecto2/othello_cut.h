@@ -16,6 +16,10 @@
  *
  *  Last revision: 1/11/2016
  *
+ *  Modified by:
+ *      Edward Fernandez 10-11121
+ *      Stefani Castellanos 11-11394
+ *      Jirlfe Oropeza
  */
 
 #include <cassert>

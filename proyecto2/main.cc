@@ -3,10 +3,13 @@
 // Author: Blai Bonet
 // Last Revision: 1/11/16
 // Modified by:
+//      Edward Fernandez 10-11121
+//      Stefani Castellanos 11-11394
+//      Jirlfe Oropeza
 
 #include <iostream>
 #include <limits>
-#include "othello_cut.h" // won't work correctly until .h is fixed!
+#include "othello_cut.h"
 #include "utils.h"
 
 #include <unordered_map>
@@ -299,21 +302,6 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
     return score;
 }
 
-vector<state_t> get_children(state_t state, bool player) {
-
-    vector<state_t> children;
-    state_t new_state;
-
-    for( int pos = 0; pos < DIM; ++pos ) {
-        if (state.outflank(player, pos)) {
-            new_state = state.move(player, pos);
-            children.push_back(new_state);
-        }
-    }
-
-    return children;
-}
-
 /**
 * TEST FUNCTION for Scout
 *
@@ -338,38 +326,39 @@ bool TEST(state_t state, int depth, int score, int color, int condition){
 
     // We get the clindren states of the actual state
     bool player = color == 1;
-    vector<state_t> children = get_children(state, player);
-    int nchildren = children.size(); // We get the number of children.
-    state_t child;                   // The actual children.
+    bool pass = true;
+    state_t child;                   // The actual children.                 // The actual children.
     ++expanded;
 
-    for (int i = 0; i < nchildren; ++i) {
-        // We set who is the actual children.
-        child = children[i];
-        ++generated;
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
 
-        // If the node is a Max node (aka the player's turn)...
-        if (color == 1 && TEST(child, depth - 1, score, -color, condition)){
+            // If the node is a Max node (aka the player's turn)...
+            if (color == 1 && TEST(child, depth - 1, score, -color, condition)){
+                return true;
+            }
+
+            // If the node is a Min node (aka the enemy's turn).
+            if (color == -1 && !TEST(child, depth - 1, score, -color, condition)){
+                return false;
+            }
+        }
+    }
+
+    // Passing the turn
+    if (pass) {
+        if (color == 1 && TEST(state, depth - 1, score, -color, condition)){
             return true;
         }
 
         // If the node is a Min node (aka the enemy's turn).
-        if (color == -1 && !TEST(child, depth - 1, score, -color, condition)){
+        if (color == -1 && !TEST(state, depth - 1, score, -color, condition)){
             return false;
         }
-    }
-
-    if (nchildren == 0) {
-      // If the node is a Max node (aka the player's turn)...
-      if (color == 1 && TEST(state, depth - 1, score, -color, condition)){
-          return true;
-      }
-
-      // If the node is a Min node (aka the enemy's turn).
-      if (color == -1 && !TEST(state, depth - 1, score, -color, condition)){
-          return false;
-      }
-
     }
 
     return color == 1 ? false : true;
@@ -395,34 +384,37 @@ int scout(state_t state, int depth, int color, bool use_tt) {
 
     // We get the clindren states of the actual state.
     bool player = color == 1;
-    vector<state_t> children = get_children(state, player);
-    int nchildren = children.size(); // We get the number of children.
+    bool pass = true;
+    bool firstChild = true;
     state_t child;                   // The actual children.
 
-    for (int i = 0; i < nchildren; ++i) {
-        // We set who is the actual children.
-        child = children[i];
-        ++generated;
-
-        // If it is the first child...
-        if (i == 0){
-            score = scout(child, depth - 1, -color, false);
-        }else{
-            // If the node is a Max node (aka the player's turn)...
-            if (color == 1 && TEST(child, depth - 1, score, -color, 0)){
+    for (int pos = 0; pos < DIM; pos++) {
+        // Generate child
+        if (state.outflank(player, pos)) {
+            child = state.move(player, pos);
+            pass = false; // some child was generated hence player did not pass
+            ++generated;
+            if (firstChild) {
+                firstChild = false;
                 score = scout(child, depth - 1, -color, false);
             }
+            else {
+                // If the node is a Max node (aka the player's turn)...
+                if (color == 1 && TEST(child, depth - 1, score, -color, 0)){
+                    score = scout(child, depth - 1, -color, false);
+                }
 
-            // If the node is a Min node (aka the enemy's turn)...
-            if (color == -1 && !TEST(child, depth - 1, score,-color, 1)){
-                score = scout(child, depth - 1, -color, false);
+                // If the node is a Min node (aka the enemy's turn)...
+                if (color == -1 && !TEST(child, depth - 1, score,-color, 1)){
+                    score = scout(child, depth - 1, -color, false);
+                }
             }
         }
     }
 
-    // If I pass...
-    if (nchildren == 0){
-      score = scout(state, depth - 1, -color, false);
+    // Passing the turn
+    if (pass) {
+        score = scout(state, depth - 1, -color, false);
     }
 
     return score;
