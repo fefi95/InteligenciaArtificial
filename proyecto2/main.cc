@@ -468,7 +468,7 @@ int negascout(state_t state, int depth, int alpha, int beta, int color, bool use
 
     // Passing the turn
     if (pass) {
-        score = -negascout(state, depth + 1, -beta, -score, -color, use_tt);
+        score = -negascout(state, depth + 1, -beta, -alpha, -color, use_tt);
         alpha = max(alpha, score);
     }
 
