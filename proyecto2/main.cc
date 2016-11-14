@@ -170,6 +170,7 @@ int minmax(state_t state, int depth, bool use_tt) {
     // Passing the turn
     if (pass) {
         score = min(score, maxmin(state, depth + 1, use_tt));
+        ++generated;
     }
 
     return score;
@@ -209,6 +210,7 @@ int maxmin(state_t state, int depth, bool use_tt) {
     // Passing the turn
     if (pass) {
         score = max(score, minmax(state, depth + 1, use_tt));
+        ++generated;
     }
 
     return score;
@@ -250,6 +252,7 @@ int negamax(state_t state, int depth, int color, bool use_tt) {
     // Passing the turn
     if (pass) {
         alpha = max(alpha, -negamax(state, depth + 1, -color, use_tt));
+        ++generated;
     }
 
     return alpha;
@@ -297,6 +300,7 @@ int negamax(state_t state, int depth, int alpha, int beta, int color, bool use_t
     if (pass) {
         val = -negamax(state, depth + 1, -beta, -alpha, -color, use_tt);
         score = max(score, val);
+        ++generated;
     }
 
     return score;
@@ -359,6 +363,7 @@ bool TEST(state_t state, int depth, int score, int color, int condition){
         if (color == -1 && !TEST(state, depth - 1, score, -color, condition)){
             return false;
         }
+        ++generated;
     }
 
     return color == 1 ? false : true;
@@ -415,6 +420,7 @@ int scout(state_t state, int depth, int color, bool use_tt) {
     // Passing the turn
     if (pass) {
         score = scout(state, depth - 1, -color, false);
+        ++generated;
     }
 
     return score;
@@ -470,6 +476,7 @@ int negascout(state_t state, int depth, int alpha, int beta, int color, bool use
     if (pass) {
         score = -negascout(state, depth + 1, -beta, -alpha, -color, use_tt);
         alpha = max(alpha, score);
+        ++generated;
     }
 
     return alpha;
