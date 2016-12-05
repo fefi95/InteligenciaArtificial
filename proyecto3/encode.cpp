@@ -17,12 +17,11 @@ int main(int argc, const char **argv) {
         std::cout << "input file missing!" << std::endl;
         return 1;
     }
-
     ifstream input; // input file
     ofstream encode; // output encode SAT file
 
     input.open(argv[1]);
-    encode.open("encode.cnf")
+    encode.open("encode.cnf");
     int N, M; // dimesions (row, colmuns) of the problem
     input >> N;
     input >> M;
