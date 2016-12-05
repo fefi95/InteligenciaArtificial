@@ -1,6 +1,7 @@
 # Excluding unnecessary files in the repository
 
 main
+encode
 *~
 
 # Compiled Object files
