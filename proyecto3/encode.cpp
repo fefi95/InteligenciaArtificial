@@ -129,6 +129,34 @@ int main(int argc, const char **argv) {
                         encode << clause;
                     break;
                 case '3':
+                        up = std::to_string(val);
+                        dw = std::to_string(i * M + j);
+                        lt = std::to_string(val + i + N * (M + 1) - 1);
+                        rt = std::to_string(val + i + N * (M + 1));
+
+                        encode << "c rules for 3:" << std::endl;
+                        clause +=  "-" + up + " -" + dw + " -"+ lt + " -"+ rt +" 0\n";
+
+                        // up, down and left segments are true and right is false
+                        clause +=  rt + " " + up + " 0\n";
+                        clause +=  rt + " " + dw + " 0\n";
+                        clause +=  rt + " " + lt + " 0\n";
+
+                        // up, down and right segments are true and left is false
+                        clause +=  lt + " " + up + " 0\n";
+                        clause +=  lt + " " + dw + " 0\n";
+                        // clause +=  lt + " " + rt + " 0\n";
+
+                        // up, left and right segments are true and down is false
+                        clause +=  dw + " " + up + " 0\n";
+                        // clause +=  dw + " " + lt + " 0\n";
+                        // clause +=  dw + " " + rt + " 0\n";
+
+                        // down, left and right segments are true and up is false
+                        // clause +=  up + " " + dw + " 0\n";
+                        // clause +=  up + " " + lt + " 0\n";
+                        // clause +=  up + " " + rt + " 0\n";
+                        encode << clause;
                     break;
                 case '4':
                         // all surrounding segments are true
