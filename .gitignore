@@ -6,7 +6,6 @@ encode
 *.or
 *.mk
 minisat_static
-*.cnf
 
 # Compiled Object files
 *.slo
