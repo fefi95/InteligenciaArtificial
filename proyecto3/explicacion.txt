@@ -67,8 +67,8 @@ para el 3:
     "Si esta up, right y left, no puede estar down y viceversa"
     (up and right and left => ~down) and (~down => up and right and left)
 
-    "Si esta up, down y left, no puede estar right y viceversa"
-    (up and down and left => ~right) and (~rt => up and down and left)
+    "Si esta right, down y left, no puede estar up y viceversa"
+    (right and down and left => ~up) and (~up => right and down and left)
 
 para el 4:
     "Todos los segmentos rodean la celda"
@@ -79,3 +79,10 @@ en donde:
     down es el segmento inferior de la celda.
     left es el segmento de la izquierda de la celda.
     right es el segmento de la derecha de la celda.
+
+por ultimo, para mantener una linea simple y sin ciclos se observa que cada segmento puede ser
+continuado de 6 maneras diferentes, si cada uno de ellos se continua exactamente con 2 lineas
+se logra esta restriccion. Tenemos:
+
+    "Para cada segmento que aparece en la solucion hay exactamente 2 segmentos adyacentes que
+    tambien aparecen en la solucion"
