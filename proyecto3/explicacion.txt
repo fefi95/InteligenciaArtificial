@@ -17,4 +17,65 @@ en donde:
     - los numeros del 31 al 60 son los segmentos verticales.
     - los valores dentro de la casilla corresponden a las posicion i,j de la celda
 
-Nota: todas las clausulas deben terminar en 0.
+Nota: todas las clausulas deben terminar en 0 y la teoria debe estar en CNF.
+
+las restricciones en las celdas se pueden ver como:
+
+para el 0:
+    "No existe ningun segmento que rodee la celda"
+    ~up and ~down and ~left and ~right
+
+para el 1:
+    "Si esta up, down, left y right no pueden aparecer y viceversa"
+    (up => ~down and ~left and ~right) and (~(down or left or right) => up)
+
+    "Si esta down, up, left y right no pueden aparecer y viceversa"
+    (down => ~up and ~left and ~right) and (~(up or left or right) => down)
+
+    "Si esta left, up, down y right no pueden aparecer y viceversa"
+    (left => ~up and ~down and ~right) and (~(up or down or right) => left)
+
+    "Si esta right, up, left y down no pueden aparecer y viceversa"
+    (right => ~up and ~left and ~down) and (~(up or left or down) => right)
+
+para el 2:
+    "Si esta up y down, left y right no pueden aparecer y viceversa"
+    (up and down => ~left and ~right) and (~(left or right) => down and up)
+
+    "Si esta up y left, down y right no pueden aparecer y viceversa"
+    (up and left => ~down and ~right) and (~(down or right) => left and up)
+
+    "Si esta up y right, left y down no pueden aparecer y viceversa"
+    (up and right => ~left and ~down) and (~(left or down) => right and up)
+
+    "Si esta down y left, up y right no pueden aparecer y viceversa"
+    (down and left => ~up and ~right) and (~(up or right) => left and down)
+
+    "Si esta down y right, left y up no pueden aparecer y viceversa"
+    (down and right => ~left and ~up) and (~(left or up) => right and down)
+
+    "Si esta left y right, up y down no pueden aparecer y viceversa"
+    (left and right => ~up and ~down) and (~(up or down) => right and left)
+
+para el 3:
+    "Si esta up, down y left, no puede estar right y viceversa"
+    (up and down and left => ~right) and (~right => up and down and left)
+
+    "Si esta up, down y right, no puede estar left y viceversa"
+    (up and down and right => ~left) and (~left => up and down and right)
+
+    "Si esta up, right y left, no puede estar down y viceversa"
+    (up and right and left => ~down) and (~down => up and right and left)
+
+    "Si esta up, down y left, no puede estar right y viceversa"
+    (up and down and left => ~right) and (~rt => up and down and left)
+
+para el 4:
+    "Todos los segmentos rodean la celda"
+    up and down and left and right
+
+en donde:
+    up es el segmento superior de la celda.
+    down es el segmento inferior de la celda.
+    left es el segmento de la izquierda de la celda.
+    right es el segmento de la derecha de la celda.
