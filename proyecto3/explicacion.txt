@@ -16,3 +16,5 @@ en donde:
     - los numeros de 1 al 30 son los segmentos horizontales.
     - los numeros del 31 al 60 son los segmentos verticales.
     - los valores dentro de la casilla corresponden a las posicion i,j de la celda
+
+Nota: todas las clausulas deben terminar en 0.
