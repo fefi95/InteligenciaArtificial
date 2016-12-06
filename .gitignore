@@ -2,6 +2,7 @@
 
 main
 encode
+decode
 *~
 *.or
 *.mk
