@@ -14,6 +14,24 @@
 
 using namespace std;
 
+int N, M; // dimensions (row, columns) of the problem
+
+string q(int i, int j, char coord) {
+
+    int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
+    switch (coord) {
+        case 'n': return std::to_string(val);
+                break;
+        case 's': return std::to_string(i * M + j);
+                break;
+        case 'e': return std::to_string(val + i + N * (M + 1));
+                break;
+        case 'w': return std::to_string(val + i + N * (M + 1) - 1);
+                break;
+    }
+    return "";
+}
+
 int main(int argc, const char **argv) {
     if( argc < 2 ) {
         std::cout << "input file missing!" << std::endl;
@@ -24,7 +42,6 @@ int main(int argc, const char **argv) {
 
     input.open(argv[1]);
     encode.open("encode.cnf");
-    int N, M; // dimensions (row, colmuns) of the problem
     input >> N;
     input >> M;
 
@@ -35,144 +52,109 @@ int main(int argc, const char **argv) {
     encode << "p cnf " << numVar << " " << numClauses << std::endl;
     // std::cout << N << M << std::endl;
     char cell;
-    int val;
-    string clause = ""; // all clauses represents a CNF problem.
-    string up, dw, lt, rt; // every segment that surrounds one cell
+    string clause; // all clauses represents a CNF problem.
 
     for (int i = 1; i <= N; i++) {
         for (int j = 1; j <= M; j++) {
+            clause = "";
             input >> cell;
-            val = (i - 1) * M + j;
+            // Type 0 clauses (are implied because of the enumeration function q(i,j,[n,s,e,w]))
+
+            // Type 1 clauses
             switch (cell) {
-                // case ' ': break;
-                case '.':
-                    break;
                 case '0':
                         encode << "c rules for 0:" << std::endl;
                         // all surrounding segments are false
-                        up = std::to_string(-val);
-                        dw = std::to_string(-(i * M + j));
-                        lt = std::to_string(-(val + i + N * (M + 1) - 1));
-                        rt = std::to_string(-(val + i + N * (M + 1)));
-                        clause  =  up + " 0\n";
-                        clause +=  dw + " 0\n";
-                        clause +=  lt + " 0\n";
-                        clause +=  rt + " 0\n";
-                        encode << clause;
+                        clause += "-" + q(i,j,'n') + " 0\n";
+                        clause += "-" + q(i,j,'e') + " 0\n";
+                        clause += "-" + q(i,j,'s') + " 0\n";
+                        clause += "-" + q(i,j,'w') + " 0\n";
                     break;
                 case '1':
-                        up = std::to_string(val);
-                        dw = std::to_string(i * M + j);
-                        lt = std::to_string(val + i + N * (M + 1) - 1);
-                        rt = std::to_string(val + i + N * (M + 1));
-
                         encode << "c rules for 1:" << std::endl;
-                        clause  =  up + " " + dw +  " " + lt +  " " + rt + " 0\n";
-
-                        // up segment is true and the rest are false
-                        clause +=  "-" + up + " -" + dw + " 0\n";
-                        clause +=  "-" + up + " -" + lt + " 0\n";
-                        clause +=  "-" + up + " -" + rt + " 0\n";
-
-                        // down segment is true and the rest are false
-                        clause +=  "-" + dw + " -" + lt + " 0\n";
-                        clause +=  "-" + dw + " -" + rt + " 0\n";
-
-                        // left segment is true and the rest are false
-                        clause +=  "-" + lt + " -" + rt + " 0\n";
-                        encode << clause;
+                        // a segment is true and the rest are false
+                        clause += q(i,j,'n') + " " + q(i,j,'e') + " " + q(i,j,'s') + " " + q(i,j,'w') + " 0\n";
+                        clause += "-" + q(i,j,'n') + " -" + q(i,j,'e') + " 0\n";
+                        clause += "-" + q(i,j,'n') + " -" + q(i,j,'s') + " 0\n";
+                        clause += "-" + q(i,j,'n') + " -" + q(i,j,'w') + " 0\n";
+                        clause += "-" + q(i,j,'e') + " -" + q(i,j,'s') + " 0\n";
+                        clause += "-" + q(i,j,'e') + " -" + q(i,j,'w') + " 0\n";
+                        clause += "-" + q(i,j,'s') + " -" + q(i,j,'w') + " 0\n";
                     break;
                 case '2':
-
-                        up = std::to_string(val);
-                        dw = std::to_string(i * M + j);
-                        lt = std::to_string(val + i + N * (M + 1) - 1);
-                        rt = std::to_string(val + i + N * (M + 1));
-
                         encode << "c rules for 2:" << std::endl;
 
                         // up and down segment are true and the rest are false
-                        clause +=  "-" + up + " -" + dw + " -"+ lt + " 0\n";
-                        clause +=  "-" + up + " -" + dw + " -"+ rt + " 0\n";
-                        clause +=  rt + " " + lt + " " + dw + " 0\n";
-                        clause +=  rt + " " + lt + " " + up + " 0\n";
+                        clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'s') + " -"+ q(i,j,'w') + " 0\n";
+                        clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'s') + " -"+ q(i,j,'e') + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'w') + " " + q(i,j,'s') + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'w') + " " + q(i,j,'n') + " 0\n";
 
                         // up and left segment are true and the rest are false
-                        // clause +=  "-" + up + " -" + lt + " -"+ dw + " 0\n";
-                        clause +=  "-" + up + " -" + lt + " -"+ rt + " 0\n";
-                        // clause +=  rt + " " + dw + " " + lt + " 0\n";
-                        clause +=  rt + " " + dw + " " + up + " 0\n";
+                        // clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'w') + " -"+ q(i,j,'s') + " 0\n";
+                        clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'w') + " -"+ q(i,j,'e') + " 0\n";
+                        // clause +=  q(i,j,'e') + " " + q(i,j,'s') + " " + q(i,j,'w') + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'s') + " " + q(i,j,'n') + " 0\n";
 
                         // up and right segment are true and the rest are false
-                        // clause +=  "-" + up + " -" + rt + " -"+ dw + " 0\n";
-                        // clause +=  "-" + up + " -" + rt + " -"+ lt + " 0\n";
-                        // clause +=  lt + " " + dw + " " + rt + " 0\n";
-                        clause +=  lt + " " + dw + " " + up + " 0\n";
+                        // clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'e') + " -"+ q(i,j,'s') + " 0\n";
+                        // clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'e') + " -"+ q(i,j,'w') + " 0\n";
+                        // clause +=  q(i,j,'w') + " " + q(i,j,'s') + " " + q(i,j,'e') + " 0\n";
+                        clause +=  q(i,j,'w') + " " + q(i,j,'s') + " " + q(i,j,'n') + " 0\n";
 
                         // down and left segment are true and the rest are false
-                        // clause +=  "-" + dw + " -" + lt + " -"+ up + " 0\n";
-                        clause +=  "-" + dw + " -" + lt + " -"+ rt + " 0\n";
-                        // clause +=  up + " " + rt + " " + dw + " 0\n";
-                        clause +=  up + " " + rt + " " + lt + " 0\n";
+                        // clause +=  "-" + q(i,j,'s') + " -" + q(i,j,'w') + " -"+ q(i,j,'n') + " 0\n";
+                        clause +=  "-" + q(i,j,'s') + " -" + q(i,j,'w') + " -"+ q(i,j,'e') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'e') + " " + q(i,j,'s') + " 0\n";
+                        clause +=  q(i,j,'n') + " " + q(i,j,'e') + " " + q(i,j,'w') + " 0\n";
 
                         // down and right segment are true and the rest are false
-                        // clause +=  "-" + dw + " -" + rt + " -"+ up + " 0\n";
-                        // clause +=  "-" + dw + " -" + rt + " -"+ lt + " 0\n";
-                        // clause +=  up + " " + lt + " " + dw + " 0\n";
-                        // clause +=  up + " " + lt + " " + rt + " 0\n";
+                        // clause +=  "-" + q(i,j,'s') + " -" + q(i,j,'e') + " -"+ q(i,j,'n') + " 0\n";
+                        // clause +=  "-" + q(i,j,'s') + " -" + q(i,j,'e') + " -"+ q(i,j,'w') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'w') + " " + q(i,j,'s') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'w') + " " + q(i,j,'e') + " 0\n";
 
                         // left and right segment are true and the rest are false
-                        // clause +=  "-" + lt + " -" + rt + " -"+ up + " 0\n";
-                        // clause +=  "-" + lt + " -" + rt + " -"+ dw + " 0\n";
-                        // clause +=  up + " " + dw + " " + lt + " 0\n";
-                        // clause +=  up + " " + dw + " " + rt + " 0\n";
-                        encode << clause;
+                        // clause +=  "-" + q(i,j,'w') + " -" + q(i,j,'e') + " -"+ q(i,j,'n') + " 0\n";
+                        // clause +=  "-" + q(i,j,'w') + " -" + q(i,j,'e') + " -"+ q(i,j,'s') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'s') + " " + q(i,j,'w') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'s') + " " + q(i,j,'e') + " 0\n";
                     break;
                 case '3':
-                        up = std::to_string(val);
-                        dw = std::to_string(i * M + j);
-                        lt = std::to_string(val + i + N * (M + 1) - 1);
-                        rt = std::to_string(val + i + N * (M + 1));
-
                         encode << "c rules for 3:" << std::endl;
-                        clause +=  "-" + up + " -" + dw + " -"+ lt + " -"+ rt +" 0\n";
+                        clause +=  "-" + q(i,j,'n') + " -" + q(i,j,'s') + " -"+ q(i,j,'w') + " -"+ q(i,j,'e') +" 0\n";
 
                         // up, down and left segments are true and right is false
-                        clause +=  rt + " " + up + " 0\n";
-                        clause +=  rt + " " + dw + " 0\n";
-                        clause +=  rt + " " + lt + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'n') + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'s') + " 0\n";
+                        clause +=  q(i,j,'e') + " " + q(i,j,'w') + " 0\n";
 
                         // up, down and right segments are true and left is false
-                        clause +=  lt + " " + up + " 0\n";
-                        clause +=  lt + " " + dw + " 0\n";
-                        // clause +=  lt + " " + rt + " 0\n";
+                        clause +=  q(i,j,'w') + " " + q(i,j,'n') + " 0\n";
+                        clause +=  q(i,j,'w') + " " + q(i,j,'s') + " 0\n";
+                        // clause +=  q(i,j,'w') + " " + q(i,j,'e') + " 0\n";
 
                         // up, left and right segments are true and down is false
-                        clause +=  dw + " " + up + " 0\n";
-                        // clause +=  dw + " " + lt + " 0\n";
-                        // clause +=  dw + " " + rt + " 0\n";
+                        clause +=  q(i,j,'s') + " " + q(i,j,'n') + " 0\n";
+                        // clause +=  q(i,j,'s') + " " + q(i,j,'w') + " 0\n";
+                        // clause +=  q(i,j,'s') + " " + q(i,j,'e') + " 0\n";
 
                         // down, left and right segments are true and up is false
-                        // clause +=  up + " " + dw + " 0\n";
-                        // clause +=  up + " " + lt + " 0\n";
-                        // clause +=  up + " " + rt + " 0\n";
-                        encode << clause;
+                        // clause +=  up + " " + q(i,j,'s') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'w') + " 0\n";
+                        // clause +=  q(i,j,'n') + " " + q(i,j,'e') + " 0\n";
                     break;
                 case '4':
                         // all surrounding segments are true
-                        up = std::to_string(val);
-                        dw = std::to_string(i * M + j);
-                        lt = std::to_string(val + i + N * (M + 1) - 1);
-                        rt = std::to_string(val + i + N * (M + 1));
-                        clause  =  up + " 0\n";
-                        clause +=  dw + " 0\n";
-                        clause +=  lt + " 0\n";
-                        clause +=  rt + " 0\n";
-                        encode << clause;
+                        clause  =  q(i,j,'n') + " 0\n";
+                        clause +=  q(i,j,'s') + " 0\n";
+                        clause +=  q(i,j,'w') + " 0\n";
+                        clause +=  q(i,j,'e') + " 0\n";
+
                     break;
             }
+            encode << clause;
             // std::cout << "cell:" << cell << std::endl;
-            clause = "";
         }
     }
 
