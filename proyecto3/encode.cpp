@@ -72,7 +72,8 @@ string r(int i, int j, int c1_i, int c1_j ) {
     // numVertical + numHorizontal so we use that as an offset for next variables
 
     int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
-    return std::to_string(2 * numSegm + val);
+    int c1_val = (c1_i - 1) * M + c1_j; // transforming de c1_i,c1_j position to a one dimensional array
+    return std::to_string(2 * numSegm + val + c1_val);
 }
 
 int main(int argc, const char **argv) {
@@ -283,31 +284,42 @@ int main(int argc, const char **argv) {
             /******************************************************************
                 Type 3 clauses
             ******************************************************************/
-            // encode << "c TYPE 3 CLAUSES:" << std::endl;
-            //
-            // // Every cell is reachable from itself
-            // clause += r(i,j,i,j) + " 0\n";
-            //
-            // // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
-            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-            // encode << clause;
-            // clause = "";
+            encode << "c TYPE 3 CLAUSES:" << std::endl;
+
+            // Every cell is reachable from itself
+            clause += r(i,j,i,j) + " 0\n";
+
+            // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
+            for (int c1_i = 1; c1_i <= N; c1_i++) {
+                for (int c1_j = 1; c1_j <= M; c1_j++) {
+                    if (c1_i != i && c1_j != j) {
+                        for (int c2_i = c1_i + 1; c2_i <= N; c2_i++) {
+                            for (int c2_j = c1_i + 1; c2_j <= M; c2_j++) {
+                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                            }
+                        }
+                    }
+                }
+            }
+            encode << clause;
+            clause = "";
 
             /******************************************************************
                 Type 4 clauses
             ******************************************************************/
             encode << "c TYPE 4 CLAUSES:" << std::endl;
 
-            for (int c1_i = 1; c1_i < N; c1_i++) {
-                for (int c1_j = 1; c1_j < N; c1_j++) {
+            for (int c1_i = 1; c1_i <= N; c1_i++) {
+                for (int c1_j = 1; c1_j <= M; c1_j++) {
                     clause += "-" + z(i,j) + " -" + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
                 }
             }
 
             encode << clause;
+            clause = "";
             // std::cout << "cell:" << cell << std::endl;
         }
     }
