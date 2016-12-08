@@ -69,11 +69,12 @@ string z(int i, int j) {
 string r(int i, int j, int c1_i, int c1_j ) {
     // The variables must not correspond to segments, hence they should
     // have another enumeration. Note that the number of segments are :
-    // numVertical + numHorizontal so we use that as an offset for next variables
+    // numVertical + numHorizontal + N * M so we use that as an offset
+    // for next variables
 
     int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
     int c1_val = (c1_i - 1) * M + c1_j; // transforming de c1_i,c1_j position to a one dimensional array
-    return std::to_string(2 * numSegm + val + c1_val);
+    return std::to_string(numSegm + val * (N * M) + val + c1_val);
 }
 
 int main(int argc, const char **argv) {
@@ -293,12 +294,14 @@ int main(int argc, const char **argv) {
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
                     if (c1_i != i && c1_j != j) {
-                        for (int c2_i = c1_i + 1; c2_i <= N; c2_i++) {
-                            for (int c2_j = c1_i + 1; c2_j <= M; c2_j++) {
-                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                        for (int c2_i = 1; c2_i <= N; c2_i++) {
+                            for (int c2_j = 1; c2_j <= M; c2_j++) {
+                                // if (c1_i != c2_i && c1_j != c2_j) {
+                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+                                // }
                             }
                         }
                     }
