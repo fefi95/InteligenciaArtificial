@@ -16,6 +16,13 @@ using namespace std;
 
 int N, M; // dimensions (row, columns) of the problem
 
+/**
+    Function that represents a variable for the SATLIB format
+    @param i: row position of the cell
+    @param j: column position of the cell
+    @param coord [n|s|e|w]: cardinal reference of the segment
+    return: a string that represents the number of variable of that segment
+*/
 string q(int i, int j, char coord) {
 
     int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
@@ -30,6 +37,23 @@ string q(int i, int j, char coord) {
                 break;
     }
     return "";
+}
+
+/**
+    Function that represents a variable for the SATLIB format
+    @param i: row position of the cell
+    @param j: column position of the cell
+    return: a string that represents the number of variable of that segment
+*/
+string z(int i, int j) {
+    // The variables must not correspond to segments, hence they should
+    // have another enumeration. Note that the number of segments are :
+    // numVertical + numHorizontal so we use that as an offset for next variables
+
+    int numHorizontal = (N + 1) * M; // number of horizontal segments
+    int numVertical = (M + 1) * N; // number of vertical segments
+    int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
+    return std::to_string(numHorizontal + numVertical + val);
 }
 
 int main(int argc, const char **argv) {
