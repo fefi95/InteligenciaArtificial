@@ -18,11 +18,12 @@ int N, M; // dimensions (row, columns) of the problem
 int numSegm; // Number of segments of the problem
 
 /**
-    Function that represents a variable for the SATLIB format
-    @param i: row position of the cell
-    @param j: column position of the cell
-    @param coord [n|s|e|w]: cardinal reference of the segment
-    return: a string that represents the number of variable of that segment
+*    Function that represents a variable for the SATLIB format
+*    for a segment
+*    @param i: row position of the cell
+*    @param j: column position of the cell
+*    @param coord [n|s|e|w]: cardinal reference of the segment
+*    return: a string that represents the number of variable of that segment
 */
 string q(int i, int j, char coord) {
 
@@ -41,10 +42,11 @@ string q(int i, int j, char coord) {
 }
 
 /**
-    Function that represents a variable for the SATLIB format
-    @param i: row position of the cell
-    @param j: column position of the cell
-    return: a string that represents the number of variable of that segment
+*   Function that represents a variable for the SATLIB format for interior
+*   and exterior cells
+*   @param i: row position of the cell
+*   @param j: column position of the cell
+*   return: a string that represents the number of variable of that restriction
 */
 string z(int i, int j) {
     // The variables must not correspond to segments, hence they should
@@ -53,6 +55,24 @@ string z(int i, int j) {
 
     int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
     return std::to_string(numSegm + val);
+}
+
+/**
+*   Function that represents a variable for the SATLIB format for the
+*   reachability restrictions
+*   @param i: row position of the cell
+*   @param j: column position of the cell
+*   @param c1_i: row position of the c1 cell
+*   @param c1_j: column position of the c1 cell
+*   return: a string that represents the number of variable of that restrictions
+*/
+string r(int i, int j, int c1_i, int c1_j ) {
+    // The variables must not correspond to segments, hence they should
+    // have another enumeration. Note that the number of segments are :
+    // numVertical + numHorizontal so we use that as an offset for next variables
+
+    int val = (i - 1) * M + j; // transforming de i,j position to a one dimensional array
+    return std::to_string(2 * numSegm + val);
 }
 
 int main(int argc, const char **argv) {
@@ -98,7 +118,9 @@ int main(int argc, const char **argv) {
             ******************************************************************/
             switch (cell) {
                 case '0':
+                        encode << "c TYPE 1 CLAUSES:" << std::endl;
                         encode << "c rules for 0:" << std::endl;
+
                         // all surrounding segments are false
                         clause += "-" + q(i,j,n) + " 0\n";
                         clause += "-" + q(i,j,e) + " 0\n";
@@ -106,7 +128,9 @@ int main(int argc, const char **argv) {
                         clause += "-" + q(i,j,w) + " 0\n";
                     break;
                 case '1':
+                        encode << "c TYPE 1 CLAUSES:" << std::endl;
                         encode << "c rules for 1:" << std::endl;
+
                         // a segment is true and the rest are false
                         clause += q(i,j,n) + " " + q(i,j,e) + " " + q(i,j,s) + " " + q(i,j,w) + " 0\n";
                         clause += "-" + q(i,j,n) + " -" + q(i,j,e) + " 0\n";
@@ -117,6 +141,7 @@ int main(int argc, const char **argv) {
                         clause += "-" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
                     break;
                 case '2':
+                        encode << "c TYPE 1 CLAUSES:" << std::endl;
                         encode << "c rules for 2:" << std::endl;
 
                         // up and down segment are true and the rest are false
@@ -156,7 +181,9 @@ int main(int argc, const char **argv) {
                         // clause +=  q(i,j,n) + " " + q(i,j,s) + " " + q(i,j,e) + " 0\n";
                     break;
                 case '3':
+                        encode << "c TYPE 1 CLAUSES:" << std::endl;
                         encode << "c rules for 3:" << std::endl;
+
                         clause +=  "-" + q(i,j,n) + " -" + q(i,j,s) + " -"+ q(i,j,w) + " -"+ q(i,j,e) +" 0\n";
 
                         // up, down and left segments are true and right is false
@@ -180,19 +207,23 @@ int main(int argc, const char **argv) {
                         // clause +=  q(i,j,n) + " " + q(i,j,e) + " 0\n";
                     break;
                 case '4':
+                        encode << "c TYPE 1 CLAUSES:" << std::endl;
+                        encode << "c rules for 4:" << std::endl;
+
                         // all surrounding segments are true
                         clause  =  q(i,j,n) + " 0\n";
                         clause +=  q(i,j,s) + " 0\n";
                         clause +=  q(i,j,w) + " 0\n";
                         clause +=  q(i,j,e) + " 0\n";
-
                     break;
             }
+            encode << clause;
+            clause = "";
 
             /******************************************************************
                 Type 2 clauses
             ******************************************************************/
-
+            encode << "c TYPE 2 CLAUSES:" << std::endl;
             // Upper border
             if (i == 1) {
                 clause +=  q(i,j,n) + " -" + z(1,j) + " 0\n";
@@ -246,14 +277,35 @@ int main(int argc, const char **argv) {
                 clause += " " + z(i,j) + " " + q(i,j,s) + " -" + z(i,j-1) + " 0\n";
                 clause += " " + z(i,j) + " " + q(i,j,w) + " -" + z(i-1,j) + " 0\n";
             }
+            encode << clause;
+            clause = "";
 
             /******************************************************************
                 Type 3 clauses
             ******************************************************************/
+            // encode << "c TYPE 3 CLAUSES:" << std::endl;
+            //
+            // // Every cell is reachable from itself
+            // clause += r(i,j,i,j) + " 0\n";
+            //
+            // // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
+            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+            // clause += "-" + r(i,j,c1_i,c1_j) + " " q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
+            // encode << clause;
+            // clause = "";
 
             /******************************************************************
-                Type 2 clauses
+                Type 4 clauses
             ******************************************************************/
+            encode << "c TYPE 4 CLAUSES:" << std::endl;
+
+            for (int c1_i = 1; c1_i < N; c1_i++) {
+                for (int c1_j = 1; c1_j < N; c1_j++) {
+                    clause += "-" + z(i,j) + " -" + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
+                }
+            }
 
             encode << clause;
             // std::cout << "cell:" << cell << std::endl;
