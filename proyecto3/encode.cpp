@@ -100,7 +100,8 @@ int main(int argc, const char **argv) {
     int numHorizontal = (N + 1) * M; // number of horizontal segments
     int numVertical = (M + 1) * N;   // number of vertical segments
     numSegm = numHorizontal + numVertical;
-    int numVar = numSegm; // FIX!
+    // Number of segments + Number of z(i,j) + number of r(c,c')
+    int numVar = numSegm + N * M + N * M * N * M;
     int numClauses = 0; // FIX!
 
     encode << "p cnf " << numVar << " " << numClauses << std::endl;
@@ -299,18 +300,12 @@ int main(int argc, const char **argv) {
             // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
-                    if (c1_i != i && c1_j != j) {
-                        for (int c2_i = 1; c2_i <= N; c2_i++) {
-                            for (int c2_j = 1; c2_j <= M; c2_j++) {
-                                if (c1_i != c2_i && c1_j != c2_j) {
-                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                    clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c2_i, c2_j) + " 0\n";
-                                }
-                            }
-                        }
-                    }
+                    // if (c1_i != i && c1_j == j) {
+                        clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c1_i-1,c1_j) + " 0\n";
+                        clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c1_i,c1_j+1) + " 0\n";
+                        clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c1_i+1,c1_j) + " 0\n";
+                        clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c1_i,c1_j-1) + " 0\n";
+                    // }
                 }
             }
             encode << clause;
@@ -323,13 +318,13 @@ int main(int argc, const char **argv) {
 
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
-                    clause += "-" + z(i,j) + " -" + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
+                    clause += z(i,j) + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
                 }
             }
 
             encode << clause;
             clause = "";
-            // std::cout << "cell:" << cell << std::endl;
+            // std::cout << "cell(" << i << ", " << j << ") =" << cell << std::endl;
         }
     }
 
