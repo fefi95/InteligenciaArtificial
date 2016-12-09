@@ -300,12 +300,18 @@ int main(int argc, const char **argv) {
             // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
-                    // if (c1_i != i && c1_j == j) {
+                    if (c1_i - 1 > 1) {
                         clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,n) + " " + r(i,j,c1_i-1,c1_j) + " 0\n";
+                    }
+                    if (c1_j + 1 < M) {
                         clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,e) + " " + r(i,j,c1_i,c1_j+1) + " 0\n";
+                    }
+                    if (c1_i + 1 < N ) {
                         clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,s) + " " + r(i,j,c1_i+1,c1_j) + " 0\n";
+                    }
+                    if (c1_j - 1 > 1) {
                         clause += "-" + r(i,j,c1_i,c1_j) + " " + q(c1_i,c1_j,w) + " " + r(i,j,c1_i,c1_j-1) + " 0\n";
-                    // }
+                    }
                 }
             }
             encode << clause;
@@ -318,7 +324,7 @@ int main(int argc, const char **argv) {
 
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
-                    clause += z(i,j) + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
+                    clause += z(i,j) + " " + z(c1_i,c1_j) + " " + r(i,j,c1_i,c1_j) + " 0\n";
                 }
             }
 
