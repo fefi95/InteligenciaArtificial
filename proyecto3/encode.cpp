@@ -334,6 +334,90 @@ int main(int argc, const char **argv) {
         }
     }
 
+    /******************************************************************
+        Type 5 clauses
+    ******************************************************************/
+
+    // Each point on the grid must have zero or exactly 2 adjacent segments
+
+    // Case: upper-left corner
+    clause += "-" + q(1,1,n) + " " + q(1,1,w) + " 0\n";
+    clause += "-" + q(1,1,w) + " " + q(1,1,n) + " 0\n";
+
+    // Case upper-right corner
+    clause += "-" + q(1,M,n) + " " + q(1,M,e) + " 0\n";
+    clause += "-" + q(1,M,e) + " " + q(1,M,n) + " 0\n";
+
+    // Case lower-left corner
+    clause += "-" + q(N,1,s) + " " + q(N,1,w) + " 0\n";
+    clause += "-" + q(N,1,w) + " " + q(N,1,s) + " 0\n";
+
+    // Case lower-right corner
+    clause += "-" + q(N,M,s) + " " + q(N,M,e) + " 0\n";
+    clause += "-" + q(N,M,e) + " " + q(N,M,s) + " 0\n";
+
+    for (int i = 0; i <= N; i++) {
+        for (int j = 0; j <= M; j++) {
+            // Upper border without corner
+            if (i == 0 && j != 0 && j != M) {
+                clause += "-" + q(1,j,n) + " " + q(1,j+1,n) + " " + q(1,j,e) + " 0\n";
+                clause += q(1,j,n) + " -" + q(1,j+1,n) + " " + q(1,j,e) + " 0\n";
+                clause += q(1,j,n) + " " + q(1,j+1,n) + " -" + q(1,j,e) + " 0\n";
+                clause += "-" + q(1,j,n) + " -" + q(1,j+1,n) + " -" + q(1,j,e) + " 0\n";
+            }
+
+            // Lower border without corner
+            else if (i == N && j != 0 && j != M) {
+                clause += "-" + q(N,j,s) + " " + q(N,j+1,s) + " " + q(N,j,e) + " 0\n";
+                clause += q(N,j,s) + " -" + q(N,j+1,s) + " " + q(N,j,e) + " 0\n";
+                clause += q(N,j,s) + " " + q(N,j+1,s) + " -" + q(N,j,e) + " 0\n";
+                clause += "-" + q(N,j,s) + " -" + q(N,j+1,s) + " -" + q(N,j,e) + " 0\n";
+            }
+
+            // Left border without corner
+            if (j == 0 && i != 0 && i != N ){
+                clause += "-" + q(i,1,w) + " " + q(i+1,1,w) + " " + q(i,1,s) + " 0\n";
+                clause += q(i,1,w) + " -" + q(i+1,1,w) + " " + q(i,1,s) + " 0\n";
+                clause += q(i,1,w) + " " + q(i+1,1,w) + " -" + q(i,1,s) + " 0\n";
+                clause += "-" + q(i,1,w) + " -" + q(i+1,1,w) + " -" + q(i,1,s) + " 0\n";
+            }
+
+            // Right border without corner
+            else if (j == M  && i != 0 && i != N){
+                clause += "-" + q(i,M,e) + " " + q(i+1,M,e) + " " + q(i,M,s) + " 0\n";
+                clause += q(i,M,e) + " -" + q(i+1,M,e) + " " + q(i,M,s) + " 0\n";
+                clause += q(i,M,e) + " " + q(i+1,M,e) + " -" + q(i,M,s) + " 0\n";
+                clause += "-" + q(i,M,e) + " -" + q(i+1,M,e) + " -" + q(i,M,s) + " 0\n";
+            }
+
+            if (i > 0 && i < N && j > 0 && j < M) {
+                // If a segment is adjacent to the dot on the grid (i,j) then exist
+                // another segment that is adjacent as well
+                clause += "-" + q(i,j,e) + " " + q(i,j,s) + " " + q(i+1,j+1,w) + " " + q(i+1,j+1,n) + " 0\n";
+                clause += q(i,j,e) + " -" + q(i,j,s) + " " + q(i+1,j+1,w) + " " + q(i+1,j+1,n) + " 0\n";
+                clause += q(i,j,e) + " " + q(i,j,s) + " -" + q(i+1,j+1,w) + " " + q(i+1,j+1,n) + " 0\n";
+                clause += q(i,j,e) + " " + q(i,j,s) + " " + q(i+1,j+1,w) + " -" + q(i+1,j+1,n) + " 0\n";
+
+                // If there are two segments that are adjacent to the dot on the grid (i,j)
+                // then the other two are not
+                clause += "-" + q(i,j,e) + " -" + q(i,j,s) + " -" + q(i+1,j+1,w) + " 0\n";
+                clause += "-" + q(i,j,e) + " -" + q(i,j,s) + " -" + q(i+1,j+1,n) + " 0\n";
+                clause += "-" + q(i,j,e) + " -" + q(i+1,j+1,w) + " -" + q(i,j,s)  + " 0\n";
+                clause += "-" + q(i,j,e) + " -" + q(i+1,j+1,w) + " -" + q(i+1,j+1,n) + " 0\n";
+                clause += "-" + q(i,j,e) + " -" + q(i+1,j+1,n) + " -" + q(i,j,s) + " 0\n";
+                clause += "-" + q(i,j,e) + " -" + q(i+1,j+1,n) + " -" + q(i+1,j+1,w)  + " 0\n";
+                clause += "-" + q(i,j,s) + " -" + q(i+1,j+1,w) + " -" + q(i,j,e) + " 0\n";
+                clause += "-" + q(i,j,s) + " -" + q(i+1,j+1,w) + " -" + q(i+1,j+1,n) + " 0\n";
+                clause += "-" + q(i,j,s) + " -" + q(i+1,j+1,n) + " -" + q(i,j,e) + " 0\n";
+                clause += "-" + q(i,j,s) + " -" + q(i+1,j+1,n) + " -" + q(i+1,j+1,w) + " 0\n";
+                clause += "-" + q(i+1,j+1,w) + " -" + q(i+1,j+1,n) + " -" + q(i,j,e) + " 0\n";
+                clause += "-" + q(i+1,j+1,w) + " -" + q(i+1,j+1,n) + " -" + q(i,j,s) + " 0\n";
+            }
+            encode << clause;
+            clause = "";
+        }
+    }
+
 
     input.close();
     encode.close();
