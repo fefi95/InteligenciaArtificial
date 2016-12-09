@@ -124,6 +124,7 @@ int main(int argc, const char **argv) {
 
             /******************************************************************
                 Type 1 clauses
+                exactly n segment surrounds the cell for n = 0, 1, 2, 3, 4
             ******************************************************************/
             switch (cell) {
                 case '0':
@@ -160,34 +161,17 @@ int main(int argc, const char **argv) {
                         clause +=  q(i,j,e) + " " + q(i,j,w) + " " + q(i,j,n) + " 0\n";
 
                         // up and left segment are true and the rest are false
-                        // clause +=  "-" + q(i,j,n) + " -" + q(i,j,w) + " -"+ q(i,j,s) + " 0\n";
                         clause +=  "-" + q(i,j,n) + " -" + q(i,j,w) + " -"+ q(i,j,e) + " 0\n";
-                        // clause +=  q(i,j,e) + " " + q(i,j,s) + " " + q(i,j,w) + " 0\n";
                         clause +=  q(i,j,e) + " " + q(i,j,s) + " " + q(i,j,n) + " 0\n";
 
                         // up and right segment are true and the rest are false
-                        // clause +=  "-" + q(i,j,n) + " -" + q(i,j,e) + " -"+ q(i,j,s) + " 0\n";
-                        // clause +=  "-" + q(i,j,n) + " -" + q(i,j,e) + " -"+ q(i,j,w) + " 0\n";
-                        // clause +=  q(i,j,w) + " " + q(i,j,s) + " " + q(i,j,e) + " 0\n";
                         clause +=  q(i,j,w) + " " + q(i,j,s) + " " + q(i,j,n) + " 0\n";
 
                         // down and left segment are true and the rest are false
-                        // clause +=  "-" + q(i,j,s) + " -" + q(i,j,w) + " -"+ q(i,j,n) + " 0\n";
                         clause +=  "-" + q(i,j,s) + " -" + q(i,j,w) + " -"+ q(i,j,e) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,e) + " " + q(i,j,s) + " 0\n";
                         clause +=  q(i,j,n) + " " + q(i,j,e) + " " + q(i,j,w) + " 0\n";
 
-                        // down and right segment are true and the rest are false
-                        // clause +=  "-" + q(i,j,s) + " -" + q(i,j,e) + " -"+ q(i,j,n) + " 0\n";
-                        // clause +=  "-" + q(i,j,s) + " -" + q(i,j,e) + " -"+ q(i,j,w) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,w) + " " + q(i,j,s) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,w) + " " + q(i,j,e) + " 0\n";
 
-                        // left and right segment are true and the rest are false
-                        // clause +=  "-" + q(i,j,w) + " -" + q(i,j,e) + " -"+ q(i,j,n) + " 0\n";
-                        // clause +=  "-" + q(i,j,w) + " -" + q(i,j,e) + " -"+ q(i,j,s) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,s) + " " + q(i,j,w) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,s) + " " + q(i,j,e) + " 0\n";
                     break;
                 case '3':
                         encode << "c TYPE 1 CLAUSES:" << std::endl;
@@ -203,17 +187,9 @@ int main(int argc, const char **argv) {
                         // up, down and right segments are true and left is false
                         clause +=  q(i,j,w) + " " + q(i,j,n) + " 0\n";
                         clause +=  q(i,j,w) + " " + q(i,j,s) + " 0\n";
-                        // clause +=  q(i,j,w) + " " + q(i,j,e) + " 0\n";
 
                         // up, left and right segments are true and down is false
                         clause +=  q(i,j,s) + " " + q(i,j,n) + " 0\n";
-                        // clause +=  q(i,j,s) + " " + q(i,j,w) + " 0\n";
-                        // clause +=  q(i,j,s) + " " + q(i,j,e) + " 0\n";
-
-                        // down, left and right segments are true and up is false
-                        // clause +=  up + " " + q(i,j,s) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,w) + " 0\n";
-                        // clause +=  q(i,j,n) + " " + q(i,j,e) + " 0\n";
                     break;
                 case '4':
                         encode << "c TYPE 1 CLAUSES:" << std::endl;
@@ -231,6 +207,8 @@ int main(int argc, const char **argv) {
 
             /******************************************************************
                 Type 2 clauses
+                Interior cells are within the perimeter of the solution and
+                exterior cells are not
             ******************************************************************/
             encode << "c TYPE 2 CLAUSES:" << std::endl;
             // Upper border
@@ -259,12 +237,6 @@ int main(int argc, const char **argv) {
 
             // Cells that are not in the border
             else {
-                // z(i,j) <=> [-q(i,j,n) & z(i,j+1)] v [-q(i,j,e) & z(i+1,j)] v [-q(i,j,s) & z(i,j-1)] v [-q(i,j,w) & z(i-1,j)]
-                // renaming
-                // (~P || ((~Q && R) || (~S && T) || (~U && V) || (~W && X))) && (P || ~((~Q && R) || (~S && T) || (~U && V) || (~W && X)))
-                // to cnf:
-                // (~P | ~Q | ~S | ~U | ~W) & (~P | ~Q | ~S | ~U | X) & (~P | ~Q | ~S | V | ~W) & (~P | ~Q | ~S | V | X) & (~P | ~Q | T | ~U | ~W) & (~P | ~Q | T | ~U | X) & (~P | ~Q | T | V | ~W) & (~P | ~Q | T | V | X) & (~P | R | ~S | ~U | ~W) & (~P | R | ~S | ~U | X) & (~P | R | ~S | V | ~W) & (~P | R | ~S | V | X) & (~P | R | T | ~U | ~W) & (~P | R | T | ~U | X) & (~P | R | T | V | ~W) & (~P | R | T | V | X) & (P | Q | ~R) & (P | S | ~T) & (P | U | ~V) & (P | W | ~X)
-
                 clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
                 clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " " +  z(i-1,j) + " 0\n";
                 clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " " + z(i,j-1) + " -" + q(i,j,w) + " 0\n";
@@ -291,13 +263,16 @@ int main(int argc, const char **argv) {
 
             /******************************************************************
                 Type 3 clauses
+                Reachability
             ******************************************************************/
             encode << "c TYPE 3 CLAUSES:" << std::endl;
 
             // Every cell is reachable from itself
             clause += r(i,j,i,j) + " 0\n";
 
-            // i,j is reachable form c1_i,c1_j and c2_i,c2_j is adjacent to c1_i,c1,j
+            // i,j is reachable form c1_i,c1_j and another cell is adjacent to it,
+            // say c'', and there is not segment between them then i,j is reachable
+            // from c''
             for (int c1_i = 1; c1_i <= N; c1_i++) {
                 for (int c1_j = 1; c1_j <= M; c1_j++) {
                     if (c1_i - 1 > 1) {
@@ -319,6 +294,7 @@ int main(int argc, const char **argv) {
 
             /******************************************************************
                 Type 4 clauses
+                All interior cells are reachable from each other
             ******************************************************************/
             encode << "c TYPE 4 CLAUSES:" << std::endl;
 
@@ -336,9 +312,9 @@ int main(int argc, const char **argv) {
 
     /******************************************************************
         Type 5 clauses
+        Each dot on the grid must have zero or exactly 2 adjacent segments
     ******************************************************************/
-
-    // Each point on the grid must have zero or exactly 2 adjacent segments
+    encode << "c TYPE 5 CLAUSES:" << std::endl;
 
     // Case: upper-left corner
     clause += "-" + q(1,1,n) + " " + q(1,1,w) + " 0\n";
