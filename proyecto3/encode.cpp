@@ -394,7 +394,8 @@ int main(int argc, const char **argv) {
         }
     }
 
-
+    encode << "\n";
+    
     input.close();
     encode.close();
     return 0;

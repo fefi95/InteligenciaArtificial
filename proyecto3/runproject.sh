@@ -13,5 +13,29 @@ make
 
 echo "done!"
 echo "Running encoding..."
-./encode input.txt
-./minisat_static encode.cnf decode.txt -no-luby -rinc=1.5 -phase-saving=0 -rnd-freq=0.02
+
+rm -f output.txt
+
+while read line || [[ -n "$line" ]]; 
+do
+	# Add the actual game state to the file.
+	echo $line
+	echo $line > gameState.txt
+
+	# Encode the file.
+	./encode gameState.txt
+
+	# Use minisat.
+	./minisat_static encode.cnf decode.txt -no-luby -rinc=1.5 -phase-saving=0 -rnd-freq=0.02
+	
+	# Decore the result
+	echo $line >> output.txt
+	./decode decode.txt $line[0] $line[1] 
+	echo >> output.txt
+done < input.txt
+
+# Delete the aux file.
+rm -f aux.txt decode.txt
+make clean
+
+

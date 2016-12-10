@@ -1,0 +1,42 @@
+/* 
+	Clausulas:
+		+ Tipo 0:
+			1. ((¬q (i, j, e) v q(i+1,j,w)) 
+			2. (¬q(i+1, j,w) v (q(i,j,e)))
+			3. ((¬q (i, j, n) v q(i,j+1,s))
+			4. (¬q(i, j+1,s) v (q(i,j,n)))
+
+		+ Tipo 1:
+			Para n=0
+			5. -q(i,j,n)
+			6. -q(i,j,e)
+			7. -q(i,j,s)
+			8. -q(i,j,w)
+
+			Para n=1
+
+			9.   q(i,j,n) v q(i,j,e) v q(i,j,s) v q(i,j,w)
+			10.  -q(i,j,n) v -q(i,j,e)
+			11.  -q(i,j,n) v -q(i,j,s)
+			12. -q(i,j,n) v -q(i,j,w)
+			13. -q(i,j,e) v -q(i,j,s)
+			14. -q(i,j,e) v -q(i,j,w)
+			15. -q(i,j,s) v -q(i,j,w)
+
+		+ Tipo 2:
+			16. q(1,j,w) v z(1,j)
+			17. -z(1,j) v q(1,j,w) 
+			18. q(N,j,e) v z(N,j)
+			19. -z(N,j) v q(N,j,e)
+			20. q(i,1,s) v z(i,1)
+			21. -z(i,1) v q(i,1,s)
+			22. q(i,M,n) v z(i,M)
+			23. q(i,M,n) v -z(i,M) 
+			
+		+ Tipo 3:
+			24. -r(c,c') v q(c',n) v r(c,c'')
+		+ Tipo 4:
+			25. -z(c) v -z(c') v r(c,c')
+
+			26. r(c,c)
+*/

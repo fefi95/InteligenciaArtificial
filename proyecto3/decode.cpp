@@ -23,7 +23,7 @@ int main(int argc, const char **argv) {
     ofstream output; // output output SAT file
 
     input.open(argv[1]);
-    output.open("output.txt");
+    output.open("output.txt", std::ios::app);
     string sol; // dimensions (row, colmuns) of the problem
     input >> sol;
     int N = atoi(argv[2]);
