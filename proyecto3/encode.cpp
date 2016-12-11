@@ -96,7 +96,6 @@ int main(int argc, const char **argv) {
     input >> N;
     input >> M;
 
-    //WARNING: NUMBER OF VARIABLES AND CLAUSES WITHOUT CONSIDERING THAT IS A COMPLETE CYCLE. FIX
     int numHorizontal = (N + 1) * M; // number of horizontal segments
     int numVertical = (M + 1) * N;   // number of vertical segments
     numSegm = numHorizontal + numVertical;
@@ -105,7 +104,6 @@ int main(int argc, const char **argv) {
     int numClauses = 0; // FIX!
 
     encode << "p cnf " << numVar << " " << numClauses << std::endl;
-    // std::cout << N << M << std::endl;
     char cell;
     string clause; // all clauses represents a CNF problem.
     char n = 'n';
@@ -154,6 +152,8 @@ int main(int argc, const char **argv) {
                         encode << "c TYPE 1 CLAUSES:" << std::endl;
                         encode << "c rules for 2:" << std::endl;
 
+                        clause += "-" + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " -"+ q(i,j,w) + " 0\n";
+
                         // up and down segment are true and the rest are false
                         clause +=  "-" + q(i,j,n) + " -" + q(i,j,s) + " -"+ q(i,j,w) + " 0\n";
                         clause +=  "-" + q(i,j,n) + " -" + q(i,j,s) + " -"+ q(i,j,e) + " 0\n";
@@ -170,7 +170,6 @@ int main(int argc, const char **argv) {
                         // down and left segment are true and the rest are false
                         clause +=  "-" + q(i,j,s) + " -" + q(i,j,w) + " -"+ q(i,j,e) + " 0\n";
                         clause +=  q(i,j,n) + " " + q(i,j,e) + " " + q(i,j,w) + " 0\n";
-
 
                     break;
                 case '3':
@@ -237,26 +236,28 @@ int main(int argc, const char **argv) {
 
             // Cells that are not in the border
             else {
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " " +  z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " " + z(i,j-1) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " -" + q(i,j,e) + " " + z(i,j-1) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " " + z(i+1,j) + " -" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " " + z(i+1,j) + " -" + q(i,j,s) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " " + z(i+1,j) + " -" + z(i,j-1) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " -" + q(i,j,n) + " " + z(i+1,j) + " -" + z(i,j-1) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " -" + q(i,j,e) + " -" + q(i,j,s) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " -" + q(i,j,e) + " " + z(i,j-1) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " -" + q(i,j,e) + " " + z(i,j-1) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " " + z(i+1,j) + " -" + q(i,j,s) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " " + z(i+1,j) + " -" + q(i,j,s) + " " + z(i-1,j) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " " + z(i+1,j) + " " + z(i,j-1) + " -" + q(i,j,w) + " 0\n";
-                clause += "-" + z(i,j) + " " + q(i,j,n) + " " + z(i+1,j) + " " + z(i,j-1) + " " + z(i-1,j) + " 0\n";
-                clause += " " + z(i,j) + " " + q(i,j,n) + " -" + q(i,j,n) + " 0\n";
-                clause += " " + z(i,j) + " " + q(i,j,e) + " -" + z(i+1,j) + " 0\n";
-                clause += " " + z(i,j) + " " + q(i,j,s) + " -" + z(i,j-1) + " 0\n";
-                clause += " " + z(i,j) + " " + q(i,j,w) + " -" + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,n) + "-" + q(i,j,s) + "-" + q(i,j,w) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,n) + "-" + q(i,j,s) + " " + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,n) + " " + z(i,j-1) + "-" + q(i,j,w) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,n) + " " + z(i,j-1) + " " + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,n) + "-" + q(i,j,s) + "-" + q(i,j,w) + " " + z(i+1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,n) + "-" + q(i,j,s) + " " + z(i-1,j) + " " + z(i+1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,n) + "-" + q(i,j,w) + " " + z(i,j-1) + " " + z(i+1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,n) + " " + z(i,j-1) + " " + z(i-1,j) + " " + z(i+1,j) + " 0\n";
+                  
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,s) + "-" + q(i,j,w) + " " + z(i,j+1) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,s) + " " + z(i,j+1) + " " + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + "-" + q(i,j,w) + " " + z(i,j+1) + " " + z(i,j-1) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,e) + " " + z(i,j-1) + " " + z(i,j+1) + " " + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,s) + "-" + q(i,j,w) + " " + z(i,j+1) + " " + z(i+1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,s) + " " + z(i,j+1) + " " + z(i+1,j) + " " + z(i-1,j) + " 0\n";
+                clause += "-" + z(i,j) + "-" + q(i,j,w) + " " + z(i,j+1) + " " + z(i+1,j) + " " + z(i,j-1) + " 0\n";
+                clause += "-" + z(i,j) + " " + z(i-1,j) + " " + z(i,j+1) + " " + z(i+1,j) + " " + z(i,j-1) + " 0\n";
+
+                clause += " " + z(i,j) + " " + q(i,j,n) + "-" + z(i,j+1) + " 0\n";
+                clause += " " + z(i,j) + " " + q(i,j,e) + "-" + z(i+1,j) + " 0\n";
+                clause += " " + z(i,j) + " " + q(i,j,s) + "-" + z(i,j-1) + " 0\n";
+                clause += " " + z(i,j) + " " + q(i,j,w) + "-" + z(i-1,j) + " 0\n";
             }
             encode << clause;
             clause = "";
@@ -306,7 +307,6 @@ int main(int argc, const char **argv) {
 
             encode << clause;
             clause = "";
-            // std::cout << "cell(" << i << ", " << j << ") =" << cell << std::endl;
         }
     }
 
@@ -395,7 +395,7 @@ int main(int argc, const char **argv) {
     }
 
     encode << "\n";
-    
+
     input.close();
     encode.close();
     return 0;
