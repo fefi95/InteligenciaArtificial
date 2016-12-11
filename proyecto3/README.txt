@@ -4,7 +4,7 @@ OVERVIEW:
 minisat/        Contains minisat project
 encode.cpp      Encoding the problem so it can be use by Minisat
 decode.cpp      Decoding of the solution given by minisat
-runproject.sh   Shell scrip that reads input file a gives a solution for all the
+runproject.sh   Shell script that reads input file a gives a solution for all the
                 problems in that file
 
 ================================================================================
