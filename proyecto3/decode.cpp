@@ -4,7 +4,7 @@
     Edward Fernandez 10-11121
     Stefani Castellanos 11-11394
 
-    This file contains the encoding for the SAT problem especified
+    This file contains the decoding for the SAT problem especified
     It outputs a file in SATLIB format to be use with minisat
 */
 
@@ -44,9 +44,7 @@ int main(int argc, const char **argv) {
             }
         }
         hor[i] = horTemp;
-        // std::cout << i+1 << " " << hor[i] << std::endl;
     }
-    // std::cout << "vertical:" << std::endl;
     // reading vertical segments from input file
     string ver[M], verTemp;
     for (int i = 0; i < M; i++) {
@@ -61,7 +59,6 @@ int main(int argc, const char **argv) {
             }
         }
         ver[i] = verTemp;
-        // std::cout << i+1 << " " << ver[i] << std::endl;
     }
 
     // write to output
