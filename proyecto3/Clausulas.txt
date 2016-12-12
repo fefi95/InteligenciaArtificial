@@ -1,7 +1,7 @@
-/* 
+/*
 	Clausulas:
 		+ Tipo 0:
-			1. ((¬q (i, j, e) v q(i+1,j,w)) 
+			1. ((¬q (i, j, e) v q(i+1,j,w))
 			2. (¬q(i+1, j,w) v (q(i,j,e)))
 			3. ((¬q (i, j, n) v q(i,j+1,s))
 			4. (¬q(i, j+1,s) v (q(i,j,n)))
@@ -23,20 +23,134 @@
 			14. -q(i,j,e) v -q(i,j,w)
 			15. -q(i,j,s) v -q(i,j,w)
 
+			Para n=2
+			-q(i,j,n) v -q(i,j,e) v -q(i,j,s) v -q(i,j,w)
+
+			-q(i,j,n) v -q(i,j,s) v -q(i,j,w)
+			-q(i,j,n) v -q(i,j,s) v -q(i,j,e)
+			q(i,j,e) v q(i,j,w) v q(i,j,s)
+			q(i,j,e) v q(i,j,w) v q(i,j,n)
+
+			-q(i,j,n) v -q(i,j,w) v -q(i,j,e)
+			q(i,j,e) v q(i,j,s) v q(i,j,n)
+
+			q(i,j,w) v q(i,j,s) v q(i,j,n)
+
+			-q(i,j,s) v -q(i,j,w) v -q(i,j,e)
+			q(i,j,n) v q(i,j,e) v q(i,j,w)
+
+			Para n=3
+			-q(i,j,n) v -q(i,j,s) v -q(i,j,w) v -q(i,j,e)
+
+			q(i,j,e) v q(i,j,n)
+			q(i,j,e) v q(i,j,s)
+			q(i,j,e) v q(i,j,w)
+
+			q(i,j,w) v q(i,j,n)
+			q(i,j,w) v q(i,j,s)
+			q(i,j,s) v q(i,j,n)
+
+			Para n=4
+			// all surrounding segments are true
+			q(i,j,n)
+			q(i,j,s)
+			q(i,j,w)
+			q(i,j,e)
+
 		+ Tipo 2:
 			16. q(1,j,w) v z(1,j)
-			17. -z(1,j) v q(1,j,w) 
+			17. -z(1,j) v q(1,j,w)
 			18. q(N,j,e) v z(N,j)
 			19. -z(N,j) v q(N,j,e)
 			20. q(i,1,s) v z(i,1)
 			21. -z(i,1) v q(i,1,s)
 			22. q(i,M,n) v z(i,M)
-			23. q(i,M,n) v -z(i,M) 
-			
+			23. q(i,M,n) v -z(i,M)
+			-z(i,j) v -q(i,j,e) v -q(i,j,n) v -q(i,j,s) v -q(i,j,w)
+			-z(i,j) v -q(i,j,e) v -q(i,j,n) v -q(i,j,s) v z(i-1,j)
+			-z(i,j) v -q(i,j,e) v -q(i,j,n) v z(i,j-1) v -q(i,j,w)
+			-z(i,j) v -q(i,j,e) v -q(i,j,n) v z(i,j-1) v z(i-1,j)
+			-z(i,j) v -q(i,j,n) v -q(i,j,s) v -q(i,j,w) v z(i+1,j)
+			-z(i,j) v -q(i,j,n) v -q(i,j,s) v z(i-1,j) v z(i+1,j)
+			-z(i,j) v -q(i,j,n) v -q(i,j,w) v z(i,j-1) v z(i+1,j)
+			-z(i,j) v -q(i,j,n) v z(i,j-1) v z(i-1,j) v z(i+1,j)
+
+			-z(i,j) v -q(i,j,e) v -q(i,j,s) v -q(i,j,w) v z(i,j+1)
+			-z(i,j) v -q(i,j,e) v -q(i,j,s) v z(i,j+1) v z(i-1,j)
+			-z(i,j) v -q(i,j,e) v -q(i,j,w) v z(i,j+1) v z(i,j-1)
+			-z(i,j) v -q(i,j,e) v z(i,j-1) v z(i,j+1) v z(i-1,j)
+			-z(i,j) v -q(i,j,s) v -q(i,j,w) v z(i,j+1) v z(i+1,j)
+			-z(i,j) v -q(i,j,s) v z(i,j+1) v z(i+1,j) v z(i-1,j)
+			-z(i,j) v -q(i,j,w) v z(i,j+1) v z(i+1,j) v z(i,j-1)
+			-z(i,j) v z(i-1,j) v z(i,j+1) v z(i+1,j) v z(i,j-1)
+			z(i,j) v q(i,j,n) v -z(i,j+1)
+			z(i,j) v q(i,j,e) v -z(i+1,j)
+			z(i,j) v q(i,j,s) v -z(i,j-1)
+			z(i,j) v q(i,j,w) v -z(i-1,j)
+
+
 		+ Tipo 3:
 			24. -r(c,c') v q(c',n) v r(c,c'')
 		+ Tipo 4:
 			25. -z(c) v -z(c') v r(c,c')
 
 			26. r(c,c)
+
+		+Tipo 5:
+		// Case: upper-left corner
+	    -q(1,1,n) v q(1,1,w)
+	    -q(1,1,w) v q(1,1,n)
+
+	    // Case upper-right corner
+	    -q(1,M,n) v q(1,M,e)
+	    -q(1,M,e) v q(1,M,n)
+
+	    // Case lower-left corner
+	    -q(N,1,s) v q(N,1,w)
+	    -q(N,1,w) v q(N,1,s)
+
+	    // Case lower-right corner
+	    -q(N,M,s) v q(N,M,e)
+	    -q(N,M,e) v q(N,M,s)
+
+	    // For every point in the excluding the corners
+	    -q(1,j,n) v q(1,j+1,n) v q(1,j,e)
+	    q(1,j,n) v -q(1,j+1,n) v q(1,j,e)
+	    q(1,j,n) v q(1,j+1,n) v -q(1,j,e)
+	    -q(1,j,n) v -q(1,j+1,n) v -q(1,j,e)
+        -q(N,j,s) v q(N,j+1,s) v q(N,j,e)
+        q(N,j,s) v -q(N,j+1,s) v q(N,j,e)
+        q(N,j,s) v q(N,j+1,s) v -q(N,j,e)
+        -q(N,j,s) v -q(N,j+1,s) v -q(N,j,e)
+        -q(i,1,w) v q(i+1,1,w) v q(i,1,s)
+        q(i,1,w) v -q(i+1,1,w) v q(i,1,s)
+        q(i,1,w) v q(i+1,1,w) v -q(i,1,s)
+        -q(i,1,w) v -q(i+1,1,w) v -q(i,1,s)
+        -q(i,M,e) v q(i+1,M,e) v q(i,M,s)
+        q(i,M,e) v -q(i+1,M,e) v q(i,M,s)
+        q(i,M,e) v q(i+1,M,e) v -q(i,M,s)
+        -q(i,M,e) v -q(i+1,M,e) v -q(i,M,s)
+
+	    // Inner cells
+        // If a segment is adjacent to the dot on the grid (i,j) then exist
+        // another segment that is adjacent as well
+        -q(i,j,e) v q(i,j,s) v q(i+1,j+1,w) v q(i+1,j+1,n)
+        q(i,j,e) v -q(i,j,s) v q(i+1,j+1,w) v q(i+1,j+1,n)
+        q(i,j,e) v q(i,j,s) v -q(i+1,j+1,w) v q(i+1,j+1,n)
+        q(i,j,e) v q(i,j,s) v q(i+1,j+1,w) v -q(i+1,j+1,n)
+
+        // If there are two segments that are adjacent to the dot on the grid (i,j)
+        // then the other two are not
+        -q(i,j,e) v -q(i,j,s) v -q(i+1,j+1,w)
+        -q(i,j,e) v -q(i,j,s) v -q(i+1,j+1,n)
+        -q(i,j,e) v -q(i+1,j+1,w) v -q(i,j,s)
+        -q(i,j,e) v -q(i+1,j+1,w) v -q(i+1,j+1,n)
+        -q(i,j,e) v -q(i+1,j+1,n) v -q(i,j,s)
+        -q(i,j,e) v -q(i+1,j+1,n) v -q(i+1,j+1,w)
+        -q(i,j,s) v -q(i+1,j+1,w) v -q(i,j,e)
+        -q(i,j,s) v -q(i+1,j+1,w) v -q(i+1,j+1,n)
+        -q(i,j,s) v -q(i+1,j+1,n) v -q(i,j,e)
+        -q(i,j,s) v -q(i+1,j+1,n) v -q(i+1,j+1,w)
+        -q(i+1,j+1,w) v -q(i+1,j+1,n) v -q(i,j,e)
+        -q(i+1,j+1,w) v -q(i+1,j+1,n) v -q(i,j,s)
 */
