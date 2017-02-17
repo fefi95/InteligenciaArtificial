@@ -44,9 +44,9 @@ def main():
             # Initialize the dataset information (rows length, columns length, names)
             # if it not store.
             if not(init):
-                columms = int(word[0])                # We obtain the columns length.
+                columms = int(wordList[0])                # We obtain the columns length.
                 wordList = next(dataSetFile).split()  # We obtain the next line to obtain the rows length.
-                rows = int(word[0])
+                rows = int(wordList[0])
 
                 # Store the name of the dataset atributes.
                 for i in range(columms):
@@ -76,7 +76,7 @@ def main():
         auxtheta = [0] * (columms - 1)  # Store the new theta's value.
 
         for j in range(columms-1):
-            auxtheta[j] = dcost(alpha, x, y, theta, rows, j)
+            auxtheta[j] = dcost(alpha, varList, resultList, thetas, rows, j)
 
         thetas = np.array(auxtheta, dtype=float) # Update the thetas value.
         newcost = cost(varList , resultList, thetas, rows)
@@ -97,9 +97,9 @@ def main():
 def cost(varList, resultList, theta, m):
     cost = 0
     for i in range(m):
-        aux = np.dot(x[i],theta)-y[i]
+        aux = np.dot(varList[i], theta)- resultList[i]
         cost = cost + (aux * aux)
-    return(cost/(2*m))
+    return(cost / (2*m))
 
 """
     Descripction: calculate the derived cost function.
@@ -107,15 +107,16 @@ def cost(varList, resultList, theta, m):
         @param alpha: this is the learning rate to use.
         @param varList   : all variables in the model.
         @param resultList: store the result of the data.
+        @param theta     : array with the parameters to use.
         @param m         : number of rows.
         @param j         : position of the theta to use.
 """
 def dcost(alpha, varList, resultList, thetas, m, j):
     dcost = 0
     for i in range(m):
-        aux = (np.dot(x[i],theta)-y[i]) * x[i][j]
+        aux = (np.dot(varList[i], thetas)-resultList[i]) * varList[i][j]
         dcost = dcost + aux
-    return(theta[j] - alpha * dcost / (2*m))
+    return(thetas[j] - alpha * dcost / (2*m))
 
 # .----------------------------------------------------------------------------.
 
