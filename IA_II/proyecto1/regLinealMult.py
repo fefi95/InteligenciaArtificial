@@ -65,6 +65,28 @@ def main():
     thetas = np.asarray(thetas, dtype=float)
     varList    = np.array(varList, dtype=float)
     resultList = np.array(resultList, dtype=float)
+
+    # Mean normalization to the varList and resultList.
+    meanVar = [0] * (columms - 1)
+    meanResult = 0
+
+    # First, we obtain the total sum.
+    for i in range(rows):
+        meanVar[0] += varList[i][0]
+        meanVar[1] += varList[i][1]
+        meanResult += resultList[i]
+
+    # Then, we divide into the rows number.
+    for i in range(columms - 1):
+        meanVar[i] = meanVar[i] / rows
+    meanResult = meanResult / rows
+
+    # Update the varList and the resultList.
+    for i in range(rows):
+        meanVar[0] = (varList[i][0] - meanVar[0]) / rows
+        meanVar[1] = (varList[i][1] - meanVar[1]) / rows
+        meanResult = (resultList[i] - meanResult) / rows
+
     conv = False  # Let you know if the function converge.
 
     # Calculate the initial cost.
