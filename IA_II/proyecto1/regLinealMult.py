@@ -3,7 +3,7 @@
     CI-5437
     Edward Fernandez 10-11121
     Stefani Castellanos 11-11394
-    Carlos <insert last name> <insert ID>
+    Carlos Ferreira <insert ID>
 
     Description:
         This file contains the Gradient Descent implementation to solve an multiple
@@ -13,15 +13,16 @@
 # .----------------------------------------------------------------------------.
 # Import libraries to use.
 
-import sys          # This provides access to some variables used or maintained
-                    # by the interpreter.
-import numpy as np  # This provides access to an efficient multi-dimensional
-                    # container of generic data.
+import sys                      # This provides access to some variables used
+                                # or maintained by the interpreter.
+import numpy as np              # This provides access to an efficient
+                                # multi-dimensional container of generic data.
+import matplotlib.pyplot as plt # This provides functions for making plots
 
 # .----------------------------------------------------------------------------.
 
+# Two parameters: input file with data and learning rate (alpha)
 def main():
-
     init = False    # This let you know if it store the dataset information.
     att  = []       # List of dataset attribute.
     varList = []    # Matrix of all the variables in our model.
@@ -44,7 +45,7 @@ def main():
             # Initialize the dataset information (rows length, columns length, names)
             # if it not store.
             if not(init):
-                columms = int(wordList[0])                # We obtain the columns length.
+                columms = int(wordList[0])            # We obtain the columns length.
                 wordList = next(dataSetFile).split()  # We obtain the next line to obtain the rows length.
                 rows = int(wordList[0])
 
@@ -66,9 +67,11 @@ def main():
     varList    = np.array(varList, dtype=float)
     resultList = np.array(resultList, dtype=float)
     conv = False  # Let you know if the function converge.
+    JofTheta = [] # Store values of the cost function for plotting
 
     # Calculate the initial cost.
     cos = cost(varList,resultList,thetas,rows)
+    JofTheta.append(cos)
 
     i = 0 # Initialize the counter of iterations.
     while (not(conv) and (i <= maxIter)):
@@ -80,11 +83,16 @@ def main():
 
         thetas = np.array(auxtheta, dtype=float) # Update the thetas value.
         newcost = cost(varList , resultList, thetas, rows)
+        JofTheta.append(newcost)
 
         i = i + 1 # Update the actual number of iterations.
         if (abs(newcost - cos) <= 0.001):
             conv = True
     print(conv) # Let you know if the function converge.
+
+    # PLOT
+    iterations = np.arange(0, i + 1, 1)
+    makeSimplePlot(iterations, JofTheta, sys.argv[1])
 
 """
     Descripction: Calcule the cost function.
@@ -117,6 +125,22 @@ def dcost(alpha, varList, resultList, thetas, m, j):
         aux = (np.dot(varList[i], thetas)-resultList[i]) * varList[i][j]
         dcost = dcost + aux
     return(thetas[j] - alpha * dcost / (2*m))
+
+"""
+    Descripction: plot of the cost function against number of iterations
+    Parameters:
+        @param iterations   : position of the theta to use.
+        @param costFunction : array that contains the values for every cost
+        @param dsName       : string with the dataset name
+"""
+def makeSimplePlot(iterations, costFunction, dsName):
+    plt.plot(iterations, costFunction)
+    plt.xlabel("numero de iteraciones")
+    plt.ylabel("Funcion de costo (J)")
+    plt.title(dsName)
+    plt.grid(True)
+    plt.savefig(dsName + ".png")
+    plt.show()
 
 # .----------------------------------------------------------------------------.
 
