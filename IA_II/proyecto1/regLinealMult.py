@@ -62,9 +62,9 @@ def main():
         else:
             pass
 
-    thetas = np.asarray(thetas, dtype=float)
-    varList    = np.array(varList, dtype=float)
-    resultList = np.array(resultList, dtype=float)
+    thetas = np.asarray(thetas, dtype=np.float128)
+    varList    = np.array(varList, dtype=np.float128)
+    resultList = np.array(resultList, dtype=np.float128)
 
     # Mean normalization to the varList and resultList.
     meanVar = [0] * (columms - 1)
@@ -100,7 +100,7 @@ def main():
         for j in range(columms-1):
             auxtheta[j] = dcost(alpha, varList, resultList, thetas, rows, j)
 
-        thetas = np.array(auxtheta, dtype=float) # Update the thetas value.
+        thetas = np.array(auxtheta, dtype=np.float128) # Update the thetas value.
         newcost = cost(varList , resultList, thetas, rows)
 
         i = i + 1 # Update the actual number of iterations.
