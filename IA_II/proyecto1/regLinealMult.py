@@ -63,9 +63,31 @@ def main():
         else:
             pass
 
-    thetas = np.asarray(thetas, dtype=float)
-    varList    = np.array(varList, dtype=float)
-    resultList = np.array(resultList, dtype=float)
+    thetas = np.asarray(thetas, dtype=np.float128)
+    varList    = np.array(varList, dtype=np.float128)
+    resultList = np.array(resultList, dtype=np.float128)
+
+    # Mean normalization to the varList and resultList.
+    meanVar = [0] * (columms - 1)
+    meanResult = 0
+
+    # First, we obtain the total sum.
+    for i in range(rows):
+        meanVar[0] += varList[i][0]
+        meanVar[1] += varList[i][1]
+        meanResult += resultList[i]
+
+    # Then, we divide into the rows number.
+    for i in range(columms - 1):
+        meanVar[i] = meanVar[i] / rows
+    meanResult = meanResult / rows
+
+    # Update the varList and the resultList.
+    for i in range(rows):
+        varList[i][0] = (varList[i][0] - meanVar[0]) / rows
+        varList[i][1] = (varList[i][1] - meanVar[1]) / rows
+        #resultList[i] = (resultList[i] - meanResult) / rows
+
     conv = False  # Let you know if the function converge.
     JofTheta = [] # Store values of the cost function for plotting
 
@@ -81,7 +103,7 @@ def main():
         for j in range(columms-1):
             auxtheta[j] = dcost(alpha, varList, resultList, thetas, rows, j)
 
-        thetas = np.array(auxtheta, dtype=float) # Update the thetas value.
+        thetas = np.array(auxtheta, dtype=np.float128) # Update the thetas value.
         newcost = cost(varList , resultList, thetas, rows)
         JofTheta.append(newcost)
 
