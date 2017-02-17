@@ -83,9 +83,9 @@ def main():
 
     # Update the varList and the resultList.
     for i in range(rows):
-        meanVar[0] = (varList[i][0] - meanVar[0]) / rows
-        meanVar[1] = (varList[i][1] - meanVar[1]) / rows
-        meanResult = (resultList[i] - meanResult) / rows
+        varList[i][0] = (varList[i][0] - meanVar[0]) / rows
+        varList[i][1] = (varList[i][1] - meanVar[1]) / rows
+        #resultList[i] = (resultList[i] - meanResult) / rows
 
     conv = False  # Let you know if the function converge.
 
