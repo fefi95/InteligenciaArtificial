@@ -28,7 +28,7 @@ def main():
     varList = []    # Matrix of all the variables in our model.
     resultList = [] # Array with the data result.
 
-    maxIter = 1000  # Number of maximal iterations for the function to converge.
+    maxIter = 10000  # Number of maximal iterations for the function to converge.
     alpha = float(sys.argv[2]) # learning rate to use.
 
     dataSetFile = open(sys.argv[1], 'r'); # Get the dataset.
@@ -68,25 +68,14 @@ def main():
     resultList = np.array(resultList, dtype=np.float128)
 
     # Mean normalization to the varList and resultList.
-    meanVar = [0] * (columms - 1)
-    meanResult = 0
-
-    # First, we obtain the total sum.
-    for i in range(rows):
-        meanVar[0] += varList[i][0]
-        meanVar[1] += varList[i][1]
-        meanResult += resultList[i]
-
-    # Then, we divide into the rows number.
-    for i in range(columms - 1):
-        meanVar[i] = meanVar[i] / rows
-    meanResult = meanResult / rows
+    transVar = varList.transpose()
 
     # Update the varList and the resultList.
-    for i in range(rows):
-        varList[i][0] = (varList[i][0] - meanVar[0]) / rows
-        varList[i][1] = (varList[i][1] - meanVar[1]) / rows
-        #resultList[i] = (resultList[i] - meanResult) / rows
+    for i in range(1,columms-1):
+        mean = np.mean(transVar[i])
+        std = np.std(transVar[i])
+        for j in range(rows):
+            varList[j][i] = (varList[j][i] - mean) / std
 
     conv = False  # Let you know if the function converge.
     JofTheta = [] # Store values of the cost function for plotting
@@ -110,6 +99,7 @@ def main():
         i = i + 1 # Update the actual number of iterations.
         if (abs(newcost - cos) <= 0.001):
             conv = True
+        cos = newcost
     print(conv) # Let you know if the function converge.
 
     # PLOT
