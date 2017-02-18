@@ -21,6 +21,11 @@ import numpy as np              # This provides access to an efficient
 
 maxIter = 10000  # Number of maximal iterations for the function to converge.
 
+"""
+    Descripction: Class for storing the dataset
+    Parameters:
+        @param dataSetName : name of the file where the dataset is
+"""
 class DataSet:
     def __init__(self, dataSetName):
         init = False    # This let you know if it store the dataset information.
@@ -82,7 +87,7 @@ class DataSet:
         self.columns = columns
 
 """
-    Descripction: Calcule the cost function.
+    Descripction: Calculates the cost function.
     Parameters:
         @param varList   : all variables in the model.
         @param resultList: store the result of the data.
@@ -97,7 +102,7 @@ def cost(varList, resultList, theta, m):
     return(cost / (2*m))
 
 """
-    Descripction: calculate the derived cost function.
+    Descripction: calculates the derived cost function.
     Parameters:
         @param alpha: this is the learning rate to use.
         @param varList   : all variables in the model.
@@ -114,12 +119,14 @@ def dcost(alpha, varList, resultList, thetas, m, j):
     return(thetas[j] - alpha * dcost / (2*m))
 
 """
-    Descripction: Calcule the cost function.
+    Descripction: runs gradientDescent algorithm
     Parameters:
+        @param alpha     : learning rate.
         @param varList   : all variables in the model.
         @param resultList: store the result of the data.
         @param thetas    : array with the parameters to use.
-        @param m         : number of rows.
+        @param row       : number of rows.
+        @param columns   : number of columns.
 """
 def gradientDescent(alpha, varList, resultList, thetas, rows, columns):
     conv = False  # Let you know if the function converge.

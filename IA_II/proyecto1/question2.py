@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt # This provides functions for making plots
 import linearRegression as lr   # linear regresion library
 # .----------------------------------------------------------------------------.
 
+# Color using for the plots
 colors = {'purple' : '#78037F',
           'orange' : '#F55D3E',
           'magenta': '#A4243B',
@@ -28,7 +29,6 @@ colors = {'purple' : '#78037F',
           'green'  : '#6DA34D', #23CE6B
          }
 
-# Two parameters: input file with data and learning rate (alpha)
 def main():
 
     # ------------------------------------------------------------------------#
@@ -99,6 +99,7 @@ def main():
     plt.show()
     #------------------------------ end question b ---------------------------#
 
+# .----------------------------------------------------------------------------.
 """
     Descripction: plot of the cost function against number of iterations
     Parameters:
