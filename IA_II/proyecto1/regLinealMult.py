@@ -95,6 +95,7 @@ def main():
         i = i + 1 # Update the actual number of iterations.
         if (abs(newcost - cos) <= 0.001):
             conv = True
+        cos = newcost
     print(conv) # Let you know if the function converge.
 
 """
