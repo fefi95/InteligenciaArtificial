@@ -102,9 +102,20 @@ def main():
         cos = newcost
     print(conv) # Let you know if the function converge.
 
-    # PLOT
+    #------------------------------- PLOTS -----------------------------------#
+
+    # Simple plot: iterations vs cost function
     iterations = np.arange(0, i + 1, 1)
     makeSimplePlot(iterations, JofTheta, sys.argv[1])
+
+    # Scatter plot: feature xi vs result and hypothesis
+    x1 = [] # feature x1
+    h = [] # hypothesis
+    for xi in varList:
+        x1.append(xi[1])
+        h.append(thetas[0] + thetas[1]*xi[1])
+
+    makeScatterPlot(x1, resultList, h, att[1], att[2], sys.argv[1])
 
 """
     Descripction: Calcule the cost function.
@@ -143,7 +154,7 @@ def dcost(alpha, varList, resultList, thetas, m, j):
     Parameters:
         @param iterations   : position of the theta to use.
         @param costFunction : array that contains the values for every cost
-        @param dsName       : string with the dataset name
+        @param dsName       : name of dataset
 """
 def makeSimplePlot(iterations, costFunction, dsName):
     plt.plot(iterations, costFunction)
@@ -152,6 +163,25 @@ def makeSimplePlot(iterations, costFunction, dsName):
     plt.title(dsName)
     plt.grid(True)
     plt.savefig(dsName + ".png")
+    plt.show()
+
+"""
+    Descripction: scatter plot of the cost function against number of iterations
+    Parameters:
+        @param feature     : position of the theta to use.
+        @param result      : results. Column to be predicted (y)
+        @param linearReg   : linear regresion that fits into the data
+        @param featureName : name of the feature (xi)
+        @param resultName  : name of result (y)
+        @param dsName      : name of dataset
+"""
+def makeScatterPlot(feature, result, linearReg, featureName, resultName, dsName):
+    plt.scatter(feature, result)
+    plt.plot(feature, linearReg)
+    plt.xlabel(featureName)
+    plt.ylabel(resultName)
+    plt.title(dsName)
+    plt.savefig(dsName + "_scatter.png")
     plt.show()
 
 # .----------------------------------------------------------------------------.
