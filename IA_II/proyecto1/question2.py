@@ -20,6 +20,14 @@ import matplotlib.pyplot as plt # This provides functions for making plots
 import linearRegression as lr   # linear regresion library
 # .----------------------------------------------------------------------------.
 
+colors = {'purple' : '#78037F',
+          'orange' : '#F55D3E',
+          'magenta': '#A4243B',
+          'gray'   : '#454545',
+          'blue'   : '#1781AA',
+          'green'  : '#6DA34D', #23CE6B
+         }
+
 # Two parameters: input file with data and learning rate (alpha)
 def main():
 
@@ -37,7 +45,7 @@ def main():
 
     # Simple plot: iterations vs cost function
     iterations = np.arange(0, result['nIterations'] + 1, 1)
-    makeSimplePlot(iterations, result['costFunction'], dataSetName)
+    makeSimplePlot(iterations, result['costFunction'], dataSetName, alpha, colors['blue'])
     plt.show()
 
     # Scatter plot: feature xi vs result and hypothesis
@@ -65,7 +73,7 @@ def main():
 
     # Simple plot: iterations vs cost function
     iterations = np.arange(0, result['nIterations'] + 1, 1)
-    makeSimplePlot(iterations, result['costFunction'], dataSetName)
+    makeSimplePlot(iterations, result['costFunction'], dataSetName, alpha, colors['purple'])
     plt.show()
 
     #------------------------------ end question a ---------------------------#
@@ -75,7 +83,8 @@ def main():
     alphas = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0]
 
     ds_08 = lr.DataSet(dataSetName + '.txt')
-
+    colorsKeys = colors.keys()
+    color = 0;
     for alpha in alphas :
         result = lr.gradientDescent(alpha, ds_08.varList, ds_08.resultList, ds_08.thetas, ds_08.rows, ds_08.columns)
         print(result['converge']) # Let you know if the function converge.
@@ -84,7 +93,9 @@ def main():
 
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
-        makeSimplePlot(iterations, result['costFunction'], dataSetName + '_multiple')
+        makeSimplePlot(iterations, result['costFunction'], dataSetName + '_multiple', alpha, colors[colorsKeys[color]])
+        color = color + 1
+
     plt.show()
     #------------------------------ end question b ---------------------------#
 
@@ -94,14 +105,18 @@ def main():
         @param iterations   : position of the theta to use.
         @param costFunction : array that contains the values for every cost
         @param dsName       : name of dataset
+        @param label        : label of the legend plot
+        @param color        : color of the line on the plot
 """
-def makeSimplePlot(iterations, costFunction, dsName):
-    plt.plot(iterations, costFunction)
+def makeSimplePlot(iterations, costFunction, dsName, label, color):
+    plt.plot(iterations, costFunction, label='alpha= ' + str(label), c=color, linewidth=1.5)
     plt.xlabel("numero de iteraciones")
     plt.ylabel("Funcion de costo (J)")
     plt.title(dsName)
     plt.grid(True)
+    plt.legend()
     plt.savefig(dsName + ".png")
+
 """
     Descripction: scatter plot of the cost function against number of iterations
     Parameters:
@@ -113,11 +128,13 @@ def makeSimplePlot(iterations, costFunction, dsName):
         @param dsName      : name of dataset
 """
 def makeScatterPlot(feature, result, linearReg, featureName, resultName, dsName):
-    plt.scatter(feature, result)
-    plt.plot(feature, linearReg)
+
+    plt.scatter(feature, result, c=colors['orange'], edgecolor = colors['gray'])
+    plt.plot(feature, linearReg, label='regresion lineal', c=colors['gray'])
     plt.xlabel(featureName)
     plt.ylabel(resultName)
     plt.title(dsName)
+    plt.legend()
     plt.savefig(dsName + "_scatter.png")
 
 # .----------------------------------------------------------------------------.
