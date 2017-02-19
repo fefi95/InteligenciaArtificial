@@ -77,7 +77,8 @@ class DataSet:
             mean = np.mean(transVar[i])
             std = np.std(transVar[i])
             for j in range(rows):
-                varList[j][i] = (varList[j][i] - mean) / std
+                if (std != 0):
+                    varList[j][i] = (varList[j][i] - mean) / std
 
         self.varList = varList
         self.resultList = resultList
