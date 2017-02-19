@@ -23,13 +23,15 @@ from attributes import *
 # .----------------------------------------------------------------------------.
 
 data = pd.DataFrame.from_csv("dataC12X.csv") # Load the data with the initial mining.
-# atrributeNames = list(data)       # Get the attribute's name.
 
-# Hash table to replace the atributes with nominal values for numeric values.
-# attributeNewValues = attributeTransformation
-
+# Delete column sale price before get dummies
+resultList = data['SalePrice']
+print(resultList.values)
+data = data.drop('SalePrice', 1)
 # Make dummies variables for nominal attributes.
-processedData = pd.get_dummies(data, dummy_na=True)
+processedData = pd.get_dummies(data)
+#  Add column sale price at the end of the dummies
+processedData = processedData.assign(SalePrice=resultList.values)
 
 # Get the 80% of the data.
 eightyP = int(processedData.shape[0] * 0.8);
@@ -66,5 +68,5 @@ ds_80 = lr.DataSet('eightyPData.txt')
 print(ds_80.varList)
 result = lr.gradientDescent(alpha, ds_80.varList, ds_80.resultList, ds_80.thetas, ds_80.rows, ds_80.columns)
 print(result['converge']) # Let you know if the function converge.
-
+print(result['nIterations'])
 # processedData.to_csv('data2.csv')
