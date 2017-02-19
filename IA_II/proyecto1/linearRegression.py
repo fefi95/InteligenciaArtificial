@@ -1,9 +1,9 @@
 """
     Universidad Simon Bolivar
-    CI-5437
+    CI-5438 - Inteligencia Artificial
     Edward Fernandez 10-11121
     Stefani Castellanos 11-11394
-    Carlos Ferreira <insert ID>
+    Carlos Ferreira 11-10323
 
     Description:
         This file contains the Gradient Descent implementation to solve an multiple

@@ -1,0 +1,11 @@
+#
+#    Universidad Simon Bolivar
+#    CI-5438 - Inteligencia Artificial II
+#    Edward Fernandez 10-11121
+#    Stefani Castellanos 11-11394
+#    Carlos Ferreira 11-10323
+
+Para correr este proyecto se necesitan las librerias de python:
+    numpy 
+    matplotlib
+    pandas
