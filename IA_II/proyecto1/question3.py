@@ -36,8 +36,9 @@ eightyP = int(processedData.shape[0] * 0.8);
 eightyPData = processedData[1:eightyP + 1]
 # Add the text format.
 eightyPDataFile = open('eightyPData.txt','w')
-eightyPDataFile.write(str(eightyPData.shape[1]) + ' columns\n') # Add the number of columns.
+eightyPDataFile.write(str(eightyPData.shape[1] + 1) + ' columns\n') # Add the number of columns.
 eightyPDataFile.write(str(eightyPData.shape[0]) + ' rows\n')    # Add the number of rows.
+eightyPDataFile.write('order\n')    # Add the number of rows.
 
 # Add the attributes name.
 for attribute in list(processedData):
@@ -63,7 +64,7 @@ twentyPData.to_csv('twentyPData.txt', sep=' ', header=False, encoding='utf-8', m
 alpha = float(0.1) # learning rate to use.
 ds_80 = lr.DataSet('eightyPData.txt')
 print(ds_80.varList)
-#result = lr.gradientDescent(alpha, ds_80.varList, ds_80.resultList, ds_80.thetas, ds_80.rows, ds_80.columns)
-#print(result['converge']) # Let you know if the function converge.
+result = lr.gradientDescent(alpha, ds_80.varList, ds_80.resultList, ds_80.thetas, ds_80.rows, ds_80.columns)
+print(result['converge']) # Let you know if the function converge.
 
 # processedData.to_csv('data2.csv')
