@@ -28,7 +28,44 @@ data = pd.DataFrame.from_csv("dataC12.csv") # Load the data with the initial min
 # Hash table to replace the atributes with nominal values for numeric values.
 # attributeNewValues = attributeTransformation
 
+# Make dummies variables for nominal attributes.
 processedData = pd.get_dummies(data, dummy_na=True)
+
+# Get the 80% of the data.
+eightyP = int(processedData.shape[0] * 0.8);
+eightyPData = processedData[1:eightyP + 1]
+
+# Add the text format.
+eightyPDataFile = open('eightyPData.txt','w')
+eightyPDataFile.write(str(eightyPData.shape[1]) + ' columns\n') # Add the number of columns.
+eightyPDataFile.write(str(eightyPData.shape[0]) + ' rows\n')    # Add the number of rows.
+
+# Add the attributes name.
+for attribute in list(processedData):
+    eightyPDataFile.write(attribute +'\n')
+eightyPDataFile.close()
+# Add the values.
+eightyPData.to_csv('eightyPData.txt', sep=' ', header=False, encoding='utf-8', mode='a')
+
+# Get the remaining 20% of the data.
+twentyPData = processedData[eightyPData.shape[0] + 1: processedData.shape[0] + 1]
+twentyPData.to_csv('twentyPData.txt', sep='\t', encoding='utf-8', mode='a')
+
+twentyPDataFile = open('twentyPData.txt','w')
+twentyPDataFile.write(str(twentyPData.shape[1]) + ' columns\n') # Add the number of columns.
+twentyPDataFile.write(str(twentyPData.shape[0]) + ' rows\n')    # Add the number of rows.
+
+# Add the attributes name.
+for attribute in list(processedData):
+    twentyPDataFile.write(attribute +'\n')
+twentyPDataFile.close()
+# Add the values.
+twentyPDataFile.to_csv('twentyPData.txt', sep=' ', header=False, encoding='utf-8', mode='a')
+
+
+alpha = float(0.1) # learning rate to use.
+ds_80 = lr.DataSet('eightyPData.txt')
+result = lr.gradientDescent(alpha, ds_80.varList, ds_80.resultList, ds_80.thetas, ds_80.rows, ds_80.columns)
+print(result['converge']) # Let you know if the function converge.
+
 # processedData.to_csv('data2.csv')
-print(len(list(processedData)))
-# processedData.to_csv('data3.txt', sep=' ')
