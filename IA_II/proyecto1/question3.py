@@ -22,7 +22,7 @@ import linearRegression as lr   # linear regresion library
 from attributes import *
 # .----------------------------------------------------------------------------.
 
-data = pd.DataFrame.from_csv("dataC12.csv") # Load the data with the initial mining.
+data = pd.DataFrame.from_csv("dataC12X.csv") # Load the data with the initial mining.
 # atrributeNames = list(data)       # Get the attribute's name.
 
 # Hash table to replace the atributes with nominal values for numeric values.
@@ -33,12 +33,12 @@ processedData = pd.get_dummies(data, dummy_na=True)
 
 # Get the 80% of the data.
 eightyP = int(processedData.shape[0] * 0.8);
-eightyPData = processedData[1:eightyP + 1]
+eightyPData = processedData[0:eightyP]
 # Add the text format.
 eightyPDataFile = open('eightyPData.txt','w')
 eightyPDataFile.write(str(eightyPData.shape[1] + 1) + ' columns\n') # Add the number of columns.
 eightyPDataFile.write(str(eightyPData.shape[0]) + ' rows\n')    # Add the number of rows.
-eightyPDataFile.write('order\n')    # Add the number of rows.
+eightyPDataFile.write('Order\n')    # Add the number of rows.
 
 # Add the attributes name.
 for attribute in list(processedData):
@@ -53,7 +53,7 @@ twentyPData = processedData[eightyPData.shape[0] + 1: processedData.shape[0] + 1
 twentyPDataFile = open('twentyPData.txt','w')
 twentyPDataFile.write(str(twentyPData.shape[1]) + ' columns\n') # Add the number of columns.
 twentyPDataFile.write(str(twentyPData.shape[0]) + ' rows\n')    # Add the number of rows.
-
+twentyPDataFile.write('Order\n')
 # Add the attributes name.
 for attribute in list(processedData):
     twentyPDataFile.write(attribute +'\n')
