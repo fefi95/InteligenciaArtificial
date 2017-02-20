@@ -32,7 +32,7 @@ colors = {'purple' : '#78037F',
          }
 
 def main():
-    data = pd.DataFrame.from_csv("dataC12X.csv") # Load the data with the initial mining.
+    data = pd.DataFrame.from_csv("dataC12X3.csv") # Load the data with the initial mining.
 
     # Delete column sale price before get dummies
     resultList = data['SalePrice']

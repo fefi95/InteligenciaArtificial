@@ -19,7 +19,7 @@ import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
 # .----------------------------------------------------------------------------.
 
-maxIter = 10000  # Number of maximal iterations for the function to converge.
+maxIter = 1000  # Number of maximal iterations for the function to converge.
 
 """
     Descripction: Class for storing the dataset
@@ -152,6 +152,7 @@ def gradientDescent(alpha, varList, resultList, thetas, rows, columns):
         i = i + 1 # Update the actual number of iterations.
         if (abs(newcost - cos) <= 0.001):
             conv = True
+        print('iteraciones=' + str(i) + ' cost' + str(abs(newcost - cos)))
         cos = newcost
 
     return {'converge' : conv, 'costFunction' : JofTheta, 'thetas': thetas, 'nIterations': i}
