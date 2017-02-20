@@ -152,7 +152,6 @@ def gradientDescent(alpha, varList, resultList, thetas, rows, columns):
         i = i + 1 # Update the actual number of iterations.
         if (abs(newcost - cos) <= 0.001):
             conv = True
-        print('iteraciones=' + str(i) + ' cost' + str(abs(newcost - cos)))
         cos = newcost
 
     return {'converge' : conv, 'costFunction' : JofTheta, 'thetas': thetas, 'nIterations': i}

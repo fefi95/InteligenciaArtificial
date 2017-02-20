@@ -81,11 +81,11 @@ def main():
 
     # Simple plot: iterations vs cost function
     iterations = np.arange(0, result['nIterations'] + 1, 1)
-    makeSimplePlot(iterations, result['costFunction'], 'Ames Houses', alpha, colors['magenta'])
+    makeSimplePlot(iterations, result['costFunction'], 'Ames Housing', alpha, colors['magenta'])
 
     # Use the test data set with the predicting model
     ds_20 = lr.DataSet('twentyPData.txt')
-    hypothesis = np.dot(ds_80.thetas, np.transpose(ds_20.varList))
+    hypothesis = np.dot(ds_20.varList, result['thetas'])
     makeBiasPlot(ds_20.resultList, hypothesis)
     makeMaxDeviationPlot(ds_20.resultList, hypothesis)
     makeMeanDeviationPlot(ds_20.resultList, hypothesis)
@@ -121,7 +121,7 @@ def makeBiasPlot(real, predicted):
     index = np.arange(2)
     bias = np.average(real - predicted)
     print(bias)
-    dsName = "Sesgado - Ames Houses"
+    dsName = "Sesgado - Ames Housing"
     plt.bar(index, [0, bias], width=0.35, color=colors['blue'] )
     plt.xlabel("promedio(valor real - valor estimado)")
     plt.title(dsName)
@@ -141,7 +141,7 @@ def makeMaxDeviationPlot(real, predicted):
     index = np.arange(2)
     maxi = np.max(np.abs(real - predicted))
     print(maxi)
-    dsName = "Desviacion Maxima - Ames Houses"
+    dsName = "Desviacion Maxima - Ames Housing"
     plt.bar(index, [0, maxi], width=0.35, color=colors['purple'] )
     plt.xlabel("max(abs(valor real - valor estimado))")
     plt.title(dsName)
@@ -159,9 +159,9 @@ def makeMaxDeviationPlot(real, predicted):
 def makeMeanDeviationPlot(real, predicted):
 
     index = np.arange(2)
-    mean = np.mean(real - predicted)
+    mean = np.average(abs(real - predicted))
     print(mean)
-    dsName = "Desviacion Media Absoluta  - Ames Houses"
+    dsName = "Desviacion Media Absoluta  - Ames Housing"
     plt.bar(index, [0, mean], width=0.35, color=colors['orange'] )
     plt.xlabel("promedio(abs(valor real - valor estimado))")
     plt.title(dsName)
@@ -181,7 +181,7 @@ def makeMeanSquarePlot(real, predicted):
     index = np.arange(2)
     mean2 = np.mean((real - predicted)**2)
     print(mean2)
-    dsName = "Error cuadratico medio  - Ames Houses"
+    dsName = "Error cuadratico medio  - Ames Housing"
     plt.bar(index, [0, mean2], width=0.35, color=colors['green'] )
     plt.xlabel("media(valor real - valor estimado ^ 2)")
     plt.title(dsName)

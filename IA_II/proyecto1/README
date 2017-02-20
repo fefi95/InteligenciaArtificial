@@ -5,7 +5,31 @@
 #    Stefani Castellanos 11-11394
 #    Carlos Ferreira 11-10323
 
-Para correr este proyecto se necesitan las librerias de python:
-    numpy 
-    matplotlib
-    pandas
+ARCHIVOS.
+    AmesHousing.png - Gráfica de función de costo vs iteraciones para el conjunto Ames Housing
+    AmesHousing.txt - Conjunto de datos Ames Housing en archivo de texto
+    AmesHousing.xls - Conjunto de datos Ames Housing en hoja de calculo
+    data.csv - Conjunto de datos Ames Housing en archivo csv
+    dataC12X.csv - Conjunto de datos Ames Housing eliminando instancias sin valor en archivo csv
+    dataC12X2.csv - Conjunto de datos Ames Housing eliminando columna PID en archivo csv
+    dataC12X3.csv - Conjunto de datos Ames Housing eliminando columnas innecesarias y filtrando en archivo csv
+    dataset_x01_scatter.png - Scatter plot para el conjunto de datos sobre el cerebro
+    dataset_x01.png - Gráfica de función de costo vs iteraciones para el conjunto sobre el cerebro
+    dataset_x08_multiple.png - Grafica de función de costo vs iteraciones para el conjunto sobre la mortalidad para diferentes valores de alpha
+    dataset_x08.png - Gráfica de función de costo vs iteraciones para el conjunto sobre sobre la mortalidad
+    Desviación Máxima - Ames Housing - Gráfica de métrica desviación máxima
+    Desviación Media Absoluta - Ames Housing - Gráfica de métrica desviación absoluta media
+    eightyPData.txt - 80% del conjunto de datos Ames Housing en archivo de texto
+    Error cuadratico medio - Ames housing - Gráfica de métrica error cuadratico medio
+    linearRegression.py - Implmentación de regresión lineal.
+    Proy1_RegLinM_EM2017.pdf - Enunciado del proyecto.
+    question2.py - respuesta a la segunda pregunta
+    question3.py - respuesta a la segunda pregunta
+    Sesgado - Ames Housing.png - Gráfica de métrica sesgada
+    twentyPData.txt - 20% del conjunto de datos Ames Housing en archivo de texto
+
+DEPENDENCIAS.
+    Para correr este proyecto se necesitan las librerias de Python:
+        numpy
+        matplotlib
+        pandas
