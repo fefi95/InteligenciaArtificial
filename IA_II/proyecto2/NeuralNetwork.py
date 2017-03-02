@@ -119,6 +119,18 @@ class NeuralNetwork:
         # D(l)i,j:=1mΔ(l)i,j If j=0
         # The capital-delta matrix D is used as an "accumulator" to add up our values as we go along and eventually compute our partial derivative. Thus we get ∂∂Θ(l)ijJ(Θ)= D(l)ij
 
+    def cost(x,y):
+        aux = 0
+        #Varias cosas que no tengo claras, nuestro forward creo que solo funciona con una neurona de salida
+        # por lo cual nunca le tengo que dar un x y el calcula, si se dan cuenta si k = 1 es la 
+        # regresion logica por lo cual creo que falta algo, aunque la y por lo que entendi no cambia
+        # ya que y[i]k deberia ser la misma para todos.
+        for i in range(0,len(y)):
+            for k in range(0,self.nO):
+                h = self.forwardPropagation()
+                aux += y[i] * np.log(h) + (1 - y[i]) * np.log(1-h)
+        return -aux/len(y)
+
     def training():
         pass
         # Implement the cost function
