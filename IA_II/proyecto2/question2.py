@@ -34,9 +34,57 @@ def readData(dataSetName):
     return {'x' : varList, 'y': resultList}
 
 def main():
-    data = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    print data['x']
-    print data['y']
+    data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+    print data500['x']
+    print data500['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(data500['x']), i, 1)
+        # nn.training(data500['x'], data500['y'])
+
+
+    dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
+    print dataG500['x']
+    print dataG500['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(dataG500['x']), i, 1)
+        # nn.training(dataG500['x'], dataG500['y'])
+
+
+    data1000 = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
+    print data1000['x']
+    print data1000['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(data1000['x']), i, 1)
+        # nn.training(data1000['x'], data1000['y'])
+
+    dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
+    print dataG1000['x']
+    print dataG1000['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(dataG1000['x']), i, 1)
+        # nn.training(dataG1000['x'], dataG1000['y'])
+
+
+    data2000 = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
+    print data2000['x']
+    print data2000['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(data2000['x']), i, 1)
+        # nn.training(data2000['x'], data2000['y'])
+
+
+    dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
+    print dataG2000['x']
+    print dataG2000['y']
+
+    for i in range(2, 11):
+        nn = NeuralNetwork(len(dataG2000['x']), i, 1)
+        # nn.training(dataG2000['x'], dataG2000['y'])
 
 # .----------------------------------------------------------------------------.
 

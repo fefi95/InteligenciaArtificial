@@ -60,13 +60,10 @@ class NeuralNetwork:
         self.actH = np.ones(nH) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
         self.actO = np.ones(nO)
 
-        # create parameters of the neural network (weights)
-        self.thetasI = np.array(self.nHL + 2, self.nHL + 2)
-        self.thetasO = np.array(self.nHL + 2, self.nHL + 2)
-
-        #randomly initialize the parameters (weights)
-        self.thetasI = 2 * np.random.random((1,nI)) - 1
-        self.thetasO = 2 * np.random.random((1,nI)) - 1
+        # create parameters of the neural network (weights) and
+        # randomly initialize them
+        self.thetasI = 2 * np.random.rand((self.nH, self.nI)) - 1
+        self.thetasO = 2 * np.random.rand((self.nO, self.nH + 1)) - 1
 
     """
         Descripction: forward propagation for the neural network
@@ -82,7 +79,7 @@ class NeuralNetwork:
         #z(2) = theta(1) * a(1)
         z = np.dot(self.actI, self.thetasI)
         #a(2) = g(z(2))
-        self.actH = sigmoid(z)
+        self.actH[:-1] = sigmoid(z)
         self.actH[0] = 1 #bias unit
 
         #z(3) = theta(2) * a(2)
@@ -155,40 +152,3 @@ class NeuralNetwork:
         # Implement backpropagation to compute partial derivatives
         # Use gradient checking to confirm that your backpropagation works. Then disable gradient checking.
         # Use gradient descent or a built-in optimization function to minimize the cost function with the weights in theta.
-
-"""
-    Descripction: runs gradientDescent algorithm
-    Parameters:
-        @param alpha     : learning rate.
-        @param varList   : all variables in the model.
-        @param resultList: store the result of the data.
-        @param thetas    : array with the parameters to use.
-        @param row       : number of rows.
-        @param columns   : number of columns.
-"""
-def gradientDescent(alpha, varList, resultList, thetas, rows, columns):
-    conv = False  # Let you know if the function converge.
-    JofTheta = [] # Store values of the cost function for plotting
-
-    # Calculate the initial cost.
-    cos = cost(varList, resultList, thetas, rows)
-    JofTheta.append(cos)
-
-    i = 0 # Initialize the counter of iterations.
-    while (not(conv) and (i <= maxIter)):
-        # Update of theta's
-        auxtheta = [0] * (columns - 1)  # Store the new theta's value.
-
-        for j in range(columns-1):
-            auxtheta[j] = dcost(alpha, varList, resultList, thetas, rows, j)
-
-        thetas = np.array(auxtheta, dtype=np.float128) # Update the thetas value.
-        newcost = cost(varList , resultList, thetas, rows)
-        JofTheta.append(newcost)
-
-        i = i + 1 # Update the actual number of iterations.
-        if (abs(newcost - cos) <= 0.001):
-            conv = True
-        cos = newcost
-
-    return {'converge' : conv, 'costFunction' : JofTheta, 'thetas': thetas, 'nIterations': i}
