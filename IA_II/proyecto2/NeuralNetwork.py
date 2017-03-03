@@ -34,7 +34,7 @@ def sigmoid(z):
     @param x : sample
 """
 def dsigmoid(z):
-    return np.exp(-z) / (1  + np.exp(-z)) ** 2
+    return z * (1 - z)
 
 """
     Description: neural network of one hidden layer
@@ -139,7 +139,9 @@ class NeuralNetwork:
             # The delta values of layer l are calculated by multiplying the delta values in the next layer with the theta matrix of layer l. We then element-wise multiply that with a function called g', or g-prime, which is the derivative of the activation function g evaluated with the input values given by z(l).
             # print self.actI
             # print self.thetasI
-            errorH = np.dot(np.transpose(self.thetasO), errorO) * dsigmoid(np.dot(self.thetasI, np.transpose(self.actI)))
+            errorH = np.dot(np.transpose(self.thetasO), errorO) * self.actH * (1 - self.actH)
+            print "actH?"
+            print self.actH * (1 - self.actH)
             print "errorH"
             print errorH
 
@@ -148,6 +150,8 @@ class NeuralNetwork:
             # g′(z(l))=a(l) .∗ (1−a(l))
             # 5. Δ(l)i,j:=Δ(l)i,j+a(l)jδ(l+1)i or with vectorization, Δ(l):=Δ(l)+δ(l+1)(a(l))T
             # Hence we update our new Δ matrix.
+            print errorO.shape
+            print self.actH.shape
             if len(errorO) == 1:
                 deltaO = deltaO + errorO * self.actH
             else:
