@@ -20,6 +20,7 @@ import numpy as np              # This provides access to an efficient
 # .----------------------------------------------------------------------------.
 
 np.random.seed(1)
+maxIter = 1000
 
 """
     Descripction: sigmoid function of the neural network
@@ -32,8 +33,8 @@ def sigmoid(z):
     Descripction: derivate of sigmoid function of the neural network
     @param x : sample
 """
-def dSigmoid(z):
-    return z * (1 - z)
+def dsigmoid(z):
+    return np.exp(-z) / (1  + np.exp(-z)) ** 2
 
 """
     Description: neural network of one hidden layer
@@ -48,42 +49,58 @@ class NeuralNetwork:
         @param nH  : number of units per hidden layer
         @param n0  : number of output units/classes
     """
-    def __init__(self, nI, nHL, nH, nO):
+    def __init__(self, nI, nH, nO, nHL = 1):
         # number of input, hidden, and output nodes
-        self.nI = nI + 1 # +1 for bias node
-        self.nHL = 1 #UNA SOLA CAPA OCULTA POR AHORA
-        self.nH = nH
-        self.nO = nO
+        self.nI = int(nI + 1) # +1 for bias node
+        # self.nHL = 1 #UNA SOLA CAPA OCULTA POR AHORA
+        self.nH = int(nH + 1)
+        self.nO = int(nO)
 
         # activations for nodes
-        self.actI = np.ones(nI)
-        self.actH = np.ones(nH) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
-        self.actO = np.ones(nO)
+        self.actI = np.ones((1,self.nI))
+        print self.actI.shape
+        self.actH = np.ones((1, self.nH)) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
+        self.actO = np.ones((1, self.nO))
 
         # create parameters of the neural network (weights) and
         # randomly initialize them
-        self.thetasI = 2 * np.random.rand((self.nH, self.nI)) - 1
-        self.thetasO = 2 * np.random.rand((self.nO, self.nH + 1)) - 1
-
+        self.thetasI = 2 * np.random.rand(self.nH-1, self.nI-1) - 1
+        self.thetasO = 2 * np.random.rand(self.nO, self.nH) - 1
+        self.thetasI = np.array([[-30, 20, 20],[10, -20, -20]])
+        self.thetasO = np.array([[-10, 20, 20]])
+        print self.thetasI.shape
     """
         Descripction: forward propagation for the neural network
         @param x: one training examples
     """
 
-    def forwardPropagation(x):
+    def forwardPropagation(self, x):
 
         #a(1) = x
-        self.actI = x
+        self.actI[0][1:] = x
+        # print self.actI
+        # print len(self.thetasI)
+        # print len(self.thetasI[0])
+        # print(self.thetasI)
+        # print(x)
+        # print x.shape
 
         #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
         #z(2) = theta(1) * a(1)
-        z = np.dot(self.actI, self.thetasI)
+        z = np.dot(self.thetasI, np.transpose(self.actI))
+        # print len(z)
         #a(2) = g(z(2))
-        self.actH[:-1] = sigmoid(z)
-        self.actH[0] = 1 #bias unit
+        # print self.actH.shape
+        for i in range(0,self.nH-1):
+            self.actH[0][i+1] = sigmoid(z[i])
+
+        self.actH[0][0] = 1 # bias units
 
         #z(3) = theta(2) * a(2)
-        z = np.dot(self.actH, self.thetasO)
+        # print "z"
+        # print self.thetasO.shape
+        # print self.actH.shape
+        z = np.dot(self.thetasO, np.transpose(self.actH))
         #a(3) = g(z(3))
         self.actO = sigmoid(z)
 
@@ -97,11 +114,11 @@ class NeuralNetwork:
         @param Y : vector of results (classification) of x
     """
 
-    def backPropagation(X, Y):
+    def backPropagation(self, X, y):
 
         # Set Δ(l)i,j := 0 for all (l,i,j), (hence you end up having a matrix full of zeros)
-        deltaI = np.zeros(self.nH + 1, self.nO)
-        deltaO = np.zeros(self.nI + 1, self.nH)
+        deltaO = np.zeros(self.nH)
+        # deltaI = np.zeros((self.nH, self.nO))
 
         for i in range(0, len(X)):
             #a(1) = x
@@ -109,32 +126,45 @@ class NeuralNetwork:
 
             # Perform forward propagation to compute a(l) for l=2,3,…,L
             self.forwardPropagation(X[i])
+            print "act0"
+            print self.actO
             #
             # 3. Using y(t), compute δ(L)=a(L)−y(t)
             # Where L is our total number of layers and a(L) is the vector of outputs of the activation units for the last layer. So our "error values" for the last layer are simply the differences of our actual results in the last layer and the correct outputs in y. To get the delta values of the layers before the last layer, we can use an equation that steps us back from right to left:
-            errorO = self.actO - y
+            errorO = self.actO - y[i]
+            print "errorO"
+            print errorO
             #
             # 4. Compute δ(L−1),δ(L−2),…,δ(2) using δ(l)=((Θ(l))Tδ(l+1)) .∗ a(l) .∗ (1−a(l))
             # The delta values of layer l are calculated by multiplying the delta values in the next layer with the theta matrix of layer l. We then element-wise multiply that with a function called g', or g-prime, which is the derivative of the activation function g evaluated with the input values given by z(l).
-
-            errorH = np.dot(thetaI.transpose(), errorO) * dsigmoid(self.actH)
+            # print self.actI
+            # print self.thetasI
+            errorH = np.dot(np.transpose(self.thetasO), errorO) * dsigmoid(np.dot(self.thetasI, np.transpose(self.actI)))
+            print "errorH"
+            print errorH
 
             # The g-prime derivative terms can also be written out as:
             #
             # g′(z(l))=a(l) .∗ (1−a(l))
             # 5. Δ(l)i,j:=Δ(l)i,j+a(l)jδ(l+1)i or with vectorization, Δ(l):=Δ(l)+δ(l+1)(a(l))T
             # Hence we update our new Δ matrix.
+            if len(errorO) == 1:
+                deltaO = deltaO + errorO * self.actH
+            else:
+                deltaO = deltaO + np.dot(errorO, np.transpose(self.actH))
 
-            deltaO = deltaO + np.dot(errorO, np.transpose(self.actH))
-            deltaI = deltaI + np.dot(errorH, np.transpose(self.actI))
-
+            # print deltaI
+            print self.actI
+            print self.actI.shape
+            deltaI = np.dot(errorH[1:], np.transpose(self.actI))
         # D(l)i,j:=1m(Δ(l)i,j+λΘ(l)i,j), if j≠0.
         # D(l)i,j:=1mΔ(l)i,j If j=0
         # The capital-delta matrix D is used as an "accumulator" to add up our values as we go along and eventually compute our partial derivative. Thus we get ∂∂Θ(l)ijJ(Θ)= D(l)ij
-        DO = deltaO/ m
-        DI = deltaI/ m
+        DO = deltaO * (1 / len(X))
+        DI = deltaI * (1 / len(X))
+        return [DI, DO]
 
-    def cost(x,y):
+    def cost(self, X,y):
         aux = 0
         #Varias cosas que no tengo claras, nuestro forward creo que solo funciona con una neurona de salida
         # por lo cual nunca le tengo que dar un x y el calcula, si se dan cuenta si k = 1 es la
@@ -142,13 +172,66 @@ class NeuralNetwork:
         # ya que y[i]k deberia ser la misma para todos.
         for i in range(0,len(y)):
             for k in range(0,self.nO):
-                h = self.forwardPropagation()
+                h = self.forwardPropagation(X[i])
                 aux += y[i] * np.log(h) + (1 - y[i]) * np.log(1-h)
         return -aux/len(y)
 
-    def training():
-        pass
-        # Implement the cost function
-        # Implement backpropagation to compute partial derivatives
-        # Use gradient checking to confirm that your backpropagation works. Then disable gradient checking.
-        # Use gradient descent or a built-in optimization function to minimize the cost function with the weights in theta.
+    """
+        Descripction: runs gradientDescent algorithm
+        Parameters:
+            @param varList   : all variables in the model.
+            @param resultList: store the result of the data.
+    """
+    def gradientDescent(self, varList, resultList):
+        conv = False  # Let you know if the function converge.
+        JofTheta = [] # Store values of the cost function for plotting
+
+        # Calculate the initial cost.
+        cos = self.cost(varList, resultList)
+        JofTheta.append(cos)
+
+        i = 0 # Initialize the counter of iterations.
+        while (not(conv) and (i <= maxIter)):
+            # Update of theta's
+
+            auxtheta = self.backPropagation(varList, resultList)
+            gc = self.gradientChecking(varList, resultList)
+            print auxtheta[0].shape
+            print gc[0].shape
+            if ((gc[0] - auxtheta[0] < 0.001) or (gc[1] - auxThetaI[1] < 0.001)):
+                print "noooooooooooooooo, mori"
+                break
+
+            self.thetasI = auxtheta[0] # Update the thetasI value.
+            self.thetasO = auxtheta[1] # Update the thetasO value.
+            newcost = self.cost(varList , resultList)
+            JofTheta.append(newcost)
+
+            i = i + 1 # Update the actual number of iterations.
+            if (abs(newcost - cos) <= 0.001):
+                conv = True
+            cos = newcost
+
+        return {'converge' : conv, 'costFunction' : JofTheta, 'thetas': self.thetasI, 'nIterations': i}
+
+
+    def gradientChecking(self, X, y):
+        epsilon = 0.0001;
+
+        auxThetaI = self.thetasI
+        self.thetasI = auxThetaI + epsilon;
+        costThetasP = self.cost(X, y)
+        self.thetasI = auxThetaI - epsilon;
+        costThetasM = self.cost(X, y)
+        gradApproxI = (costThetasP - costThetasM)/(2 * epsilon)
+        self.thetasI = auxThetaI
+
+        auxThetaO = self.thetasO
+        self.thetasO = auxThetaO + epsilon;
+        costThetasP = self.cost(X, y)
+        self.thetasO = auxThetaO - epsilon;
+        costThetasM = self.cost(X, y)
+        gradApproxO = (costThetasP - costThetasM)/(2 * epsilon)
+        self.thetasO = auxThetaO
+
+        return [gradApproxI, gradApproxO]
