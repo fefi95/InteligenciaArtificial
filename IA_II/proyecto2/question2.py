@@ -19,13 +19,26 @@ import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
-colors = {'purple' : '#78037F',
-          'orange' : '#F55D3E',
-          'magenta': '#A4243B',
-          'gray'   : '#454545',
-          'blue'   : '#1781AA',
-          'green'  : '#23CE6B',
-         }
+# colors = {'purple' : '#78037F',
+#           'orange' : '#F55D3E',
+#           'magenta': '#A4243B',
+#           'gray'   : '#454545',
+#           'blue'   : '#1781AA',
+#           'green'  : '#23CE6B',
+#           'yellow' : '#FFC857',
+#           'black'  : '#101010',
+#           'red'    : '#FF3030'
+#          }
+colors = ['#78037F',
+          '#F55D3E',
+          '#A4243B',
+          '#454545',
+          '#1781AA',
+          '#23CE6B',
+          '#FFC857',
+          '#101010',
+          '#FF3030'
+          ]
 
 alpha = 0.001
 
@@ -65,13 +78,29 @@ def readData(dataSetName):
         @param color        : color of the line on the plot
 """
 def makeSimplePlot(iterations, costFunction, dsName, label, color):
-    plt.plot(iterations, costFunction, label='#neuronas= ' + str(label), linewidth=1.5)
+    plt.plot(iterations, costFunction, label='#neuronas= ' + str(label), c=color, linewidth=1.5)
     plt.xlabel("numero de iteraciones")
     plt.ylabel("Funcion de costo (J)")
     plt.title(dsName)
     plt.grid(True)
     plt.legend()
     plt.savefig(dsName + ".png")
+
+"""
+    Descripction: scatter plot of the cost function against number of iterations
+    Parameters:
+        @param circle : position of the theta to use.
+        @param square : position of the theta to use.
+        @param dsName : name of dataset
+"""
+def makeScatterPlot(circleX, circleY, squareX, squareY, dsName):
+
+    plt.scatter(circleX, circleY, c=colors[0], edgecolor = colors[0])
+    plt.scatter(squareX, squareY, c=colors[1], edgecolor = colors[1])
+    plt.title(dsName)
+    plt.legend()
+    plt.savefig(dsName + "_scatter.png")
+    plt.show()
 
 def calculate(dataFileName, dataTest):
     n = 10000
@@ -84,7 +113,10 @@ def calculate(dataFileName, dataTest):
         print "\t calculando thetas para" + dataFileName + " con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(data['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, data['x'], data['y'])
-
+        circleX = []
+        circleY = []
+        squareX = []
+        squareY = []
         # Statistics
         errorE = 0
         errorAux = 0
@@ -96,6 +128,12 @@ def calculate(dataFileName, dataTest):
             predicted = hyp[0]
             real = dataTest['y'][j]
             errorAux += abs(predicted - real )
+            if predicted > 0.5:
+                circleX.append(dataTest['x'][j][0])
+                circleY.append(dataTest['x'][j][1])
+            else:
+                squareX.append(dataTest['x'][j][0])
+                squareY.append(dataTest['x'][j][1])
             if (predicted > 0.5 and real < 0.01):
                 falseP += 1
             elif (predicted < 0.5 and abs(real - 1) < 0.01):
@@ -106,7 +144,8 @@ def calculate(dataFileName, dataTest):
 
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
-        makeSimplePlot(iterations, result['costFunction'], dataFileName, i, colors['blue'])
+        makeSimplePlot(iterations, result['costFunction'], dataFileName, i, colors[i-2])
+        # makeScatterPlot(circleX, circleY, squareX, squareY, dataFileName)
     print "--------------------------------------------------------------------------------"
     plt.show()
 
@@ -123,11 +162,11 @@ def main():
     # g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
     dataTest = readData('datosP2EM2017/dataset_test_circle.txt')
     calculate("datos_P2_EM2017_N500", dataTest)
-    calculate("datos_P2_Gen_500", dataTest)
-    calculate("datos_P2_EM2017_N1000", dataTest)
-    calculate("datos_P2_Gen_1000", dataTest)
-    calculate("datos_P2_EM2017_N2000", dataTest)
-    calculate("datos_P2_Gen_2000", dataTest)
+    # calculate("datos_P2_Gen_500", dataTest)
+    # calculate("datos_P2_EM2017_N1000", dataTest)
+    # calculate("datos_P2_Gen_1000", dataTest)
+    # calculate("datos_P2_EM2017_N2000", dataTest)
+    # calculate("datos_P2_Gen_2000", dataTest)
 
 # .----------------------------------------------------------------------------.
 
