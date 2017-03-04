@@ -83,10 +83,11 @@ def main():
     # print b
     alpha = 0.001
     # g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-
+    dataTest = readData('datosP2EM2017/dataset_test_circle.txt')
+    n = 10000
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
-    # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
+    statsF500 = open("datosP2EM2017/datos_P2_EM2017_N500_stats.csv", 'w')
+    statsF500.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
@@ -95,11 +96,24 @@ def main():
         result = neural.gradientDescent(alpha, data500['x'], data500['y'])
 
         # Statistics
-        # errorE = 0
-        # errorP = 0
-        # falseP = 0
-        # flaseN = 0
-        # statsF500.write(str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(flaseN))
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsF500.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
@@ -108,12 +122,34 @@ def main():
 
 
     dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
+    statsFG500 = open("datosP2EM2017/datos_P2_Gen_500_stats.csv", 'w')
+    statsFG500.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_Gen_500 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(dataG500['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, dataG500['x'], dataG500['y'])
+
+        # Statistics
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsFG500.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_500", i, colors['blue'])
@@ -123,12 +159,34 @@ def main():
 
 
     data1000 = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
+    statsF1000 = open("datosP2EM2017/datos_P2_EM2017_N1000_stats.csv", 'w')
+    statsF1000.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_EM2017_N1000 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(data1000['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, data1000['x'], data1000['y'])
+
+        # Statistics
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsF1000.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N1000", i, colors['blue'])
@@ -136,12 +194,34 @@ def main():
     plt.show()
 
     dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
+    statsFG1000 = open("datosP2EM2017/datos_P2_Gen_1000_stats.csv", 'w')
+    statsFG1000.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_Gen_1000 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(dataG1000['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, dataG1000['x'], dataG1000['y'])
+
+        # Statistics
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsFG1000.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_1000", i, colors['blue'])
@@ -150,12 +230,34 @@ def main():
 
 
     data2000 = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
+    statsF2000 = open("datosP2EM2017/datos_P2_EM2017_N2000.csv", 'w')
+    statsF2000.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_EM2017_N2000 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(data2000['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, data2000['x'], data2000['y'])
+
+        # Statistics
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsF2000.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N2000", i, colors['blue'])
@@ -163,12 +265,34 @@ def main():
     plt.show()
 
     dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
+    statsFG2000 = open("datosP2EM2017/datos_P2_Gen_2000.csv", 'w')
+    statsFG2000.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
 
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_Gen_2000 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(dataG2000['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, dataG2000['x'], dataG2000['y'])
+
+        # Statistics
+        errorE = 0
+        errorAux = 0
+        falseP = 0
+        falseN = 0
+        errorP = 0
+        for j in range(0, n):
+            hyp = neural.forwardPropagation(dataTest['x'][j])
+            predicted = hyp[0]
+            real = dataTest['y'][j]
+            errorAux += abs(predicted - real )
+            if (predicted > 0.5 and real < 0.01):
+                falseP += 1
+            elif (predicted < 0.5 and abs(real - 1) < 0.01):
+                falseN += 1
+
+        errorP = errorAux[0]/n
+        statsFG2000.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_2000", i, colors['blue'])
