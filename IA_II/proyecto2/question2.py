@@ -15,7 +15,17 @@
 import NeuralNetwork as nn      # Neural Network library
 import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
+import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
+
+# Colors used for the plots
+colors = {'purple' : '#78037F',
+          'orange' : '#F55D3E',
+          'magenta': '#A4243B',
+          'gray'   : '#454545',
+          'blue'   : '#1781AA',
+          'green'  : '#23CE6B',
+         }
 
 def readData(dataSetName):
     dataSetFile = open(dataSetName, 'r'); # Get the dataset.
@@ -54,9 +64,9 @@ def main():
     b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
     print "ahhhhh"
     print b
-    # g = neural.gradientDescent(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
-    # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
-    # neural.gradientDescent(data500['x'], data500['y'])
+    g = neural.gradientDescent(0.1, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
+    neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
+    neural.gradientDescent(0.1, data500['x'], data500['y'])
 
     # for i in range(2, 11):
     #     nn = NeuralNetwork(len(data500['x']), i, 1)
