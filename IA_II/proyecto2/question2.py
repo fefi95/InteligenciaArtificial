@@ -72,7 +72,7 @@ def makeSimplePlot(iterations, costFunction, dsName, label, color):
     plt.savefig(dsName + ".png")
 
 def main():
-    data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+
     # print data500['x']
     # print data500['y']
     # neural = nn.NeuralNetwork(2, 2, 1)
@@ -83,22 +83,26 @@ def main():
     # print b
     alpha = 0.001
     # g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
-    # result = neural.gradientDescent(alpha, data500['x'], data500['y'])
-    #
-    # # Simple plot: iterations vs cost function
-    # iterations = np.arange(0, result['nIterations'] + 1, 1)
-    # makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
-    # plt.show()
+
+    data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+    # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
+    # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
+
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(data500['x'][0]), i, 1)
         result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+
+        # Statistics
+        # errorE = 0
+        # errorP = 0
+        # falseP = 0
+        # flaseN = 0
+        # statsF500.write(str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(flaseN))
         # Simple plot: iterations vs cost function
         iterations = np.arange(0, result['nIterations'] + 1, 1)
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
-
     print "--------------------------------------------------------------------------------"
     plt.show()
 
