@@ -54,6 +54,7 @@ def main():
     b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
     print "ahhhhh"
     print b
+    # g = neural.gradientDescent(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
     # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
     # neural.gradientDescent(data500['x'], data500['y'])
 

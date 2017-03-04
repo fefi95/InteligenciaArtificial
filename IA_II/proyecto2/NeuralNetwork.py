@@ -65,9 +65,9 @@ class NeuralNetwork:
         # create parameters of the neural network (weights) and
         # randomly initialize them
         self.thetasI = 2 * np.random.rand(self.nH-1, self.nI-1) - 1
-        self.thetasO = 2 * np.random.rand(self.nO, self.nH) - 1
+        self.thetasH = 2 * np.random.rand(self.nO, self.nH) - 1
         self.thetasI = np.array([[-30, 20, 20],[10, -20, -20]])
-        self.thetasO = np.array([[-10, 20, 20]])
+        self.thetasH = np.array([[-10, 20, 20]])
         print self.thetasI.shape
     """
         Descripction: forward propagation for the neural network
@@ -98,9 +98,9 @@ class NeuralNetwork:
 
         #z(3) = theta(2) * a(2)
         # print "z"
-        # print self.thetasO.shape
+        # print self.thetasH.shape
         # print self.actH.shape
-        z = np.dot(self.thetasO, np.transpose(self.actH))
+        z = np.dot(self.thetasH, np.transpose(self.actH))
         #a(3) = g(z(3))
         self.actO = sigmoid(z)
 
@@ -118,7 +118,7 @@ class NeuralNetwork:
 
         # Set Δ(l)i,j := 0 for all (l,i,j), (hence you end up having a matrix full of zeros)
         deltaO = np.zeros(self.nH)
-        # deltaI = np.zeros((self.nH, self.nO))
+        deltaH = np.zeros(self.nI)
 
         for i in range(0, len(X)):
             #a(1) = x
@@ -138,8 +138,9 @@ class NeuralNetwork:
             # 4. Compute δ(L−1),δ(L−2),…,δ(2) using δ(l)=((Θ(l))Tδ(l+1)) .∗ a(l) .∗ (1−a(l))
             # The delta values of layer l are calculated by multiplying the delta values in the next layer with the theta matrix of layer l. We then element-wise multiply that with a function called g', or g-prime, which is the derivative of the activation function g evaluated with the input values given by z(l).
             # print self.actI
-            # print self.thetasI
-            errorH = np.dot(np.transpose(self.thetasO), errorO) * self.actH * (1 - self.actH)
+            print self.thetasH
+            print np.dot(np.transpose(self.thetasH), errorO)
+            errorH = np.dot(np.transpose(self.thetasH), errorO) * self.actH * (1 - self.actH)
             print "actH?"
             print self.actH * (1 - self.actH)
             print "errorH"
@@ -152,21 +153,25 @@ class NeuralNetwork:
             # Hence we update our new Δ matrix.
             print errorO.shape
             print self.actH.shape
-            if len(errorO) == 1:
-                deltaO = deltaO + errorO * self.actH
-            else:
-                deltaO = deltaO + np.dot(errorO, np.transpose(self.actH))
+            # if len(errorO) == 1:
+            #     deltaO = deltaO + errorO * self.actH
+            # else:
+            #     deltaO = deltaO + np.dot(errorO, np.transpose(self.actH))
+            deltaO = deltaO + np.dot(errorO, self.actH)
 
             # print deltaI
             print self.actI
             print self.actI.shape
-            deltaI = np.dot(errorH[1:], np.transpose(self.actI))
+            deltaH = deltaH + np.dot(errorH[1:], np.transpose(self.actI))
         # D(l)i,j:=1m(Δ(l)i,j+λΘ(l)i,j), if j≠0.
         # D(l)i,j:=1mΔ(l)i,j If j=0
         # The capital-delta matrix D is used as an "accumulator" to add up our values as we go along and eventually compute our partial derivative. Thus we get ∂∂Θ(l)ijJ(Θ)= D(l)ij
+        print "deltas"
+        print deltaO
+        print deltaH
         DO = deltaO * (1 / len(X))
-        DI = deltaI * (1 / len(X))
-        return [DI, DO]
+        DH = deltaH * (1 / len(X))
+        return [DH, DO]
 
     def cost(self, X,y):
         aux = 0
@@ -207,7 +212,7 @@ class NeuralNetwork:
                 break
 
             self.thetasI = auxtheta[0] # Update the thetasI value.
-            self.thetasO = auxtheta[1] # Update the thetasO value.
+            self.thetasH = auxtheta[1] # Update the thetasH value.
             newcost = self.cost(varList , resultList)
             JofTheta.append(newcost)
 
@@ -230,12 +235,12 @@ class NeuralNetwork:
         gradApproxI = (costThetasP - costThetasM)/(2 * epsilon)
         self.thetasI = auxThetaI
 
-        auxThetaO = self.thetasO
-        self.thetasO = auxThetaO + epsilon;
+        auxThetaO = self.thetasH
+        self.thetasH = auxThetaO + epsilon;
         costThetasP = self.cost(X, y)
-        self.thetasO = auxThetaO - epsilon;
+        self.thetasH = auxThetaO - epsilon;
         costThetasM = self.cost(X, y)
         gradApproxO = (costThetasP - costThetasM)/(2 * epsilon)
-        self.thetasO = auxThetaO
+        self.thetasH = auxThetaO
 
         return [gradApproxI, gradApproxO]
