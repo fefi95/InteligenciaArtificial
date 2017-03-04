@@ -35,7 +35,7 @@ def readData(dataSetName):
     for line in dataSetFile:
         wordList = line.split()
         varList.append(wordList[:-1])
-        resultList.append(wordList[-1])
+        resultList.append([wordList[-1]])
 
     varList    = np.array(varList, dtype=np.float128)
     resultList = np.array(resultList, dtype=np.float128)
@@ -61,12 +61,12 @@ def main():
     neural = nn.NeuralNetwork(2, 2, 1)
     h = neural.forwardPropagation(np.array([[0,0]]))
     print h
-    b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
+    b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
     print "ahhhhh"
     print b
-    g = neural.gradientDescent(0.1, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([1,0, 0, 1]))
-    neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
-    neural.gradientDescent(0.1, data500['x'], data500['y'])
+    g = neural.gradientDescent(0.1, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
+    # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
+    # neural.gradientDescent(0.1, data500['x'], data500['y'])
 
     # for i in range(2, 11):
     #     nn = NeuralNetwork(len(data500['x']), i, 1)
