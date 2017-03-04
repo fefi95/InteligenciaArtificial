@@ -53,24 +53,51 @@ def readData(dataSetName):
 
     return {'x' : varList, 'y': resultList}
 
+"""
+    Descripction: plot of the cost function against number of iterations
+    Parameters:
+        @param iterations   : position of the theta to use.
+        @param costFunction : array that contains the values for every cost
+        @param dsName       : name of dataset
+        @param label        : label of the legend plot
+        @param color        : color of the line on the plot
+"""
+def makeSimplePlot(iterations, costFunction, dsName, label, color):
+    plt.plot(iterations, costFunction, label='alpha= ' + str(label), c=color, linewidth=1.5)
+    plt.xlabel("numero de iteraciones")
+    plt.ylabel("Funcion de costo (J)")
+    plt.title(dsName)
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(dsName + ".png")
 
 def main():
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    print data500['x']
-    print data500['y']
+    # print data500['x']
+    # print data500['y']
     neural = nn.NeuralNetwork(2, 2, 1)
     h = neural.forwardPropagation(np.array([[0,0]]))
     print h
     b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
     print "ahhhhh"
     print b
-    g = neural.gradientDescent(0.1, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
-    # neural.gradientDescent(0.1, data500['x'], data500['y'])
+    alpha = 0.01
+    g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
+    neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
+    result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+
+    # Simple plot: iterations vs cost function
+    iterations = np.arange(0, result['nIterations'] + 1, 1)
+    makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
+    plt.show()
 
     # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(data500['x']), i, 1)
-    #     # nn.training(data500['x'], data500['y'])
+    #     nn = NeuralNetwork(len(data500['x'][0]), i, 1)
+    #     result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+    #     # Simple plot: iterations vs cost function
+    #     iterations = np.arange(0, result['nIterations'] + 1, 1)
+    #     makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
+    #     plt.show()
     #
     #
     # dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
