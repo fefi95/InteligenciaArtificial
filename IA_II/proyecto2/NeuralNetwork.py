@@ -68,9 +68,9 @@ class NeuralNetwork:
         self.thetasH = np.random.rand(self.nO, self.nH) * 2 * ep - ep
         # self.thetasI = np.array([[-30, 20, 20],[10, -20, -20]])
         # self.thetasH = np.array([[-10, 20, 20]])
-        print "init"
-        print self.thetasI
-        print self.thetasH
+        # print "init"
+        # print self.thetasI
+        # print self.thetasH
 
     """
         Descripction: forward propagation for the neural network
@@ -213,17 +213,17 @@ class NeuralNetwork:
 
         # Calculate the initial cost.
         cos = self.cost(varList, resultList)
-        print "cos1"
-        print cos
+        # print "cos1"
+        # print cos
         JofTheta.append(cos)
 
         i = 0 # Initialize the counter of iterations.
         while (not(conv) and (i <= maxIter)):
             auxthetaI = self.thetasI
             auxthetaH = self.thetasH
-            print "before"
-            print auxthetaI
-            print auxthetaH
+            # print "before"
+            # print auxthetaI
+            # print auxthetaH
             # Get new thetas
             derivate = self.backPropagation(varList, resultList)
 
@@ -239,26 +239,26 @@ class NeuralNetwork:
             self.thetasI = auxthetaI - alpha * derivate[0]
             self.thetasH = auxthetaH - alpha * derivate[1]
 
-            print "after"
-            print self.thetasI
-            print self.thetasH
+            # print "after"
+            # print self.thetasI
+            # print self.thetasH
             newcost = self.cost(varList , resultList)
-            print "newcost"
-            print newcost
-            print "derivate"
-            print derivate[0]
-            print derivate[1]
+            # print "newcost"
+            # print newcost
+            # print "derivate"
+            # print derivate[0]
+            # print derivate[1]
             JofTheta.append(newcost)
 
             i = i + 1 # Update the actual number of iterations.
             if (abs(newcost - cos) <= 0.001):
                 conv = True
-                print "thetas"
-                print self.thetasI
-                print self.thetasH
+                # print "thetas"
+                # print self.thetasI
+                # print self.thetasH
 
-            print "dif cos"
-            print abs(newcost - cos)
+            # print "dif cos"
+            # print abs(newcost - cos)
             cos = newcost
 
 

@@ -63,7 +63,7 @@ def readData(dataSetName):
         @param color        : color of the line on the plot
 """
 def makeSimplePlot(iterations, costFunction, dsName, label, color):
-    plt.plot(iterations, costFunction, label='alpha= ' + str(label), c=color, linewidth=1.5)
+    plt.plot(iterations, costFunction, label='#neuronas= ' + str(label), linewidth=1.5)
     plt.xlabel("numero de iteraciones")
     plt.ylabel("Funcion de costo (J)")
     plt.title(dsName)
@@ -75,74 +75,101 @@ def main():
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
     # print data500['x']
     # print data500['y']
-    neural = nn.NeuralNetwork(2, 2, 1)
-    h = neural.forwardPropagation(np.array([[0,0]]))
-    print h
-    b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    print "ahhhhh"
-    print b
-    alpha = 0.01
-    g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
-    result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+    # neural = nn.NeuralNetwork(2, 2, 1)
+    # h = neural.forwardPropagation(np.array([[0,0]]))
+    # print h
+    # b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
+    # print "ahhhhh"
+    # print b
+    alpha = 0.001
+    # g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
+    # neural = nn.NeuralNetwork(len(data500['x'][0]), 2, 1)
+    # result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+    #
+    # # Simple plot: iterations vs cost function
+    # iterations = np.arange(0, result['nIterations'] + 1, 1)
+    # makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
+    # plt.show()
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(data500['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
 
-    # Simple plot: iterations vs cost function
-    iterations = np.arange(0, result['nIterations'] + 1, 1)
-    makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
+    print "--------------------------------------------------------------------------------"
     plt.show()
 
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(data500['x'][0]), i, 1)
-    #     result = neural.gradientDescent(alpha, data500['x'], data500['y'])
-    #     # Simple plot: iterations vs cost function
-    #     iterations = np.arange(0, result['nIterations'] + 1, 1)
-    #     makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", alpha, colors['blue'])
-    #     plt.show()
-    #
-    #
-    # dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
-    # print dataG500['x']
-    # print dataG500['y']
-    #
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(dataG500['x']), i, 1)
-    #     # nn.training(dataG500['x'], dataG500['y'])
-    #
-    #
-    # data1000 = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
-    # print data1000['x']
-    # print data1000['y']
-    #
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(data1000['x']), i, 1)
-    #     # nn.training(data1000['x'], data1000['y'])
-    #
-    # dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
-    # print dataG1000['x']
-    # print dataG1000['y']
-    #
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(dataG1000['x']), i, 1)
-    #     # nn.training(dataG1000['x'], dataG1000['y'])
-    #
-    #
-    # data2000 = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
-    # print data2000['x']
-    # print data2000['y']
-    #
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(data2000['x']), i, 1)
-    #     # nn.training(data2000['x'], data2000['y'])
-    #
-    #
-    # dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
-    # print dataG2000['x']
-    # print dataG2000['y']
-    #
-    # for i in range(2, 11):
-    #     nn = NeuralNetwork(len(dataG2000['x']), i, 1)
-    #     # nn.training(dataG2000['x'], dataG2000['y'])
 
+    dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
+
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_Gen_500 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(dataG500['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, dataG500['x'], dataG500['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_500", i, colors['blue'])
+
+    print "--------------------------------------------------------------------------------"
+    plt.show()
+
+
+    data1000 = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
+
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_EM2017_N1000 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(data1000['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, data1000['x'], data1000['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N1000", i, colors['blue'])
+    print "--------------------------------------------------------------------------------"
+    plt.show()
+
+    dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
+
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_Gen_1000 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(dataG1000['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, dataG1000['x'], dataG1000['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_1000", i, colors['blue'])
+    print "--------------------------------------------------------------------------------"
+    plt.show()
+
+
+    data2000 = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
+
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_EM2017_N2000 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(data2000['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, data2000['x'], data2000['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N2000", i, colors['blue'])
+    print "--------------------------------------------------------------------------------"
+    plt.show()
+
+    dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
+
+    print "--------------------------------------------------------------------------------"
+    for i in range(2, 11):
+        print "\t calculando thetas para datos_P2_Gen_2000 con " + str(i) + " neuronas..."
+        neural = nn.NeuralNetwork(len(dataG2000['x'][0]), i, 1)
+        result = neural.gradientDescent(alpha, dataG2000['x'], dataG2000['y'])
+        # Simple plot: iterations vs cost function
+        iterations = np.arange(0, result['nIterations'] + 1, 1)
+        makeSimplePlot(iterations, result['costFunction'], "datos_P2_Gen_2000", i, colors['blue'])
+    print "--------------------------------------------------------------------------------"
+    plt.show()
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
