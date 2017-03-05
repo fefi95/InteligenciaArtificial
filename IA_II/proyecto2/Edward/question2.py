@@ -35,8 +35,15 @@ def readData(dataSetName):
     # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
     # Get the data. 
+    data[1].mean()
     for index, row in data.iterrows():
-    	varList.append([row[0],row[1], row[2]])
+    	normalRow = []
+    	print len(row)
+    	for i in range(0, len(row)):
+    		normal = (row[i] - data[i].mean()) / data[i].std()
+    		normalRow.append(normal)
+    	print normalRow	
+    	varList.append(normalRow)
 
    	# Normalize the data.
    	"""
@@ -51,7 +58,7 @@ def readData(dataSetName):
 
 def main():
 
-    alpha = 0.001
+    alpha = 0.01
 
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
@@ -66,8 +73,8 @@ def main():
        	#print data500['x']
        	nn.trainNetwork(neuralNet, data500, alpha, maxIter, 2)
         print "\n Muestro la red. \n"
-        for layer in neuralNet:
-        	print layer
+        #for layer in neuralNet:
+        #	print layer
         # actualizo los pesos
         #neural.gradientChecking(data500['x'], data500['y'])
         #result = neural.gradientDescent(alpha, data500['x'], data500['y'])

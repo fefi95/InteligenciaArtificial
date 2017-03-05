@@ -171,10 +171,8 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
     for i in range(nIter):
         sumError = 0
         for row in data:
-            print row
             outputs = neuralNet.forwardPropagation(row)
             expected = [0 for j in range(nOutputs)]
-            print(int(row[-1]))
             expected[int(row[-1])] = 1
             sumError += sum([(expected[j]-outputs[j])**2 for j in range(len(expected))])
             neuralNet.backPropagation(expected)
