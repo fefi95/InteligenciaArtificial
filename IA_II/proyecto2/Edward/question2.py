@@ -112,6 +112,16 @@ def getConfusionMatrix(predictedValue, originalValue):
     print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
     return [TP, FP, TN, FN]
 
+"""
+    Description:
+        Uses the dataset in dataFileName to predict the result of the dataPredict,
+        plots the results and gets the relevant statistics
+    Params:
+        @param dataFileName: name of the file where the dataset is
+        @param dataPredict : dataset to be predicted using the values of thetas
+                             of the dataFileName
+        @param alpha       : learning rate
+"""
 
 def calculate(dataFileName, dataPredict, alpha):
     data = readData("datosP2EM2017/" + dataFileName +".txt")
