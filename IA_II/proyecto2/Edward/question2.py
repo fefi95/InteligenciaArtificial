@@ -28,30 +28,42 @@ colors = {'purple' : '#78037F',
           'green'  : '#23CE6B',
          }
 
-maxIter = 1000
+maxIter = 25000
+
+def draw_dataset(dataset):
+
+    inCircleX, inCircleY, outCircleX, outCircleY = split(dataset)
+
+    #draw figure
+    fig = plt.figure()
+    ax = fig.add_subplot()
+
+    #plot points inside circle
+    p1 = plt.scatter(inCircleX, inCircleY, c='r', marker='.', label = "Points inside circle.")
+    p2 = plt.scatter(outCircleX, outCircleY, c='c', marker='.', label = "Points outside circle.")
+    plt.legend(loc=2)
+
+    plt.show()
 
 def readData(dataSetName):
     varList     = [] # initialize matrix of features
     # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
-    # Get the data. 
-    # print data[1]
-    print data
-
+    # Get the min and max vlues for each column. 
+    minValues = []
+    maxValues = []
     for i in range(0, len(data.columns)-1):
-        data[i] = (data[i] - data[i].mean()) / data[i].std()
-    print data
-
+        minValues.append(data[i].min())
+        maxValues.append(data[i].max())
 
     # Normalize the data.
-    """
-    for i in range(0, len(varList[0])):
-        mean = np.mean(transVar[i])
-        std = np.std(transVar[i])
-        for j in range(len(varList)):
-            if (std != 0):
-                varList[j][i] = (varList[j][i] - mean) / std
-	"""
+    for index, row in data.iterrows():
+    	normalRow = []
+
+    	for i in range(0, len(row)-1):
+    		normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
+    		normalRow.append(normalize) 
+    	varList.append(normalRow)
     return varList
 
 def main():
@@ -59,7 +71,6 @@ def main():
     alpha = 0.01
 
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    return 0
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
     
@@ -71,7 +82,10 @@ def main():
         print "\n Entreno la red. \n"
        	#print data500['x']
        	nn.trainNetwork(neuralNet, data500, alpha, maxIter, 2)
-        print "\n Muestro la red. \n"
+
+       	for row in data500:
+ 			print nn.predictNetwork(neuralNet, row)
+        #print "\n Muestro la red. \n"
         #for layer in neuralNet:
         #	print layer
         # actualizo los pesos

@@ -187,7 +187,7 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
         @param neuralNet: neural network to use.
         @param row      : sample. 
 """
-def predict(neuralNet, row):
+def predictNetwork(neuralNet, row):
     outputs = neuralNet.forwardPropagation(row)
     return outputs.index(max(outputs))
 
