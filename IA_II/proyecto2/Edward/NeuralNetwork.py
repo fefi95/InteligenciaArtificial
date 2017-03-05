@@ -1,6 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+"""
+    Universidad Simon Bolivar
+    CI-5438 - Inteligencia Artificial
+    Edward Fernandez 10-11121
+    Carlos Ferreira 11-10323
+    Stefani Castellanos 11-11394
+
+    Description:
+        This file contains the backpropagation implementation for neural networks
+"""
+
+# .----------------------------------------------------------------------------.
+# Import libraries to use.
+
 from random import seed
 from random import random
 from math   import exp
+
+# .----------------------------------------------------------------------------.
 
 """
     Description: 
@@ -21,8 +39,6 @@ def sigmoid(activation):
 """
 def dsigmoid(output):
     return output * (1 - output)
-
-
 
 class NeuralNetwork:
     """
@@ -175,28 +191,4 @@ def predict(neuralNet, row):
     outputs = neuralNet.forwardPropagation(row)
     return outputs.index(max(outputs))
 
-# .----------------------------------------------------------------------------.
-
-if __name__ == '__main__':
-    seed(1)
-    dataset = [[2.7810836,2.550537003,0],
-    [1.465489372,2.362125076,0],
-    [3.396561688,4.400293529,0],
-    [1.38807019,1.850220317,0],
-    [3.06407232,3.005305973,0],
-    [7.627531214,2.759262235,1],
-    [5.332441248,2.088626775,1],
-    [6.922596716,1.77106367,1],
-    [8.675418651,-0.242068655,1],
-    [7.673756466,3.508563011,1]]
-    network = NeuralNetwork(2,2,2)
-    network.net =  [[{'weights': [-1.482313569067226, 1.8308790073202204, 1.078381922048799]}, {'weights': [0.23244990332399884, 0.3621998343835864, 0.40289821191094327]}],
-    [{'weights': [2.5001872433501404, 0.7887233511355132, -1.1026649757805829]}, {'weights': [-2.429350576245497, 0.8357651039198697, 1.0699217181280656]}]]
-
-    #expected = [0,1]
-    #neuralNet.backPropagation(expected)
-    #trainNetwork(neuralNet, dataset, 0.5, 20, n_outputs)
-    for row in dataset:
-        prediction = predict(network, row)
-        print('Expected=%d, Got=%d' % (row[-1], prediction))
 # .----------------------------------------------------------------------------.
