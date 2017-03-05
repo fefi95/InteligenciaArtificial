@@ -32,17 +32,14 @@ maxIter = 1000
 
 def readData(dataSetName):
     varList     = [] # initialize matrix of features
-    resultList  = [] # initialize matrix of results
+    # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
+    # Get the data. 
     for index, row in data.iterrows():
-    	varList.append([row[0],row[1]])
-    	resultList.append([row[2]])
-   
-   	# Get lines.
-   
+    	varList.append([row[0],row[1], row[2]])
 
-    """
-    # Update the varList and the resultList.
+   	# Normalize the data.
+   	"""
     for i in range(0, len(varList[0])):
         mean = np.mean(transVar[i])
         std = np.std(transVar[i])
@@ -50,7 +47,7 @@ def readData(dataSetName):
             if (std != 0):
                 varList[j][i] = (varList[j][i] - mean) / std
 	"""
-    return {'x' : varList, 'y': resultList}
+    return varList
 
 def main():
 
@@ -64,11 +61,10 @@ def main():
     for i in range(2, 3):
         print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         print "\n Creo la red. \n"
-        neuralNet = nn.NeuralNetwork(len(data500['x'][0]) - 1, i, 2)
+        neuralNet = nn.NeuralNetwork(len(data500[0]) - 1, i, 2)
         print "\n Entreno la red. \n"
        	#print data500['x']
-       	print data500['x']
-       	nn.trainNetwork(neuralNet, data500['x'], alpha, maxIter, 2)
+       	nn.trainNetwork(neuralNet, data500, alpha, maxIter, 2)
         print "\n Muestro la red. \n"
         for layer in neuralNet:
         	print layer

@@ -94,10 +94,6 @@ class NeuralNetwork:
             newInputs = []
             for neuron in layer:
                 # Calculate the neuron activation.
-                print "neuron"
-                print neuron['weights']
-                print "input"
-                print inputs
                 activation = self.neuronActivation(neuron['weights'], inputs)
                 
                 # The neuron's output is stored in the neuron.
@@ -175,6 +171,7 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
     for i in range(nIter):
         sumError = 0
         for row in data:
+            print row
             outputs = neuralNet.forwardPropagation(row)
             expected = [0 for j in range(nOutputs)]
             print(int(row[-1]))
