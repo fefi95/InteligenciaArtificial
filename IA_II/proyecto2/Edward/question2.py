@@ -61,7 +61,7 @@ def readData(dataSetName):
 
 def main():
 
-    alpha = 0.01
+    alpha = 0.001
 
     data500   = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
     dataG500  = readData('datosP2EM2017/datos_P2_Gen_500.txt')
@@ -69,7 +69,6 @@ def main():
     dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
     data2000  = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
     dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
-    
 
     dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
@@ -96,7 +95,7 @@ def main():
         newData = []
         i = 0;
         for row in dataPredict['original']:
-            newData.append([row[0], row[1], result[i]])
+            newData.append([round(row[0],2), round(row[1],2), result[i]])
             i += 1
 
         gf.drawPoints(newData)

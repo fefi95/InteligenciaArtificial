@@ -177,7 +177,7 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
             sumError += sum([(expected[j]-outputs[j])**2 for j in range(len(expected))])
             neuralNet.backPropagation(expected)
             neuralNet.update_weights(row, alpha)
-        print('>epoch=%d, lrate=%.3f, error=%.3f' % (i, alpha, sumError))
+        print('>iter=%d, lrate=%.3f, error=%.3f' % (i, alpha, sumError))
 
 """
     Description:

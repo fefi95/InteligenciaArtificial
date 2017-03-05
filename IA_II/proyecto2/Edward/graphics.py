@@ -14,6 +14,7 @@ def getPoints(dataset):
             outCircleX.append(row[0])
             outCircleY.append(row[1])
 
+    print outCircleX
     return {'inCircleX': inCircleX, 'inCircleY': inCircleY, 'outCircleX': outCircleX, 'outCircleY': outCircleY}
 
 def drawPoints(dataset):
@@ -26,6 +27,7 @@ def drawPoints(dataset):
     #plot points inside circle
     p1 = plt.scatter(points['inCircleX'], points['inCircleY'], c='r', marker='.', label = "Points inside circle.")
     p2 = plt.scatter(points['outCircleX'], points['outCircleY'], c='c', marker='.', label = "Points outside circle.")
+    #plt.axis((0,20,0,20))
     plt.legend(loc=2)
 
     plt.show()
