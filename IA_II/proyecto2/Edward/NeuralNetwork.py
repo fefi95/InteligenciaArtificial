@@ -100,16 +100,22 @@ class NeuralNetwork:
         for i in reversed(range(len(self.net))):
             layer = self.net[i]
             errors = list()
+            
+            # Error for the hidden layers.
             if i != len(self.net)-1:
                 for j in range(len(layer)):
                     error = 0.0
+                    # The error for a given neuron.
                     for neuron in self.net[i + 1]:
                         error += (neuron['weights'][j] * neuron['delta'])
                     errors.append(error)
             else:
+                # Error for the output layer.
                 for j in range(len(layer)):
                     neuron = layer[j]
+                    # The error for a given neuron.
                     errors.append(expected[j] - neuron['output'])
+            
             for j in range(len(layer)):
                 neuron = layer[j]
 
@@ -134,14 +140,49 @@ class NeuralNetwork:
                     neuron['weights'][j] += alpha * neuron['delta'] * inputs[j]
                 neuron['weights'][-1] += alpha * neuron['delta']
 
+"""
+    Description:
+        Training a given neural network.
+    Params:
+        @param neuralNet: neural network to use.
+        @param data     : training dataset.
+        @param alpha    : learning rate to use.
+        @param nIter    : number of iterations to update the neural network for 
+                          each row in the training dataset.
+        @param nOutputs : expected number of output values.
+"""
+def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
+    for i in range(nIter):
+        sumError = 0
+        for row in data:
+            outputs = neuralNet.forwardPropagation(row)
+            expected = [0 for j in range(nOutputs)]
+            expected[row[-1]] = 1
+            sumError += sum([(expected[j]-outputs[j])**2 for j in range(len(expected))])
+            neuralNet.backPropagation(expected)
+            neuralNet.update_weights(row, alpha)
+        print('>epoch=%d, lrate=%.3f, error=%.3f' % (i, alpha, sumError))
+
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
     seed(1)
-    neuralNet = NeuralNetwork(2, 1, 2)
-    neuralNet.net = [[{'output': 0.7105668883115941,'weights': [0.13436424411240122, 0.8474337369372327, 0.763774618976614]}],[{'output': 0.6213859615555266, 'weights': [0.2550690257394217, 0.49543508709194095]},{'output': 0.6573693455986976, 'weights': [0.4494910647887381, 0.651592972722763]}]]
+    dataset = [[2.7810836,2.550537003,0],
+    [1.465489372,2.362125076,0],
+    [3.396561688,4.400293529,0],
+    [1.38807019,1.850220317,0],
+    [3.06407232,3.005305973,0],
+    [7.627531214,2.759262235,1],
+    [5.332441248,2.088626775,1],
+    [6.922596716,1.77106367,1],
+    [8.675418651,-0.242068655,1],
+    [7.673756466,3.508563011,1]]
+    n_inputs = len(dataset[0]) - 1
+    n_outputs = len(set([row[-1] for row in dataset]))
+    neuralNet = NeuralNetwork(n_inputs, 2, n_outputs)
     #expected = [0,1]
     #neuralNet.backPropagation(expected)
+    trainNetwork(neuralNet, dataset, 0.5, 20, n_outputs)
     for layer in neuralNet.net:
         print(layer)
 # .----------------------------------------------------------------------------.
