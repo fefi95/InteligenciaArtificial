@@ -27,7 +27,7 @@ def drawPoints(dataset, dsName, nNeuron):
     p1 = plt.scatter(points['inCircleX'], points['inCircleY'], c='r', marker='.', label = "Points inside circle.")
     p2 = plt.scatter(points['outCircleX'], points['outCircleY'], c='c', marker='.', label = "Points outside circle.")
     #plt.axis((0,20,0,20))
-    plt.title(dsName + "con  " + str(nNeuron))
+    plt.title(dsName + " con " + str(nNeuron) + " neuronas")
     plt.legend(loc=2)
     plt.savefig(dsName + "_" + str(nNeuron) +"_neuronas.png")
     plt.show()

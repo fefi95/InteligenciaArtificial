@@ -120,7 +120,7 @@ def calculate(dataFileName, dataPredict, alpha):
     results = []
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
-        print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
+        print "\t calculando thetas para" + dataFileName + " con " + str(i) + " neuronas..."
         print "\t Creando la red."
         neuralNet = nn.NeuralNetwork(len(data['normalized'][0]) - 1, i, 2)
         print "\t Entrenando la red."
@@ -158,10 +158,10 @@ def main():
 
     # calculate("datos_P2_EM2017_N500", dataPredict, alpha)
     # calculate("datos_P2_Gen_500", dataPredict, alpha)
-    calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
-    calculate("datos_P2_Gen_1000", dataPredict, alpha)
-    # calculate("datos_P2_EM2017_N2000", dataPredict, alpha)
-    # calculate("datos_P2_Gen_2000", dataPredict, alpha)
+    # calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
+    # calculate("datos_P2_Gen_1000", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N2000", dataPredict, alpha)
+    calculate("datos_P2_Gen_2000", dataPredict, alpha)
 
 # .----------------------------------------------------------------------------.
 
