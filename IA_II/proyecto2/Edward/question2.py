@@ -13,6 +13,7 @@
 # Import libraries to use.
 
 import NeuralNetwork as nn      # Neural Network library
+import graphics as gf
 import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
 import pandas as pd
@@ -28,25 +29,11 @@ colors = {'purple' : '#78037F',
           'green'  : '#23CE6B',
          }
 
-maxIter = 25000
-
-def draw_dataset(dataset):
-
-    inCircleX, inCircleY, outCircleX, outCircleY = split(dataset)
-
-    #draw figure
-    fig = plt.figure()
-    ax = fig.add_subplot()
-
-    #plot points inside circle
-    p1 = plt.scatter(inCircleX, inCircleY, c='r', marker='.', label = "Points inside circle.")
-    p2 = plt.scatter(outCircleX, outCircleY, c='c', marker='.', label = "Points outside circle.")
-    plt.legend(loc=2)
-
-    plt.show()
+maxIter = 1000
 
 def readData(dataSetName):
-    varList     = [] # initialize matrix of features
+    originalList = [] # initialize matrix of features without normalization.
+    varList      = [] # initialize matrix of features with normalization.
     # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
     # Get the min and max vlues for each column. 
@@ -58,19 +45,33 @@ def readData(dataSetName):
 
     # Normalize the data.
     for index, row in data.iterrows():
-    	normalRow = []
+        normalRow   = []
+        rowObtained = []
+        
+        for i in range(0, len(row)-1):
+            normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
+            normalRow.append(normalize) 
+            rowObtained.append(row[i])
 
-    	for i in range(0, len(row)-1):
-    		normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
-    		normalRow.append(normalize) 
-    	varList.append(normalRow)
-    return varList
+        rowObtained.append(row[len(row)-1])
+
+        varList.append(normalRow)
+        originalList.append(rowObtained)
+    return { 'normalized': varList, 'original': originalList }
 
 def main():
 
     alpha = 0.01
 
-    data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+    data500   = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+    dataG500  = readData('datosP2EM2017/datos_P2_Gen_500.txt')
+    data1000  = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
+    dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
+    data2000  = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
+    dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
+    
+
+    dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
     
@@ -78,16 +79,30 @@ def main():
     for i in range(2, 3):
         print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         print "\n Creo la red. \n"
-        neuralNet = nn.NeuralNetwork(len(data500[0]) - 1, i, 2)
+        neuralNet = nn.NeuralNetwork(len(data500['normalized'][0]) - 1, i, 2)
         print "\n Entreno la red. \n"
-       	#print data500['x']
-       	nn.trainNetwork(neuralNet, data500, alpha, maxIter, 2)
+        #print data500['x']
+        nn.trainNetwork(neuralNet, data500['normalized'], alpha, maxIter, 2)
+        nn.trainNetwork(neuralNet, dataG500['normalized'], alpha, maxIter, 2)
+        nn.trainNetwork(neuralNet, data1000['normalized'], alpha, maxIter, 2)
+        nn.trainNetwork(neuralNet, dataG1000['normalized'], alpha, maxIter, 2)
+        nn.trainNetwork(neuralNet, data2000['normalized'], alpha, maxIter, 2)
+        nn.trainNetwork(neuralNet, dataG2000['normalized'], alpha, maxIter, 2)
 
-       	for row in data500:
- 			print nn.predictNetwork(neuralNet, row)
+        result = []
+        for row in dataPredict['normalized']:
+            result.append([nn.predictNetwork(neuralNet, row)])
+
+        newData = []
+        i = 0;
+        for row in dataPredict['original']:
+            newData.append([row[0], row[1], result[i]])
+            i += 1
+
+        gf.drawPoints(newData)
         #print "\n Muestro la red. \n"
         #for layer in neuralNet:
-        #	print layer
+        #   print layer
         # actualizo los pesos
         #neural.gradientChecking(data500['x'], data500['y'])
         #result = neural.gradientDescent(alpha, data500['x'], data500['y'])
@@ -103,7 +118,7 @@ def main():
         #makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
     #print "--------------------------------------------------------------------------------"
     #plt.show()
-	
+    
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
