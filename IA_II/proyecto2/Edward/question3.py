@@ -102,23 +102,27 @@ def getConfusionMatrix(predictedValue, originalValue):
     TN = 0
     FN = 0
 
-    lastpos = len(predictedValue[0]) - 1
+    lastpos = len(originalValue[0]) - 1
     nP = 0
     nF = 0
     for i in range(0, len(predictedValue)):
-        if (predictedValue[i][lastpos] >= 0.5 and originalValue[i][lastpos] == 1):
+        if (predictedValue[i] == 1 and originalValue[i][lastpos] == 1):
             TP += 1
             nP += 1
-        elif (predictedValue[i][lastpos] >= 0.5 and originalValue[i][lastpos] == 0):
+        elif (predictedValue[i] == 1 and originalValue[i][lastpos] == 0):
             FP += 1
             nP += 1
-        elif (predictedValue[i][lastpos] < 0.5 and originalValue[i][lastpos] == 0):
+        elif (predictedValue[i] == 0 and originalValue[i][lastpos] == 0):
             TN += 1
             nF += 1
-        else:
+        elif (predictedValue[i] == 0 and originalValue[i][lastpos] == 1):
             FN += 1
             nF += 1
-
+        else:
+            print "prediccion"
+            print predictedValue[i]
+            print "test"
+            print originalValue[i]
     print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
 
 def main():
@@ -143,7 +147,7 @@ def main():
 
             newData = []
             for row in dataIrisBinary['test'] :
-                newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
+                newData.append(nn.predictNetwork(neuralNet, row))
 
             getConfusionMatrix(newData, dataIrisBinary['test'])
             #gf.drawPoints(newData)
