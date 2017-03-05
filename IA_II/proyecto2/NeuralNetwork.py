@@ -57,9 +57,9 @@ class NeuralNetwork:
         self.nO = int(nO)
 
         # activations for nodes
-        self.actI = np.ones((1,self.nI))
-        self.actH = np.ones((1, self.nH)) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
-        self.actO = np.ones((1, self.nO))
+        self.actI = np.ones((self.nI, 1))
+        self.actH = np.ones((self.nH, 1)) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
+        self.actO = np.ones((self.nO, 1))
 
         # create parameters of the neural network (weights) and
         # randomly initialize them
@@ -80,30 +80,32 @@ class NeuralNetwork:
     def forwardPropagation(self, x):
 
         #a(1) = x
-        self.actI[0][1:] = x
+        # print x.shape
+        # print self.actI[1:]
+        self.actI[1:] = np.transpose(x.reshape(1,2))
         # print self.actI
-        # print len(self.thetasI)
         # print(self.thetasI)
         # print(x)
-        # print x.shape
 
         #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
         #z(2) = theta(1) * a(1)
-        z = np.transpose(np.dot(self.thetasI, np.transpose(self.actI)))
+        z = np.dot(self.thetasI, self.actI)
         #a(2) = g(z(2))
         # print z.shape
         # print self.actH.shape
-        for i in range(0,self.nH-1):
-            self.actH[0][i+1] = sigmoid(z[0][i])
+        for i in range(0, self.nH-1):
+            self.actH[i+1][0] = sigmoid(z[i][0])
 
         self.actH[0][0] = 1 # bias units
         #z(3) = theta(2) * a(2)
         # print "z"
         # print self.thetasH.shape
         # print self.actH.shape
-        z = np.transpose(np.dot(self.thetasH, np.transpose(self.actH)))
+        z = np.dot(self.thetasH, self.actH)
         #a(3) = g(z(3))
-        self.actO = sigmoid(z)
+        for i in range(0, self.nO):
+            self.actO[i][0] = sigmoid(z[i][0])
+        # self.actO = sigmoid(z)
 
         # return the hypothesis h_theta(x)
         return self.actO
@@ -142,8 +144,7 @@ class NeuralNetwork:
             # print self.actI
             # print self.thetasH
             # print np.dot(np.transpose(self.thetasH), errorO)
-            actHT = np.transpose(self.actH)
-            errorH = np.dot(np.transpose(self.thetasH), np.transpose(errorO)) * dsigmoid(actHT) #actHT * (1 - actHT)
+            errorH = np.dot(np.transpose(self.thetasH), errorO) * dsigmoid(self.actH) #actHT * (1 - actHT)
             # print "actH?"
             # print dsigmoid(actHT)
             # print "errorH"
@@ -160,12 +161,12 @@ class NeuralNetwork:
             #     deltaH = deltaH + errorO * self.actH
             # else:
             #     deltaH = deltaH + np.dot(errorO, np.transpose(self.actH))
-            deltaH = deltaH + np.dot(np.transpose(errorO), self.actH)
+            deltaH = deltaH + np.dot(errorO, np.transpose(self.actH))
 
             # print deltaI
             # print self.actI
             # print self.actI.shape
-            deltaI = deltaI + np.dot(errorH[1:], self.actI)
+            deltaI = deltaI + np.dot(errorH[1:], np.transpose(self.actI))
         # D(l)i,j:=1m(Δ(l)i,j+λΘ(l)i,j), if j≠0.
         # D(l)i,j:=1mΔ(l)i,j If j=0
         # The capital-delta matrix D is used as an "accumulator" to add up our values as we go along and eventually compute our partial derivative. Thus we get ∂∂Θ(l)ijJ(Θ)= D(l)ij
@@ -175,28 +176,24 @@ class NeuralNetwork:
         DH = np.zeros((self.nO, self.nH))
         DI = np.zeros((self.nH-1, self.nI))
         for i in range(0, self.nO):
-            DH[i][0] = deltaH[i][0]
+            DH[i][0] = deltaH[i][0]/len(X)
             for j in range(1, self.nH):
-                DH[i][j] = deltaH[i][j] + self.thetasH[i][j]/len(X)
+                DH[i][j] = (deltaH[i][j] + self.thetasH[i][j])/len(X)
 
         for i in range(0, self.nH-1):
-            DI[i][0] = deltaI[i][0]
+            DI[i][0] = deltaI[i][0]/len(X)
             for j in range(1, self.nI):
-                DI[i][j] = deltaI[i][j] + self.thetasI[i][j]/len(X)
+                DI[i][j] = (deltaI[i][j] + self.thetasI[i][j])/len(X)
 
         return [DI, DH]
 
     def cost(self, X,y):
         aux = 0
-        #Varias cosas que no tengo claras, nuestro forward creo que solo funciona con una neurona de salida
-        # por lo cual nunca le tengo que dar un x y el calcula, si se dan cuenta si k = 1 es la
-        # regresion logica por lo cual creo que falta algo, aunque la y por lo que entendi no cambia
-        # ya que y[i]k deberia ser la misma para todos.
         for i in range(0,len(y)):
             aux1 = 0
             for k in range(0,self.nO):
                 h = self.forwardPropagation(X[i])
-                aux1 += y[i][k] * np.log(h[0][k]) + (1 - y[i][k]) * np.log(1-h[0][k])
+                aux1 += y[i][k] * np.log(h[k][0]) + (1 - y[i][k]) * np.log(1-h[k][0])
             aux += aux1
         return -aux/len(y)
 
@@ -219,6 +216,7 @@ class NeuralNetwork:
 
         i = 0 # Initialize the counter of iterations.
         while (not(conv) and (i <= maxIter)):
+        # while i <= maxIter:
             auxthetaI = self.thetasI
             auxthetaH = self.thetasH
             # print "before"
@@ -251,8 +249,10 @@ class NeuralNetwork:
             JofTheta.append(newcost)
 
             i = i + 1 # Update the actual number of iterations.
-            if (abs(newcost - cos) <= 0.001):
+            if (abs(newcost - cos) <= 0.0001):
                 conv = True
+                print derivate[0]
+                print derivate[1]
                 # print "thetas"
                 # print self.thetasI
                 # print self.thetasH
