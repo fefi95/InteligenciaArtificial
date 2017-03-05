@@ -89,9 +89,10 @@ def main():
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
 
     print "--------------------------------------------------------------------------------"
-    for i in range(2, 11):
+    for i in range(2, 3):
         print "\t calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         neural = nn.NeuralNetwork(len(data500['x'][0]), i, 1)
+        #neural.gradientChecking(data500['x'], data500['y'])
         result = neural.gradientDescent(alpha, data500['x'], data500['y'])
 
         # Statistics
@@ -105,7 +106,6 @@ def main():
         makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
     print "--------------------------------------------------------------------------------"
     plt.show()
-
 
     dataG500 = readData('datosP2EM2017/datos_P2_Gen_500.txt')
 
