@@ -149,7 +149,9 @@ class NeuralNetwork:
         for i in range(len(self.net)):
             inputs = row[:-1]
             if i != 0:
-                inputs = [neuron['output'] for neuron in self.net[i - 1]]
+                inputs = []
+                for neuron in self.net[i-1]:
+                    inputs.append(neuron['output'])
             for neuron in self.net[i]:
                 for j in range(len(inputs)):
                     # Update the network weight.
@@ -168,16 +170,16 @@ class NeuralNetwork:
         @param nOutputs : expected number of output values.
 """
 def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
-    for i in range(nIter):
+    for iterAct in range(nIter):
         sumError = 0
         for row in data:
             outputs = neuralNet.forwardPropagation(row)
-            expected = [0 for j in range(nOutputs)]
+            expected = [0 for i in range(nOutputs)]
             expected[int(row[-1])] = 1
-            sumError += sum([(expected[j]-outputs[j])**2 for j in range(len(expected))])
+            sumError += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
             neuralNet.backPropagation(expected)
             neuralNet.update_weights(row, alpha)
-        print('>iter=%d, lrate=%.3f, error=%.3f' % (i, alpha, sumError))
+        #print('>iter=%d, lrate=%.3f, error=%.3f' % (iterAct, alpha, sumError))
 
 """
     Description:

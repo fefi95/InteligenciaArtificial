@@ -29,7 +29,7 @@ colors = {'purple' : '#78037F',
           'green'  : '#23CE6B',
          }
 
-maxIter = 1000
+maxIter = 15000
 
 def readData(dataSetName):
     originalList = [] # initialize matrix of features without normalization.
@@ -53,15 +53,40 @@ def readData(dataSetName):
             normalRow.append(normalize) 
             rowObtained.append(row[i])
 
+        normalRow.append(row[len(row)-1])
         rowObtained.append(row[len(row)-1])
-
         varList.append(normalRow)
         originalList.append(rowObtained)
     return { 'normalized': varList, 'original': originalList }
 
+def getConfusionMatrix(predictedValue, originalValue):
+    TP = 0
+    FP = 0
+    TN = 0
+    FN = 0
+
+    lastpos = len(predictedValue[0]) - 1
+    nP = 0
+    nF = 0
+    for i in range(0, len(predictedValue)):
+        if (predictedValue[i][lastpos] == 1 and originalValue[i][lastpos] == 1):
+            TP += 1
+            nP += 1
+        elif (predictedValue[i][lastpos] == 1 and originalValue[i][lastpos] == 0):
+            FP += 1
+            nP += 1
+        elif (predictedValue[i][lastpos] == 0 and originalValue[i][lastpos] == 0):
+            TN += 1
+            nF += 1
+        else:
+            FN += 1
+            nF += 1
+
+    print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
+
 def main():
 
-    alpha = 0.001
+    alpha = 0.1
 
     data500   = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
     dataG500  = readData('datosP2EM2017/datos_P2_Gen_500.txt')
@@ -71,33 +96,28 @@ def main():
     dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
 
     dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
+
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
-    
     print "--------------------------------------------------------------------------------"
-    for i in range(2, 3):
+    for i in range(5, 6):
         print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         print "\n Creo la red. \n"
         neuralNet = nn.NeuralNetwork(len(data500['normalized'][0]) - 1, i, 2)
         print "\n Entreno la red. \n"
         #print data500['x']
         nn.trainNetwork(neuralNet, data500['normalized'], alpha, maxIter, 2)
-        nn.trainNetwork(neuralNet, dataG500['normalized'], alpha, maxIter, 2)
-        nn.trainNetwork(neuralNet, data1000['normalized'], alpha, maxIter, 2)
-        nn.trainNetwork(neuralNet, dataG1000['normalized'], alpha, maxIter, 2)
-        nn.trainNetwork(neuralNet, data2000['normalized'], alpha, maxIter, 2)
-        nn.trainNetwork(neuralNet, dataG2000['normalized'], alpha, maxIter, 2)
-
-        result = []
-        for row in dataPredict['normalized']:
-            result.append([nn.predictNetwork(neuralNet, row)])
+        #nn.trainNetwork(neuralNet, dataG500['normalized'], alpha, maxIter, 2)
+        #nn.trainNetwork(neuralNet, data1000['normalized'], alpha, maxIter, 2)
+        #nn.trainNetwork(neuralNet, dataG1000['normalized'], alpha, maxIter, 2)
+        #nn.trainNetwork(neuralNet, data2000['normalized'], alpha, maxIter, 2)
+        #nn.trainNetwork(neuralNet, dataG2000['normalized'], alpha, maxIter, 2)
 
         newData = []
-        i = 0;
-        for row in dataPredict['original']:
-            newData.append([round(row[0],2), round(row[1],2), result[i]])
-            i += 1
+        for row in dataPredict['normalized']:
+            newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
 
+        getConfusionMatrix(newData, dataPredict['original'])
         gf.drawPoints(newData)
         #print "\n Muestro la red. \n"
         #for layer in neuralNet:

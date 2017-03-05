@@ -14,7 +14,6 @@ def getPoints(dataset):
             outCircleX.append(row[0])
             outCircleY.append(row[1])
 
-    print outCircleX
     return {'inCircleX': inCircleX, 'inCircleY': inCircleY, 'outCircleX': outCircleX, 'outCircleY': outCircleY}
 
 def drawPoints(dataset):
