@@ -163,6 +163,18 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
             neuralNet.update_weights(row, alpha)
         print('>epoch=%d, lrate=%.3f, error=%.3f' % (i, alpha, sumError))
 
+"""
+    Description:
+        Make a prediciton with a given neural network.
+        Return the index in the neural network output that has the larger probability.
+    Params:
+        @param neuralNet: neural network to use.
+        @param row      : sample. 
+"""
+def predict(neuralNet, row):
+    outputs = neuralNet.forwardPropagation(row)
+    return outputs.index(max(outputs))
+
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
@@ -177,12 +189,14 @@ if __name__ == '__main__':
     [6.922596716,1.77106367,1],
     [8.675418651,-0.242068655,1],
     [7.673756466,3.508563011,1]]
-    n_inputs = len(dataset[0]) - 1
-    n_outputs = len(set([row[-1] for row in dataset]))
-    neuralNet = NeuralNetwork(n_inputs, 2, n_outputs)
+    network = NeuralNetwork(2,2,2)
+    network.net =  [[{'weights': [-1.482313569067226, 1.8308790073202204, 1.078381922048799]}, {'weights': [0.23244990332399884, 0.3621998343835864, 0.40289821191094327]}],
+    [{'weights': [2.5001872433501404, 0.7887233511355132, -1.1026649757805829]}, {'weights': [-2.429350576245497, 0.8357651039198697, 1.0699217181280656]}]]
+
     #expected = [0,1]
     #neuralNet.backPropagation(expected)
-    trainNetwork(neuralNet, dataset, 0.5, 20, n_outputs)
-    for layer in neuralNet.net:
-        print(layer)
+    #trainNetwork(neuralNet, dataset, 0.5, 20, n_outputs)
+    for row in dataset:
+        prediction = predict(network, row)
+        print('Expected=%d, Got=%d' % (row[-1], prediction))
 # .----------------------------------------------------------------------------.
