@@ -129,10 +129,10 @@ def main():
 
         # Total of neuron to use in the hidden layers.
     for i in range(5,10):
-        for j in range(4, 10):
+        for j in range(4, 11):
 
-            dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, i/10)
-            dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, i/10)
+            dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, float(i)/10)
+            dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, float(i)/10)
             print "\n Calculando thetas para data_iris.txt usando el " + str(i/10) + " de los datos con " + str(j) + " neuronas..."
             print "\n Creo la red. \n"
             neuralNet = nn.NeuralNetwork(len(dataIrisBinary['train']) - 1, j, 2)
@@ -143,7 +143,7 @@ def main():
             newData = []
             for row in dataIrisBinary['test'] :
                 print row
-                newData.append(row[0], row[1], [nn.predictNetwork(neuralNet, row)])
+                newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
 
             getConfusionMatrix(newData, dataIrisBinary['test'])
             #gf.drawPoints(newData)
