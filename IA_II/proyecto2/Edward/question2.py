@@ -15,6 +15,7 @@
 import NeuralNetwork as nn      # Neural Network library
 import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
+import pandas as pd
 import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
 
@@ -30,21 +31,17 @@ colors = {'purple' : '#78037F',
 maxIter = 1000
 
 def readData(dataSetName):
-    dataSetFile = open(dataSetName, 'r'); # Get the dataset.
     varList     = [] # initialize matrix of features
     resultList  = [] # initialize matrix of results
+    data = pd.read_csv(dataSetName, sep=" ", header = None)
+    for index, row in data.iterrows():
+    	varList.append([row[0],row[1]])
+    	resultList.append([row[2]])
+   
+   	# Get lines.
+   
 
-    for line in dataSetFile:
-        wordList = line.split()
-        varList.append(wordList[:-1])
-        resultList.append([wordList[-1]])
-
-    varList    = np.array(varList, dtype=np.float128)
-    resultList = np.array(resultList, dtype=np.float128)
-
-    # Mean normalization to the varList and resultList.
-    transVar = varList.transpose()
-
+    """
     # Update the varList and the resultList.
     for i in range(0, len(varList[0])):
         mean = np.mean(transVar[i])
@@ -52,7 +49,7 @@ def readData(dataSetName):
         for j in range(len(varList)):
             if (std != 0):
                 varList[j][i] = (varList[j][i] - mean) / std
-
+	"""
     return {'x' : varList, 'y': resultList}
 
 def main():
@@ -62,15 +59,16 @@ def main():
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
-
+    
     print "--------------------------------------------------------------------------------"
     for i in range(2, 3):
         print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
         print "\n Creo la red. \n"
-        print data500['x']
-        neuralNet = nn.NeuralNetwork(len(data500['x'][0]), i, 2)
+        neuralNet = nn.NeuralNetwork(len(data500['x'][0]) - 1, i, 2)
         print "\n Entreno la red. \n"
-        nn.trainNetwork(neuralNet, data500, alpha, maxIter, 2)
+       	#print data500['x']
+       	print data500['x']
+       	nn.trainNetwork(neuralNet, data500['x'], alpha, maxIter, 2)
         print "\n Muestro la red. \n"
         for layer in neuralNet:
         	print layer
@@ -89,7 +87,7 @@ def main():
         #makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
     #print "--------------------------------------------------------------------------------"
     #plt.show()
-
+	
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
