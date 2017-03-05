@@ -58,7 +58,7 @@ def readData(dataSetName, isBinary, frac):
     for i in range(0, len(data.columns)-1):
         mini = data[i].min()
         maxi = data[i].max()
-        data1[i] = (data[i] - mini) / (maxi - mini)
+        data[i] = (data[i] - mini) / (maxi - mini)
         # minValues.append(data[i].min())
         # maxValues.append(data[i].max())
     if (isBinary):
