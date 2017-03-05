@@ -6,18 +6,20 @@
     Stefani Castellanos 11-11394
 
     Description:
-        This file contains the answer for question 2
+        This file contains the answer for question 3
 """
 
 # .----------------------------------------------------------------------------.
 # Import libraries to use.
 
 import NeuralNetwork as nn      # Neural Network library
-import graphics as gf
+import graphics as gf           # This provides access to plot functions for the data.
 import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
-import pandas as pd
+import pandas as pd             # This provides access to function for data manipulation
+                                # and analysis.
 import matplotlib.pyplot as plt # This provides functions for making plots
+import random as rm             # To use random functions.
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
@@ -29,13 +31,26 @@ colors = {'purple' : '#78037F',
           'green'  : '#23CE6B',
          }
 
+# Max number of iterations.
 maxIter = 15000
 
-def readData(dataSetName):
+# Co-relation between the class and number.
+binaryClass  = {"Iris-setosa": 1, "Iris-versicolor": 0, "Iris-virginica": 0}
+numericClass = {"Iris-setosa": 1, "Iris-versicolor": 2, "Iris-virginica": 3}
+
+"""
+    Description:
+        Read the dataset and transform the data class.
+    Params:
+        @param dataSetName: file's name of the dataset to use.
+        @param isBinary   : the data class will be a binary o numeric class.
+"""
+def readData(dataSetName, isBinary):
     originalList = [] # initialize matrix of features without normalization.
     varList      = [] # initialize matrix of features with normalization.
     # Open the file.
-    data = pd.read_csv(dataSetName, sep=" ", header = None)
+    data = pd.read_csv(dataSetName, sep=",", header = None)
+    
     # Get the min and max vlues for each column. 
     minValues = []
     maxValues = []
@@ -53,8 +68,14 @@ def readData(dataSetName):
             normalRow.append(normalize) 
             rowObtained.append(row[i])
 
-        normalRow.append(row[len(row)-1])
-        rowObtained.append(row[len(row)-1])
+        # Transform the data into binary class o numerical class. 
+        if (isBinary):
+            normalRow.append(binaryClass[row[len(row)-1]])
+            rowObtained.append(binaryClass[row[len(row)-1]])    
+        else:
+            normalRow.append(numericClass[row[len(row)-1]])
+            rowObtained.append(numericClass[row[len(row)-1]])
+        
         varList.append(normalRow)
         originalList.append(rowObtained)
     return { 'normalized': varList, 'original': originalList }
@@ -86,58 +107,32 @@ def getConfusionMatrix(predictedValue, originalValue):
 
 def main():
 
-    alpha = 0.1
+    alpha = 0.1 # Learning rate to use.
 
-    data500   = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    dataG500  = readData('datosP2EM2017/datos_P2_Gen_500.txt')
-    data1000  = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
-    dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
-    data2000  = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
-    dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
+    # Read the data.
+    dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True)
+    dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False)
 
-    dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
-
-    # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
-    # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
     print "--------------------------------------------------------------------------------"
-    for i in range(5, 6):
-        print "\n Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
-        print "\n Creo la red. \n"
-        neuralNet = nn.NeuralNetwork(len(data500['normalized'][0]) - 1, i, 2)
-        print "\n Entreno la red. \n"
-        #print data500['x']
-        nn.trainNetwork(neuralNet, data500['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG500['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, data1000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG1000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, data2000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG2000['normalized'], alpha, maxIter, 2)
+    # For split the data into i*10% for training and (100 - i*10) for test.
+    for i in range(9, 10):
+        # Total of neuron to use in the hidden layers.
+        for j in range(4, 5):
 
-        newData = []
-        for row in dataPredict['normalized']:
-            newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
 
-        getConfusionMatrix(newData, dataPredict['original'])
-        gf.drawPoints(newData)
-        #print "\n Muestro la red. \n"
-        #for layer in neuralNet:
-        #   print layer
-        # actualizo los pesos
-        #neural.gradientChecking(data500['x'], data500['y'])
-        #result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+            print "\n Calculando thetas para data_iris.txt usando el " + str(i/10) + " de los datos con " + str(j) + " neuronas..."
+            print "\n Creo la red. \n"
+            neuralNet = nn.NeuralNetwork(len(trainingSet[0]) - 1, j, 2)
 
-        # Statistics
-        # errorE = 0
-        # errorP = 0
-        # falseP = 0
-        # flaseN = 0
-        # statsF500.write(str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(flaseN))
-        # Simple plot: iterations vs cost function
-        #iterations = np.arange(0, result['nIterations'] + 1, 1)
-        #makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
-    #print "--------------------------------------------------------------------------------"
-    #plt.show()
-    
+            print "\n Entreno la red. \n"
+            nn.trainNetwork(neuralNet, trainingSet, alpha, maxIter, 2)  
+
+            newData = []
+            for row in testSet:
+                newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
+
+            getConfusionMatrix(newData, testSet)
+            gf.drawPoints(newData)
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
