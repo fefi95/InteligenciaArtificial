@@ -78,7 +78,6 @@ class NeuralNetwork:
     """
 
     def forwardPropagation(self, x):
-
         #a(1) = x
         # print x.shape
         # print self.actI[1:]
@@ -192,6 +191,7 @@ class NeuralNetwork:
         for i in range(0,len(y)):
             aux1 = 0
             for k in range(0,self.nO):
+                print X[i]
                 h = self.forwardPropagation(X[i])
                 aux1 += y[i][k] * np.log(h[k][0]) + (1 - y[i][k]) * np.log(1-h[k][0])
             aux += aux1
@@ -269,6 +269,7 @@ class NeuralNetwork:
     def gradientChecking(self, X, y):
         epsilon = 0.0001;
 
+        """
         auxThetaI = self.thetasI
         self.thetasI = auxThetaI + epsilon;
         costThetasP = self.cost(X, y)
@@ -284,5 +285,40 @@ class NeuralNetwork:
         costThetasM = self.cost(X, y)
         gradApproxO = (costThetasP - costThetasM)/(2 * epsilon)
         self.thetasH = auxThetaO
+        """
 
+        gradApproxI = np.zeros(self.thetasI.shape)
+        for i in range(0, len(self.thetasI)):
+            auxThetaI = self.thetasI
+            self.thetasI[i] = self.thetasI[i] + epsilon
+            costThetasP = self.cost(X, y)
+
+            self.thetasI = auxThetaI
+            self.thetasI[i] = self.thetasI[i] - epsilon;
+            costThetasM = self.cost(X, y)
+
+            gradApproxI[i] = (costThetasP - costThetasM)/(2 * epsilon)
+            self.thetasI[i] = auxThetaI[i]
+
+        gradApproxO = np.zeros(self.thetasH.shape)
+        for i in range(0, len(self.thetasH)):
+            auxThetaO = self.thetasH
+            self.thetasH[i] = self.thetasH[i] + epsilon;
+            costThetasP = self.cost(X, y)
+
+            self.thetasH = auxThetaO
+            self.thetasH[i] = self.thetasH[i] - epsilon;
+            costThetasM = self.cost(X, y)
+            gradApproxO[i] = (costThetasP - costThetasM)/(2 * epsilon)
+            self.thetasH[i] = auxThetaO[i]
+        """
+        for i in range (1, len(self.thetasO)):
+            thetasPlus = self.thetasO
+            thetasPlus[i] += epsilon
+
+            thetasMinus = self.thetasO
+            thetasMinus[i] -= epsilon
+            gradApproO[i] = (self.cost(thetasPlus, y) - self.cost(thetasMinus, y)) /(2*epsilon)
+        """
+        print [gradApproxI, gradApproxO]
         return [gradApproxI, gradApproxO]
