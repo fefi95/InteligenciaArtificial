@@ -16,7 +16,7 @@ def getPoints(dataset):
 
     return {'inCircleX': inCircleX, 'inCircleY': inCircleY, 'outCircleX': outCircleX, 'outCircleY': outCircleY}
 
-def drawPoints(dataset):
+def drawPoints(dataset, dsName, nNeuron):
     points = getPoints(dataset)
 
     # Draw the figure.
@@ -27,6 +27,25 @@ def drawPoints(dataset):
     p1 = plt.scatter(points['inCircleX'], points['inCircleY'], c='r', marker='.', label = "Points inside circle.")
     p2 = plt.scatter(points['outCircleX'], points['outCircleY'], c='c', marker='.', label = "Points outside circle.")
     #plt.axis((0,20,0,20))
+    plt.title(dsName + "con  " + str(nNeuron))
     plt.legend(loc=2)
-
+    plt.savefig(dsName + "_" + str(nNeuron) +"_neuronas.png")
     plt.show()
+
+"""
+    Descripction: plot of the cost function against number of iterations
+    Parameters:
+        @param iterations   : position of the theta to use.
+        @param error        : array that contains the values of every error
+        @param dsName       : name of dataset
+        @param label        : label of the legend plot
+        @param color        : color of the line on the plot
+"""
+def makeSimplePlot(iterations, error, dsName, label, color):
+    plt.plot(iterations, error, label='#neuronas= ' + str(label), c=color, linewidth=1.5)
+    plt.xlabel("numero de iteraciones")
+    plt.ylabel("error")
+    plt.title(dsName)
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(dsName + ".png")

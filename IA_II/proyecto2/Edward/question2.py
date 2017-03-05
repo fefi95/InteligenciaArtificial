@@ -21,22 +21,41 @@ import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
-colors = {'purple' : '#78037F',
-          'orange' : '#F55D3E',
-          'magenta': '#A4243B',
-          'gray'   : '#454545',
-          'blue'   : '#1781AA',
-          'green'  : '#23CE6B',
-         }
+# colors = {'purple' : '#78037F',
+#           'orange' : '#F55D3E',
+#           'magenta': '#A4243B',
+#           'gray'   : '#454545',
+#           'blue'   : '#1781AA',
+#           'green'  : '#23CE6B',
+#          }
 
-maxIter = 15000
+colors = ['#78037F',
+          '#F55D3E',
+          '#A4243B',
+          '#454545',
+          '#1781AA',
+          '#23CE6B',
+          '#FFC857',
+          '#101010',
+          '#FF2020'
+          ]
+
+maxIter = 1000
+
+"""
+    Description:
+        reads the data of a given datset and outputs its attributes and
+        result
+    Params:
+        @param dataSetName: name of the file where the dataset is
+"""
 
 def readData(dataSetName):
     originalList = [] # initialize matrix of features without normalization.
     varList      = [] # initialize matrix of features with normalization.
     # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
-    # Get the min and max vlues for each column. 
+    # Get the min and max vlues for each column.
     minValues = []
     maxValues = []
     for i in range(0, len(data.columns)-1):
@@ -47,10 +66,10 @@ def readData(dataSetName):
     for index, row in data.iterrows():
         normalRow   = []
         rowObtained = []
-        
+
         for i in range(0, len(row)-1):
             normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
-            normalRow.append(normalize) 
+            normalRow.append(normalize)
             rowObtained.append(row[i])
 
         normalRow.append(row[len(row)-1])
@@ -59,11 +78,19 @@ def readData(dataSetName):
         originalList.append(rowObtained)
     return { 'normalized': varList, 'original': originalList }
 
+"""
+    Description:
+        reads the data of a given datset and outputs its attributes and
+        result
+    Params:
+        @param dataSetName: name of the file where the dataset is
+"""
+
 def getConfusionMatrix(predictedValue, originalValue):
-    TP = 0
-    FP = 0
-    TN = 0
-    FN = 0
+    TP = 0 # True positive
+    FP = 0 # False positive
+    TN = 0 # True negative
+    FN = 0 # False negative
 
     lastpos = len(predictedValue[0]) - 1
     nP = 0
@@ -83,61 +110,59 @@ def getConfusionMatrix(predictedValue, originalValue):
             nF += 1
 
     print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
+    return [TP, FP, TN, FN]
 
-def main():
 
-    alpha = 0.1
-
-    data500   = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
-    dataG500  = readData('datosP2EM2017/datos_P2_Gen_500.txt')
-    data1000  = readData('datosP2EM2017/datos_P2_EM2017_N1000.txt')
-    dataG1000 = readData('datosP2EM2017/datos_P2_Gen_1000.txt')
-    data2000  = readData('datosP2EM2017/datos_P2_EM2017_N2000.txt')
-    dataG2000 = readData('datosP2EM2017/datos_P2_Gen_2000.txt')
-
-    dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
-
-    # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
-    # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
+def calculate(dataFileName, dataPredict, alpha):
+    data = readData("datosP2EM2017/" + dataFileName +".txt")
+    statsF = open("datosP2EM2017/" + dataFileName + "_stats.csv", 'w')
+    statsF.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
+    results = []
     print "--------------------------------------------------------------------------------"
-    for i in range(5, 6):
+    for i in range(2, 11):
         print "\t Calculando thetas para datos_P2_EM2017_N500 con " + str(i) + " neuronas..."
-        print "\n Creo la red. \n"
-        neuralNet = nn.NeuralNetwork(len(data500['normalized'][0]) - 1, i, 2)
-        print "\n Entreno la red. \n"
-        #print data500['x']
-        nn.trainNetwork(neuralNet, data500['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG500['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, data1000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG1000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, data2000['normalized'], alpha, maxIter, 2)
-        #nn.trainNetwork(neuralNet, dataG2000['normalized'], alpha, maxIter, 2)
-
+        print "\t Creando la red."
+        neuralNet = nn.NeuralNetwork(len(data['normalized'][0]) - 1, i, 2)
+        print "\t Entrenando la red."
+        result = nn.trainNetwork(neuralNet, data['normalized'], alpha, maxIter, 2)
+        results.append(result)
         newData = []
         for row in dataPredict['normalized']:
             newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
 
-        getConfusionMatrix(newData, dataPredict['original'])
-        gf.drawPoints(newData)
-        #print "\n Muestro la red. \n"
-        #for layer in neuralNet:
-        #   print layer
-        # actualizo los pesos
-        #neural.gradientChecking(data500['x'], data500['y'])
-        #result = neural.gradientDescent(alpha, data500['x'], data500['y'])
+        cm = getConfusionMatrix(newData, dataPredict['original'])
+        errorE = result[maxIter-1]
+        errorP = 0
+        # average(false positive + false negative )
+        errorP = (float(cm[1]) + float(cm[3]))/10000
 
-        # Statistics
-        # errorE = 0
-        # errorP = 0
-        # falseP = 0
-        # flaseN = 0
-        # statsF500.write(str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(flaseN))
-        # Simple plot: iterations vs cost function
-        #iterations = np.arange(0, result['nIterations'] + 1, 1)
-        #makeSimplePlot(iterations, result['costFunction'], "datos_P2_EM2017_N500", i, colors['blue'])
-    #print "--------------------------------------------------------------------------------"
-    #plt.show()
-    
+        statsF.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(cm[1]) + ", " + str(cm[3])+ "\n")
+        gf.drawPoints(newData, dataFileName, i)
+
+    statsF.close()
+
+    # Making plots
+    j = 2
+    for result in results:
+        # Simple plot: iterations vs error
+        iterations = np.arange(0, maxIter, 1)
+        gf.makeSimplePlot(iterations, result, dataFileName, j, colors[j-2])
+        j += 1
+    plt.show()
+
+
+def main():
+
+    alpha = 0.1
+    dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
+
+    # calculate("datos_P2_EM2017_N500", dataPredict, alpha)
+    # calculate("datos_P2_Gen_500", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
+    calculate("datos_P2_Gen_1000", dataPredict, alpha)
+    # calculate("datos_P2_EM2017_N2000", dataPredict, alpha)
+    # calculate("datos_P2_Gen_2000", dataPredict, alpha)
+
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
