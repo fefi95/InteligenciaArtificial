@@ -69,10 +69,10 @@ def readData(dataSetName, isBinary, frac):
     data_train = data.sample(frac = frac)
     data_test = data.drop(data_train.index)
     for index, row in data_train.iterrows():
-        trainList.append(row.values.tolist)
+        trainList.append(row.values.tolist())
         
     for index, row in data_test.iterrows():
-        testList.append(row.values.tolist)
+        testList.append(row.values.tolist())
 
     # Normalize the data.
     # for index, row in data.iterrows():
@@ -124,32 +124,29 @@ def getConfusionMatrix(predictedValue, originalValue):
 def main():
 
     alpha = 0.1 # Learning rate to use.
-    frac = 0.1
-
-    # Read the data.
-    dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, frac)
-    dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, frac)
-
     print "--------------------------------------------------------------------------------"
     # For split the data into i*10% for training and (100 - i*10) for test.
 
         # Total of neuron to use in the hidden layers.
-    for j in range(4, 5):
+    for i in range(5,10):
+        for j in range(4, 10):
 
+            dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, i/10)
+            dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, i/10)
+            print "\n Calculando thetas para data_iris.txt usando el " + str(i/10) + " de los datos con " + str(j) + " neuronas..."
+            print "\n Creo la red. \n"
+            neuralNet = nn.NeuralNetwork(len(dataIrisBinary['train']) - 1, j, 2)
 
-        print "\n Calculando thetas para data_iris.txt usando el " + str(i/10) + " de los datos con " + str(j) + " neuronas..."
-        print "\n Creo la red. \n"
-        neuralNet = nn.NeuralNetwork(len(trainingSet[0]) - 1, j, 2)
+            print "\n Entreno la red. \n"
+            nn.trainNetwork(neuralNet, dataIrisBinary['train'], alpha, maxIter, 2)  
 
-        print "\n Entreno la red. \n"
-        nn.trainNetwork(neuralNet, trainingSet, alpha, maxIter, 2)  
+            newData = []
+            for row in dataIrisBinary['test'] :
+                print row
+                newData.append(row[0], row[1], [nn.predictNetwork(neuralNet, row)])
 
-        newData = []
-        for row in testSet:
-            newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
-
-        getConfusionMatrix(newData, testSet)
-        gf.drawPoints(newData)
+            getConfusionMatrix(newData, dataIrisBinary['test'])
+            #gf.drawPoints(newData)
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
