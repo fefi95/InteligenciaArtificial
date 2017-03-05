@@ -35,18 +35,16 @@ def readData(dataSetName):
     # Open the file.
     data = pd.read_csv(dataSetName, sep=" ", header = None)
     # Get the data. 
-    data[1].mean()
-    for index, row in data.iterrows():
-    	normalRow = []
-    	print len(row)
-    	for i in range(0, len(row)):
-    		normal = (row[i] - data[i].mean()) / data[i].std()
-    		normalRow.append(normal)
-    	print normalRow	
-    	varList.append(normalRow)
+    # print data[1]
+    print data
 
-   	# Normalize the data.
-   	"""
+    for i in range(0, len(data.columns)-1):
+        data[i] = (data[i] - data[i].mean()) / data[i].std()
+    print data
+
+
+    # Normalize the data.
+    """
     for i in range(0, len(varList[0])):
         mean = np.mean(transVar[i])
         std = np.std(transVar[i])
@@ -61,6 +59,7 @@ def main():
     alpha = 0.01
 
     data500 = readData('datosP2EM2017/datos_P2_EM2017_N500.txt')
+    return 0
     # statsF500 = open("datos_P2_EM2017_N500_stats", 'w')
     # statsF500.write("error en entrenamiento, error en prueba, falsos positivos, falsos negativos")
     
