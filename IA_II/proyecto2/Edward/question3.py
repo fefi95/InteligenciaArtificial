@@ -119,10 +119,7 @@ def getConfusionMatrix(predictedValue, originalValue):
             FN += 1
             nF += 1
         else:
-            print "prediccion"
-            print predictedValue[i]
-            print "test"
-            print originalValue[i]
+            pass
     print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
 
 def main():
@@ -133,10 +130,9 @@ def main():
 
         # Total of neuron to use in the hidden layers.
     for i in range(5,10):
-        for j in range(4, 11):
 
-            dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, float(i)/10)
-            
+        dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, float(i)/10)
+        for j in range(4, 11):    
             # dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, float(i)/10)
             print "\n Calculando thetas para data_iris.txt usando el " + str(float(i)/10) + " de los datos con " + str(j) + " neuronas..."
             print "\n Creo la red. \n"
