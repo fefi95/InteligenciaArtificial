@@ -32,7 +32,7 @@ colors = {'purple' : '#78037F',
          }
 
 # Max number of iterations.
-maxIter = 15000
+maxIter = 1500
 
 # Co-relation between the class and number.
 binaryClass  = {"Iris-setosa": 1, "Iris-versicolor": 0, "Iris-virginica": 0}
@@ -132,20 +132,28 @@ def main():
     for i in range(5,10):
 
         dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, float(i)/10)
+        dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, float(i)/10)
+
         for j in range(4, 11):    
-            # dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, float(i)/10)
             print "\n Calculando thetas para data_iris.txt usando el " + str(float(i)/10) + " de los datos con " + str(j) + " neuronas..."
             print "\n Creo la red. \n"
             neuralNet = nn.NeuralNetwork(len(dataIrisBinary['train'][0]) - 1, j, 2)
+            neuralNet3out = nn.NeuralNetwork(len(dataIrisNumeric['train'][0]) - 1, j, 3)
 
             print "\n Entreno la red. \n"
             nn.trainNetwork(neuralNet, dataIrisBinary['train'], alpha, maxIter, 2)  
+            nn.trainNetwork(neuralNet3out, dataIrisNumeric['train'], alpha, maxIter, 3)  
 
             newData = []
             for row in dataIrisBinary['test'] :
                 newData.append(nn.predictNetwork(neuralNet, row))
+            newData3out = []
+            for row in dataIrisNumeric['test'] :
+                newData3out.append(nn.predictNetwork(neuralNet3out, row))
 
             getConfusionMatrix(newData, dataIrisBinary['test'])
+            getConfusionMatrix(newData3out, dataIrisNumeric['test'])
+
             #gf.drawPoints(newData)
 # .----------------------------------------------------------------------------.
 
