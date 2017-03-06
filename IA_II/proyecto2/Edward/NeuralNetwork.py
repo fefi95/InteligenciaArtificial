@@ -180,7 +180,6 @@ def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
             neuralNet.backPropagation(expected)
             neuralNet.update_weights(row, alpha)
         errorPlot.append(sumError)
-        #print('>iter=%d, lrate=%.3f, error=%.3f' % (iterAct, alpha, sumError))
     return errorPlot
 
 """

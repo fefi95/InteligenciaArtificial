@@ -1,5 +1,12 @@
 import matplotlib.pyplot as plt
 
+"""
+    Descripction: clasifies the data set into points thet are in the circle
+                and the ones that are on the square
+    Parameters:
+        @param dataset : data set
+"""
+
 def getPoints(dataset):
     inCircleX  = []
     inCircleY  = []
@@ -15,6 +22,14 @@ def getPoints(dataset):
             outCircleY.append(row[1])
 
     return {'inCircleX': inCircleX, 'inCircleY': inCircleY, 'outCircleX': outCircleX, 'outCircleY': outCircleY}
+
+"""
+    Descripction: draws a scatter plot for the circle and square data
+    Parameters:
+        @param dataset : data set
+        @param dsName  : name of the data set
+        @param nNeuron : number of neurons
+"""
 
 def drawPoints(dataset, dsName, nNeuron):
     points = getPoints(dataset)
@@ -33,7 +48,7 @@ def drawPoints(dataset, dsName, nNeuron):
     plt.show()
 
 """
-    Descripction: plot of the cost function against number of iterations
+    Descripction: plot of the error against number of iterations
     Parameters:
         @param iterations   : position of the theta to use.
         @param error        : array that contains the values of every error

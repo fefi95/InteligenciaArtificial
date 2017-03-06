@@ -18,18 +18,10 @@ import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
 import pandas as pd             # This provides access to function for data manipulation
                                 # and analysis.
-import matplotlib.pyplot as plt # This provides functions for making plots
 import random as rm             # To use random functions.
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
-colors = {'purple' : '#78037F',
-          'orange' : '#F55D3E',
-          'magenta': '#A4243B',
-          'gray'   : '#454545',
-          'blue'   : '#1781AA',
-          'green'  : '#23CE6B',
-         }
 
 # Max number of iterations.
 maxIter = 1000
@@ -71,6 +63,14 @@ def readData(dataSetName, isBinary, frac):
     for index, row in data_test.iterrows():
         testList.append(row.values.tolist())
     return { 'train': trainList, 'test': testList }
+
+"""
+    Description:
+        Gets the confusion matrix for the data
+    Params:
+        @param predictedValue: the value predicted for the network
+        @param originalValue : the orginal value of the data set
+"""
 
 def getConfusionMatrix(predictedValue, originalValue):
     TP = 0

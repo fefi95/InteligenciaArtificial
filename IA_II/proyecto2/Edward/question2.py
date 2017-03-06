@@ -21,14 +21,6 @@ import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
-# colors = {'purple' : '#78037F',
-#           'orange' : '#F55D3E',
-#           'magenta': '#A4243B',
-#           'gray'   : '#454545',
-#           'blue'   : '#1781AA',
-#           'green'  : '#23CE6B',
-#          }
-
 colors = ['#78037F',
           '#F55D3E',
           '#A4243B',
@@ -80,10 +72,10 @@ def readData(dataSetName):
 
 """
     Description:
-        reads the data of a given datset and outputs its attributes and
-        result
+        Gets the confusion matrix for the data
     Params:
-        @param dataSetName: name of the file where the dataset is
+        @param predictedValue: the value predicted for the network
+        @param originalValue : the orginal value of the data set
 """
 
 def getConfusionMatrix(predictedValue, originalValue):
@@ -166,10 +158,10 @@ def main():
     alpha = 0.1
     dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
 
-    # calculate("datos_P2_EM2017_N500", dataPredict, alpha)
-    # calculate("datos_P2_Gen_500", dataPredict, alpha)
-    # calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
-    # calculate("datos_P2_Gen_1000", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N500", dataPredict, alpha)
+    calculate("datos_P2_Gen_500", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
+    calculate("datos_P2_Gen_1000", dataPredict, alpha)
     calculate("datos_P2_EM2017_N2000", dataPredict, alpha)
     calculate("datos_P2_Gen_2000", dataPredict, alpha)
 
