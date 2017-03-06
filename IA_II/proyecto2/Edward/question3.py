@@ -36,7 +36,7 @@ maxIter = 1500
 
 # Co-relation between the class and number.
 binaryClass  = {"Iris-setosa": 1, "Iris-versicolor": 0, "Iris-virginica": 0}
-numericClass = {"Iris-setosa": 1, "Iris-versicolor": 2, "Iris-virginica": 3}
+numericClass = {"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2}
 
 """
     Description:
@@ -46,8 +46,6 @@ numericClass = {"Iris-setosa": 1, "Iris-versicolor": 2, "Iris-virginica": 3}
         @param isBinary   : the data class will be a binary o numeric class.
 """
 def readData(dataSetName, isBinary, frac):
-    # originalList = [] # initialize matrix of features without normalization.
-    # varList      = [] # initialize matrix of features with normalization.
     # Open the file.
     trainList = []
     testList = []
@@ -59,8 +57,7 @@ def readData(dataSetName, isBinary, frac):
         mini = data[i].min()
         maxi = data[i].max()
         data[i] = (data[i] - mini) / (maxi - mini)
-        # minValues.append(data[i].min())
-        # maxValues.append(data[i].max())
+
     if (isBinary):
         data[len(data.columns)-1].replace(binaryClass, inplace = True)
     else: 
@@ -73,27 +70,6 @@ def readData(dataSetName, isBinary, frac):
         
     for index, row in data_test.iterrows():
         testList.append(row.values.tolist())
-
-    # Normalize the data.
-    # for index, row in data.iterrows():
-    #     normalRow   = []
-    #     rowObtained = []
-        
-    #     for i in range(0, len(row)-1):
-    #         normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
-    #         normalRow.append(normalize) 
-    #         rowObtained.append(row[i])
-
-    #     # Transform the data into binary class o numerical class. 
-    #     if (isBinary):
-    #         normalRow.append(binaryClass[row[len(row)-1]])
-    #         rowObtained.append(binaryClass[row[len(row)-1]])    
-    #     else:
-    #         normalRow.append(numericClass[row[len(row)-1]])
-    #         rowObtained.append(numericClass[row[len(row)-1]])
-        
-    #     varList.append(normalRow)
-    #     originalList.append(rowObtained)
     return { 'train': trainList, 'test': testList }
 
 def getConfusionMatrix(predictedValue, originalValue):
@@ -127,13 +103,12 @@ def main():
     alpha = 0.1 # Learning rate to use.
     print "--------------------------------------------------------------------------------"
     # For split the data into i*10% for training and (100 - i*10) for test.
-
-        # Total of neuron to use in the hidden layers.
     for i in range(5,10):
 
         dataIrisBinary  = readData('datosP2EM2017/data_iris.txt', True, float(i)/10)
         dataIrisNumeric = readData('datosP2EM2017/data_iris.txt', False, float(i)/10)
 
+        # Total of neuron to use in the hidden layers.
         for j in range(4, 11):    
             print "\n Calculando thetas para data_iris.txt usando el " + str(float(i)/10) + " de los datos con " + str(j) + " neuronas..."
             print "\n Creo la red. \n"
@@ -154,7 +129,6 @@ def main():
             getConfusionMatrix(newData, dataIrisBinary['test'])
             getConfusionMatrix(newData3out, dataIrisNumeric['test'])
 
-            #gf.drawPoints(newData)
 # .----------------------------------------------------------------------------.
 
 if __name__ == '__main__':
