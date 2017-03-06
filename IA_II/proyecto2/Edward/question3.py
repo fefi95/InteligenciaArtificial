@@ -32,7 +32,7 @@ colors = {'purple' : '#78037F',
          }
 
 # Max number of iterations.
-maxIter = 1500
+maxIter = 1000
 
 # Co-relation between the class and number.
 binaryClass  = {"Iris-setosa": 1, "Iris-versicolor": 0, "Iris-virginica": 0}
@@ -113,7 +113,7 @@ def main():
     statsFC = open("datosP2EM2017/data_iris_stats_class.csv", 'w')
     statsFB.write("% \datos de entrenamiento, numero de neuronas, error en prueba, aciertos, fallos\n")
     statsFC.write("% \datos de entrenamiento, numero de neuronas, error en prueba, aciertos, fallos\n")
-    
+
     alpha = 0.1 # Learning rate to use.
     print "--------------------------------------------------------------------------------"
     # For split the data into i*10% for training and (100 - i*10) for test.
@@ -141,10 +141,10 @@ def main():
                 newData3out.append(nn.predictNetwork(neuralNet3out, row))
 
             cm = getConfusionMatrix(newData, dataIrisBinary['test'])
-            statsFB.write(str(j*10) + ", " + str(i) + ", " + str(cm[0]) + ", " + str(cm[1]) + ", " + str(cm[2])+ "\n")
+            statsFB.write(str(i*10) + ", " + str(j) + ", " + str(cm[0]) + ", " + str(cm[1]) + ", " + str(cm[2])+ "\n")
 
             cm = getConfusionMatrix(newData3out, dataIrisNumeric['test'])
-            statsFC.write(str(j*10) + ", " + str(i) + ", " + str(cm[0]) + ", " + str(cm[1]) + ", " + str(cm[2])+ "\n")
+            statsFC.write(str(i*10) + ", " + str(j) + ", " + str(cm[0]) + ", " + str(cm[1]) + ", " + str(cm[2])+ "\n")
 
 # .----------------------------------------------------------------------------.
 
