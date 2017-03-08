@@ -13,22 +13,14 @@
 # Import libraries to use.
 
 import NeuralNetwork as nn      # Neural Network library
+import graphics as gf
 import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
+import pandas as pd
 import matplotlib.pyplot as plt # This provides functions for making plots
 # .----------------------------------------------------------------------------.
 
 # Colors used for the plots
-# colors = {'purple' : '#78037F',
-#           'orange' : '#F55D3E',
-#           'magenta': '#A4243B',
-#           'gray'   : '#454545',
-#           'blue'   : '#1781AA',
-#           'green'  : '#23CE6B',
-#           'yellow' : '#FFC857',
-#           'black'  : '#101010',
-#           'red'    : '#FF3030'
-#          }
 colors = ['#78037F',
           '#F55D3E',
           '#A4243B',
@@ -37,136 +29,141 @@ colors = ['#78037F',
           '#23CE6B',
           '#FFC857',
           '#101010',
-          '#FF3030'
+          '#FF2020'
           ]
 
-alpha = 0.001
+maxIter = 1000
+
+"""
+    Description:
+        reads the data of a given datset and outputs its attributes and
+        result
+    Params:
+        @param dataSetName: name of the file where the dataset is
+"""
 
 def readData(dataSetName):
-    dataSetFile = open(dataSetName, 'r'); # Get the dataset.
-    varList = [] #initialize matrix of features
-    resultList = [] # initialize matrix of results
+    originalList = [] # initialize matrix of features without normalization.
+    varList      = [] # initialize matrix of features with normalization.
+    # Open the file.
+    data = pd.read_csv(dataSetName, sep=" ", header = None)
+    # Get the min and max vlues for each column.
+    minValues = []
+    maxValues = []
+    for i in range(0, len(data.columns)-1):
+        minValues.append(data[i].min())
+        maxValues.append(data[i].max())
 
-    for line in dataSetFile:
-        wordList = line.split()
-        varList.append(wordList[:-1])
-        resultList.append([wordList[-1]])
+    # Normalize the data.
+    for index, row in data.iterrows():
+        normalRow   = []
+        rowObtained = []
 
-    varList    = np.array(varList, dtype=np.float128)
-    resultList = np.array(resultList, dtype=np.float128)
+        for i in range(0, len(row)-1):
+            normalize = (row[i] - minValues[i]) / (maxValues[i] - minValues[i])
+            normalRow.append(normalize)
+            rowObtained.append(row[i])
 
-    # Mean normalization to the varList and resultList.
-    transVar = varList.transpose()
-
-    # Update the varList and the resultList.
-    for i in range(0, len(varList[0])):
-        mean = np.mean(transVar[i])
-        std = np.std(transVar[i])
-        for j in range(len(varList)):
-            if (std != 0):
-                varList[j][i] = (varList[j][i] - mean) / std
-
-    return {'x' : varList, 'y': resultList}
-
-"""
-    Descripction: plot of the cost function against number of iterations
-    Parameters:
-        @param iterations   : position of the theta to use.
-        @param costFunction : array that contains the values for every cost
-        @param dsName       : name of dataset
-        @param label        : label of the legend plot
-        @param color        : color of the line on the plot
-"""
-def makeSimplePlot(iterations, costFunction, dsName, label, color):
-    plt.plot(iterations, costFunction, label='#neuronas= ' + str(label), c=color, linewidth=1.5)
-    plt.xlabel("numero de iteraciones")
-    plt.ylabel("Funcion de costo (J)")
-    plt.title(dsName)
-    plt.grid(True)
-    plt.legend()
-    plt.savefig(dsName + ".png")
+        normalRow.append(row[len(row)-1])
+        rowObtained.append(row[len(row)-1])
+        varList.append(normalRow)
+        originalList.append(rowObtained)
+    return { 'normalized': varList, 'original': originalList }
 
 """
-    Descripction: scatter plot of the cost function against number of iterations
-    Parameters:
-        @param circle : position of the theta to use.
-        @param square : position of the theta to use.
-        @param dsName : name of dataset
+    Description:
+        Gets the confusion matrix for the data
+    Params:
+        @param predictedValue: the value predicted for the network
+        @param originalValue : the orginal value of the data set
 """
-def makeScatterPlot(circleX, circleY, squareX, squareY, dsName):
 
-    plt.scatter(circleX, circleY, c=colors[0], edgecolor = colors[0])
-    plt.scatter(squareX, squareY, c=colors[1], edgecolor = colors[1])
-    plt.title(dsName)
-    plt.legend()
-    plt.savefig(dsName + "_scatter.png")
-    plt.show()
+def getConfusionMatrix(predictedValue, originalValue):
+    TP = 0 # True positive
+    FP = 0 # False positive
+    TN = 0 # True negative
+    FN = 0 # False negative
 
-def calculate(dataFileName, dataTest):
-    n = 10000
+    lastpos = len(predictedValue[0]) - 1
+    nP = 0
+    nF = 0
+    for i in range(0, len(predictedValue)):
+        if (predictedValue[i][lastpos] == 1 and originalValue[i][lastpos] == 1):
+            TP += 1
+            nP += 1
+        elif (predictedValue[i][lastpos] == 1 and originalValue[i][lastpos] == 0):
+            FP += 1
+            nP += 1
+        elif (predictedValue[i][lastpos] == 0 and originalValue[i][lastpos] == 0):
+            TN += 1
+            nF += 1
+        else:
+            FN += 1
+            nF += 1
+
+    print "TP: " + str(TP) + ", FP: " + str(FP) + ", TN: " + str(TN) + ", FN: " + str(FN)
+    return [TP, FP, TN, FN]
+
+"""
+    Description:
+        Uses the dataset in dataFileName to predict the result of the dataPredict,
+        plots the results and gets the relevant statistics
+    Params:
+        @param dataFileName: name of the file where the dataset is
+        @param dataPredict : dataset to be predicted using the values of thetas
+                             of the dataFileName
+        @param alpha       : learning rate
+"""
+
+def calculate(dataFileName, dataPredict, alpha):
     data = readData("datosP2EM2017/" + dataFileName +".txt")
     statsF = open("datosP2EM2017/" + dataFileName + "_stats.csv", 'w')
     statsF.write("numero de neuronas, error en entrenamiento, error en prueba, falsos positivos, falsos negativos\n")
-
+    results = []
     print "--------------------------------------------------------------------------------"
     for i in range(2, 11):
         print "\t calculando thetas para" + dataFileName + " con " + str(i) + " neuronas..."
-        neural = nn.NeuralNetwork(len(data['x'][0]), i, 1)
-        result = neural.gradientDescent(alpha, data['x'], data['y'])
-        circleX = []
-        circleY = []
-        squareX = []
-        squareY = []
-        # Statistics
-        errorE = 0
-        errorAux = 0
-        falseP = 0
-        falseN = 0
+        print "\t Creando la red."
+        neuralNet = nn.NeuralNetwork(len(data['normalized'][0]) - 1, i, 2)
+        print "\t Entrenando la red."
+        result = nn.trainNetwork(neuralNet, data['normalized'], alpha, maxIter, 2)
+        results.append(result)
+        newData = []
+        for row in dataPredict['normalized']:
+            newData.append([row[0], row[1], nn.predictNetwork(neuralNet, row)])
+
+        cm = getConfusionMatrix(newData, dataPredict['original'])
+        errorE = result[maxIter-1]
         errorP = 0
-        for j in range(0, n):
-            hyp = neural.forwardPropagation(dataTest['x'][j])
-            predicted = hyp[0]
-            real = dataTest['y'][j]
-            errorAux += abs(predicted - real )
-            if predicted > 0.5:
-                circleX.append(dataTest['x'][j][0])
-                circleY.append(dataTest['x'][j][1])
-            else:
-                squareX.append(dataTest['x'][j][0])
-                squareY.append(dataTest['x'][j][1])
-            if (predicted > 0.5 and real < 0.01):
-                falseP += 1
-            elif (predicted < 0.5 and abs(real - 1) < 0.01):
-                falseN += 1
+        # average(false positive + false negative )
+        errorP = (float(cm[1]) + float(cm[3]))/10000
 
-        errorP = errorAux[0]/n
-        statsF.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(falseP) + ", " + str(falseN)+ "\n")
+        statsF.write(str(i) + ", " + str(errorE) + ", " + str(errorP) + ", " + str(cm[1]) + ", " + str(cm[3])+ "\n")
+        gf.drawPoints(newData, dataFileName, i)
 
-        # Simple plot: iterations vs cost function
-        iterations = np.arange(0, result['nIterations'] + 1, 1)
-        makeSimplePlot(iterations, result['costFunction'], dataFileName, i, colors[i-2])
-        # makeScatterPlot(circleX, circleY, squareX, squareY, dataFileName)
-    print "--------------------------------------------------------------------------------"
+    statsF.close()
+
+    # Making plots
+    j = 2
+    for result in results:
+        # Simple plot: iterations vs error
+        iterations = np.arange(0, maxIter, 1)
+        gf.makeSimplePlot(iterations, result, dataFileName, j, colors[j-2])
+        j += 1
     plt.show()
+
 
 def main():
 
-    # print data500['x']
-    # print data500['y']
-    # neural = nn.NeuralNetwork(2, 2, 1)
-    # h = neural.forwardPropagation(np.array([[0,0]]))
-    # print h
-    # b = neural.backPropagation(np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    # print "ahhhhh"
-    # print b
-    # g = neural.gradientDescent(alpha, np.array([[0,0],[0,1],[1,0],[1,1]]), np.array([[1],[0], [0], [1]]))
-    dataTest = readData('datosP2EM2017/dataset_test_circle.txt')
-    calculate("datos_P2_EM2017_N500", dataTest)
-    # calculate("datos_P2_Gen_500", dataTest)
-    # calculate("datos_P2_EM2017_N1000", dataTest)
-    # calculate("datos_P2_Gen_1000", dataTest)
-    # calculate("datos_P2_EM2017_N2000", dataTest)
-    # calculate("datos_P2_Gen_2000", dataTest)
+    alpha = 0.1
+    dataPredict = readData('datosP2EM2017/dataset_test_circle.txt')
+
+    calculate("datos_P2_EM2017_N500", dataPredict, alpha)
+    calculate("datos_P2_Gen_500", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N1000", dataPredict, alpha)
+    calculate("datos_P2_Gen_1000", dataPredict, alpha)
+    calculate("datos_P2_EM2017_N2000", dataPredict, alpha)
+    calculate("datos_P2_Gen_2000", dataPredict, alpha)
 
 # .----------------------------------------------------------------------------.
 

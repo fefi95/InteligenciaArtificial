@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-#TEMPORAL POR COMENTARIOS DEL CODIGO
 """
     Universidad Simon Bolivar
     CI-5438 - Inteligencia Artificial
@@ -15,310 +14,184 @@
 # .----------------------------------------------------------------------------.
 # Import libraries to use.
 
-import numpy as np              # This provides access to an efficient
-                                # multi-dimensional container of generic data.
+from random import seed
+from random import random
+from math   import exp
+
 # .----------------------------------------------------------------------------.
-
-np.random.seed(1)
-maxIter = 1000
-
 """
-    Descripction: sigmoid function of the neural network
-    @param z : sample
+    Description:
+        Sigmoid function of the neural network (transfer the activation to see
+        what the neuron output really is.
+    Params:
+        @param activation: this is the sample to see the neuron output.
 """
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-"""
-    Descripction: derivate of sigmoid function of the neural network
-    @param x : sample
-"""
-def dsigmoid(z):
-    return z * (1 - z)
+def sigmoid(activation):
+    return 1.0 / (1.0 + exp(-activation))
 
 """
-    Description: neural network of one hidden layer
+    Description:
+        Derivate of sigmoid function of the neural network.
+        Calculate the derivative of an neuron output.
+    Params:
+        @param output: neuron output to use.
 """
+def dsigmoid(output):
+    return output * (1 - output)
 
 class NeuralNetwork:
+    """
+        Description:
+            Creates a new neural network ready for training.
+        Params:
+            @param nInput : the number of inputs.
+            @param nNeuron: the number of neurons to have in the hidden layer.
+            @param nOutput: the number of outputs.
+    """
+    def __init__(self, nInput, nNeuron, nOutput):
+        # Creates the list to use like a neural network.
+        self.net = list()
+        # Creates nNeuron for the hidden layer and each neuron in the hidden layer has nInputs,
+        # each with nNeuron + 1 weights because we have to add the bias.
+        hLayers = [{'weights': [random() for i in range(nInput + 1)]} for i in range(nNeuron)]
+
+        # Add the hidden layers to our neural network.
+        self.net.append(hLayers)
+
+        # For the output layer, we know that connects to the hidden layer and it has nOutputs neurons,
+        # each with nNeuron + 1 weights.
+        outLayer = [{'weights': [random() for i in range(nNeuron + 1)]} for i in range(nOutput)]
+
+        # Add the output layer to our neural network.
+        self.net.append(outLayer)
 
     """
-        Descripction: contructor of the neural network
-        @param ni  : number of input units
-        @param nHL : number of hidden layers
-        @param nH  : number of units per hidden layer
-        @param n0  : number of output units/classes
+        Description:
+            Calculate the activation of one neuron given for an input.
+        Params:
+            @param weights: is the network weight.
+            @param inputs : is the input to use.
     """
-    def __init__(self, nI, nH, nO, nHL = 1):
-        # number of input, hidden, and output nodes
-        self.nI = int(nI + 1) # +1 for bias node
-        # self.nHL = 1 #UNA SOLA CAPA OCULTA POR AHORA
-        self.nH = int(nH + 1)
-        self.nO = int(nO)
-
-        # activations for nodes
-        self.actI = np.ones((self.nI, 1))
-        self.actH = np.ones((self.nH, 1)) #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
-        self.actO = np.ones((self.nO, 1))
-
-        # create parameters of the neural network (weights) and
-        # randomly initialize them
-        ep = 0.12 # epsilon
-        self.thetasI = np.random.rand(self.nH-1, self.nI) * 2 * ep - ep
-        self.thetasH = np.random.rand(self.nO, self.nH) * 2 * ep - ep
-        # self.thetasI = np.array([[-30, 20, 20],[10, -20, -20]])
-        # self.thetasH = np.array([[-10, 20, 20]])
-        # print "init"
-        # print self.thetasI
-        # print self.thetasH
+    def neuronActivation(self, weights, inputs):
+        # We asume the bias is in the first position.
+        activation = weights[-1]
+        for i in range(len(weights)-1):
+            activation += weights[i] * inputs[i]
+        return activation
 
     """
-        Descripction: forward propagation for the neural network
-        @param x: one training examples
+        Description:
+            Forward propagation for the neural network.
+            Calculate for each layer of the network the ouptus for each neuron.
+        Params:
+            @param row: input to predict.
     """
+    def forwardPropagation(self, row):
+        inputs = row
 
-    def forwardPropagation(self, x):
-        #a(1) = x
-        # print x.shape
-        # print self.actI[1:]
-        self.actI[1:] = np.transpose(x.reshape(1,2))
-        # print self.actI
-        # print(self.thetasI)
-        # print(x)
+        for layer in self.net:
+            newInputs = []
+            for neuron in layer:
+                # Calculate the neuron activation.
+                activation = self.neuronActivation(neuron['weights'], inputs)
 
-        #CAMBIAR DIMENSIONES SI IMPLEMENTAMOS MAS CAPAS..
-        #z(2) = theta(1) * a(1)
-        z = np.dot(self.thetasI, self.actI)
-        #a(2) = g(z(2))
-        # print z.shape
-        # print self.actH.shape
-        for i in range(0, self.nH-1):
-            self.actH[i+1][0] = sigmoid(z[i][0])
+                # The neuron's output is stored in the neuron.
+                neuron['output'] = sigmoid(activation)
 
-        self.actH[0][0] = 1 # bias units
-        #z(3) = theta(2) * a(2)
-        # print "z"
-        # print self.thetasH.shape
-        # print self.actH.shape
-        z = np.dot(self.thetasH, self.actH)
-        #a(3) = g(z(3))
-        for i in range(0, self.nO):
-            self.actO[i][0] = sigmoid(z[i][0])
-        # self.actO = sigmoid(z)
-
-        # return the hypothesis h_theta(x)
-        return self.actO
+                # Stores the outputs for a layer.
+                newInputs.append(neuron['output'])
+            # Inputs for the following layer.
+            inputs = newInputs
+        return inputs
 
     """
-        Descripction: backward propagation for the neural network
-        (one training example)
-        @param X : vector of training examples
-        @param Y : vector of results (classification) of x
+        Description:
+            Backward propagation for the neural network.
+            Calculate for each layer of the network the ouptus for each neuron.
+        Params:
+            @param expected: is the expected output value..
     """
+    def backPropagation(self, expected):
+        for i in reversed(range(len(self.net))):
+            layer = self.net[i]
+            errors = list()
 
-    def backPropagation(self, X, y):
+            # Error for the hidden layers.
+            if i != len(self.net)-1:
+                for j in range(len(layer)):
+                    error = 0.0
+                    # The error for a given neuron.
+                    for neuron in self.net[i + 1]:
+                        error += (neuron['weights'][j] * neuron['delta'])
+                    errors.append(error)
+            else:
+                # Error for the output layer.
+                for j in range(len(layer)):
+                    neuron = layer[j]
+                    # The error for a given neuron.
+                    errors.append(expected[j] - neuron['output'])
 
-        # Set Δ(l)i,j := 0 for all (l,i,j), (hence you end up having a matrix full of zeros)
-        deltaH = np.zeros((self.nO, self.nH))
-        deltaI = np.zeros((self.nH-1, self.nI))
+            for j in range(len(layer)):
+                neuron = layer[j]
 
-        for i in range(0, len(X)):
-            #a(1) = x
-            # self.actI = x
-
-            # Perform forward propagation to compute a(l) for l=2,3,…,L
-            self.forwardPropagation(X[i])
-            # print "act0"
-            # print self.actO
-            #
-            # 3. Using y(t), compute δ(L)=a(L)−y(t)
-            # Where L is our total number of layers and a(L) is the vector of outputs of the activation units for the last layer. So our "error values" for the last layer are simply the differences of our actual results in the last layer and the correct outputs in y. To get the delta values of the layers before the last layer, we can use an equation that steps us back from right to left:
-            # print y[i]
-            errorO = self.actO - y[i]
-            # print "errorO"
-            # print errorO
-            #
-            # 4. Compute δ(L−1),δ(L−2),…,δ(2) using δ(l)=((Θ(l))Tδ(l+1)) .∗ a(l) .∗ (1−a(l))
-            # The delta values of layer l are calculated by multiplying the delta values in the next layer with the theta matrix of layer l. We then element-wise multiply that with a function called g', or g-prime, which is the derivative of the activation function g evaluated with the input values given by z(l).
-            # print self.actI
-            # print self.thetasH
-            # print np.dot(np.transpose(self.thetasH), errorO)
-            errorH = np.dot(np.transpose(self.thetasH), errorO) * dsigmoid(self.actH) #actHT * (1 - actHT)
-            # print "actH?"
-            # print dsigmoid(actHT)
-            # print "errorH"
-            # print errorH
-
-            # The g-prime derivative terms can also be written out as:
-            #
-            # g′(z(l))=a(l) .∗ (1−a(l))
-            # 5. Δ(l)i,j:=Δ(l)i,j+a(l)jδ(l+1)i or with vectorization, Δ(l):=Δ(l)+δ(l+1)(a(l))T
-            # Hence we update our new Δ matrix.
-            # print errorO.shape
-            # print self.actH.shape
-            # if len(errorO) == 1:
-            #     deltaH = deltaH + errorO * self.actH
-            # else:
-            #     deltaH = deltaH + np.dot(errorO, np.transpose(self.actH))
-            deltaH = deltaH + np.dot(errorO, np.transpose(self.actH))
-
-            # print deltaI
-            # print self.actI
-            # print self.actI.shape
-            deltaI = deltaI + np.dot(errorH[1:], np.transpose(self.actI))
-        # D(l)i,j:=1m(Δ(l)i,j+λΘ(l)i,j), if j≠0.
-        # D(l)i,j:=1mΔ(l)i,j If j=0
-        # The capital-delta matrix D is used as an "accumulator" to add up our values as we go along and eventually compute our partial derivative. Thus we get ∂∂Θ(l)ijJ(Θ)= D(l)ij
-        # print "deltas"
-        # print deltaH
-        # print deltaI
-        DH = np.zeros((self.nO, self.nH))
-        DI = np.zeros((self.nH-1, self.nI))
-        for i in range(0, self.nO):
-            DH[i][0] = deltaH[i][0]/len(X)
-            for j in range(1, self.nH):
-                DH[i][j] = (deltaH[i][j] + self.thetasH[i][j])/len(X)
-
-        for i in range(0, self.nH-1):
-            DI[i][0] = deltaI[i][0]/len(X)
-            for j in range(1, self.nI):
-                DI[i][j] = (deltaI[i][j] + self.thetasI[i][j])/len(X)
-
-        return [DI, DH]
-
-    def cost(self, X,y):
-        aux = 0
-        for i in range(0,len(y)):
-            aux1 = 0
-            for k in range(0,self.nO):
-                print X[i]
-                h = self.forwardPropagation(X[i])
-                aux1 += y[i][k] * np.log(h[k][0]) + (1 - y[i][k]) * np.log(1-h[k][0])
-            aux += aux1
-        return -aux/len(y)
+                # Calculate the error for a given neuron.
+                neuron['delta'] = errors[j] * dsigmoid(neuron['output'])
 
     """
-        Descripction: runs gradientDescent algorithm
-        Parameters:
-            @param alpha     : learning rate.
-            @param varList   : all variables in the model.
-            @param resultList: store the result of the data.
+        Description:
+            Updates the weights for a neural network.
+        Params:
+            @param row  : Input row of data.
+            @param alpha: learning rate to use.
     """
-    def gradientDescent(self, alpha, varList, resultList):
-        conv = False  # Let you know if the function converge.
-        JofTheta = [] # Store values of the cost function for plotting
+    def update_weights(self, row, alpha):
+        for i in range(len(self.net)):
+            inputs = row[:-1]
+            if i != 0:
+                inputs = []
+                for neuron in self.net[i-1]:
+                    inputs.append(neuron['output'])
+            for neuron in self.net[i]:
+                for j in range(len(inputs)):
+                    # Update the network weight.
+                    neuron['weights'][j] += alpha * neuron['delta'] * inputs[j]
+                neuron['weights'][-1] += alpha * neuron['delta']
 
-        # Calculate the initial cost.
-        cos = self.cost(varList, resultList)
-        # print "cos1"
-        # print cos
-        JofTheta.append(cos)
+"""
+    Description:
+        Training a given neural network.
+    Params:
+        @param neuralNet: neural network to use.
+        @param data     : training dataset.
+        @param alpha    : learning rate to use.
+        @param nIter    : number of iterations to update the neural network for
+                          each row in the training dataset.
+        @param nOutputs : expected number of output values.
+"""
+def trainNetwork(neuralNet, data, alpha, nIter, nOutputs):
+    errorPlot = [] # List of errors used for plotting
+    for iterAct in range(nIter):
+        sumError = 0
+        for row in data:
+            outputs = neuralNet.forwardPropagation(row)
+            expected = [0 for i in range(nOutputs)]
+            expected[int(row[-1])] = 1
+            sumError += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
+            neuralNet.backPropagation(expected)
+            neuralNet.update_weights(row, alpha)
+        errorPlot.append(sumError)
+    return errorPlot
 
-        i = 0 # Initialize the counter of iterations.
-        while (not(conv) and (i <= maxIter)):
-        # while i <= maxIter:
-            auxthetaI = self.thetasI
-            auxthetaH = self.thetasH
-            # print "before"
-            # print auxthetaI
-            # print auxthetaH
-            # Get new thetas
-            derivate = self.backPropagation(varList, resultList)
+"""
+    Description:
+        Make a prediciton with a given neural network.
+        Return the index in the neural network output that has the larger probability.
+    Params:
+        @param neuralNet: neural network to use.
+        @param row      : sample.
+"""
+def predictNetwork(neuralNet, row):
+    outputs = neuralNet.forwardPropagation(row)
+    return outputs.index(max(outputs))
 
-            # Gradient checking
-            # gc = self.gradientChecking(varList, resultList)
-            # print gc[0]
-            # print gc[1]
-            # if (np.all(gc[0] - derivate[0]  < 0.001) or np.all(gc[1] - derivate[1] < 0.001)):
-            #     print "noooooooooooooooo, mori"
-            #     break
-
-            # Update of thetas
-            self.thetasI = auxthetaI - alpha * derivate[0]
-            self.thetasH = auxthetaH - alpha * derivate[1]
-
-            # print "after"
-            # print self.thetasI
-            # print self.thetasH
-            newcost = self.cost(varList , resultList)
-            # print "newcost"
-            # print newcost
-            # print "derivate"
-            # print derivate[0]
-            # print derivate[1]
-            JofTheta.append(newcost)
-
-            i = i + 1 # Update the actual number of iterations.
-            if (abs(newcost - cos) <= 0.0001):
-                conv = True
-                print derivate[0]
-                print derivate[1]
-                # print "thetas"
-                # print self.thetasI
-                # print self.thetasH
-
-            # print "dif cos"
-            # print abs(newcost - cos)
-            cos = newcost
-
-
-
-        return {'converge' : conv, 'costFunction' : JofTheta, 'nIterations': i}
-
-
-    def gradientChecking(self, X, y):
-        epsilon = 0.0001;
-
-        """
-        auxThetaI = self.thetasI
-        self.thetasI = auxThetaI + epsilon;
-        costThetasP = self.cost(X, y)
-        self.thetasI = auxThetaI - epsilon;
-        costThetasM = self.cost(X, y)
-        gradApproxI = (costThetasP - costThetasM)/(2 * epsilon)
-        self.thetasI = auxThetaI
-
-        auxThetaO = self.thetasH
-        self.thetasH = auxThetaO + epsilon;
-        costThetasP = self.cost(X, y)
-        self.thetasH = auxThetaO - epsilon;
-        costThetasM = self.cost(X, y)
-        gradApproxO = (costThetasP - costThetasM)/(2 * epsilon)
-        self.thetasH = auxThetaO
-        """
-
-        gradApproxI = np.zeros(self.thetasI.shape)
-        for i in range(0, len(self.thetasI)):
-            auxThetaI = self.thetasI
-            self.thetasI[i] = self.thetasI[i] + epsilon
-            costThetasP = self.cost(X, y)
-
-            self.thetasI = auxThetaI
-            self.thetasI[i] = self.thetasI[i] - epsilon;
-            costThetasM = self.cost(X, y)
-
-            gradApproxI[i] = (costThetasP - costThetasM)/(2 * epsilon)
-            self.thetasI[i] = auxThetaI[i]
-
-        gradApproxO = np.zeros(self.thetasH.shape)
-        for i in range(0, len(self.thetasH)):
-            auxThetaO = self.thetasH
-            self.thetasH[i] = self.thetasH[i] + epsilon;
-            costThetasP = self.cost(X, y)
-
-            self.thetasH = auxThetaO
-            self.thetasH[i] = self.thetasH[i] - epsilon;
-            costThetasM = self.cost(X, y)
-            gradApproxO[i] = (costThetasP - costThetasM)/(2 * epsilon)
-            self.thetasH[i] = auxThetaO[i]
-        """
-        for i in range (1, len(self.thetasO)):
-            thetasPlus = self.thetasO
-            thetasPlus[i] += epsilon
-
-            thetasMinus = self.thetasO
-            thetasMinus[i] -= epsilon
-            gradApproO[i] = (self.cost(thetasPlus, y) - self.cost(thetasMinus, y)) /(2*epsilon)
-        """
-        print [gradApproxI, gradApproxO]
-        return [gradApproxI, gradApproxO]
+# .----------------------------------------------------------------------------.
