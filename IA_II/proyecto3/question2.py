@@ -59,6 +59,11 @@ def main():
         print "--------------------------------------------------------------------------------"
         result = km.k_means(data['x'], k)
         print result['clusters']
+        # para comparar que los resultados cuadren iba a asignar a cada cluster la
+        # etiqueta del centroide, luego buscar en la data original cada punto y ver
+        # su etiqueta en el vector "y" luego chequear si lo clasifico correctamente
+        # pero eso implica varias busquedas y es medio ineficiente.
+        # Si se les ocurre una mejor manera...
         print "--------------------------------------------------------------------------------"
 
 
