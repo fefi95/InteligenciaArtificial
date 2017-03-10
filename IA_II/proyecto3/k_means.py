@@ -41,6 +41,7 @@ def makeCluster(X, centroids, K):
             distance = np.linalg.norm(X[i] - centroids[k])
             if (old_distance > distance):
                 best_cluster = k
+                old_distance = distance
 
         # print "best"
         # print best_cluster
@@ -64,14 +65,17 @@ def makeCluster(X, centroids, K):
         @param clusters : K clusters
 """
 
-def getNewCentroid(clusters):
+def getNewCentroid(clusters,centroids):
     newCentroids = []
     # print clusters
     # print clusters.shape
-    for cluster in clusters:
-        newCentroids.append(np.mean(cluster, axis = 0))
+    for i in range(len(clusters)):
+        if len(clusters[i]) == 0:
+            newCentroids.append(centroids[i])
+        else:
+            newCentroids.append(np.mean(clusters[i], axis = 0))
         print 'mean'
-        print np.mean(cluster, axis = 0)
+        print np.mean(clusters[i], axis = 0)
     print "new c"
     print newCentroids
     return newCentroids
@@ -101,7 +105,7 @@ def k_means(X, k):
         clusters = aux[0]
         clusters_index = aux[1]
         # print clusters
-        centroids = getNewCentroid(clusters)
+        centroids = getNewCentroid(clusters,centroids)
         print "old"
         print old_centroids
         print "new"
