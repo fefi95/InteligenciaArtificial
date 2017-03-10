@@ -96,22 +96,6 @@ def getConfusionMatrix(data, clusters, clusters_index, K):
     print matrix
     return matrix
 
-
-
-
-    # Tag each cluster
-    # clusters_tags = []
-    # for k in range(0, K):
-    #     cluster = clusters[k]
-    #     clusters_tags.append([])
-    #     for example in cluster:
-    #         index = find(data['x'], example)
-    #         print index
-    #         tag = data['y'][index]
-    #         clusters_tags[k].append(tag)
-    # print clusters_tags
-
-
 def main():
 
     data = readData("datasets/data_iris.txt")
