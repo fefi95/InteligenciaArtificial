@@ -8,7 +8,6 @@
     Description:
         This file contains the implementation of k-means algorithm
 """
-
 # .----------------------------------------------------------------------------.
 # Import libraries to use.
 
@@ -16,6 +15,8 @@ import numpy as np              # This provides access to an efficient
                                 # multi-dimensional container of generic data.
 import random as rm
 # .----------------------------------------------------------------------------.
+
+np.random.seed(1)
 
 """
     Description:
@@ -54,8 +55,8 @@ def makeCluster(X, centroids, K):
     # print "cluster"
     # print clusters
     clusters = np.asarray(clusters)
-    print clusters.shape
-    print len(clusters_index)
+    # print clusters.shape
+    # print len(clusters_index)
     return [clusters, clusters_index]
 
 """
@@ -74,10 +75,10 @@ def getNewCentroid(clusters,centroids):
             newCentroids.append(centroids[i])
         else:
             newCentroids.append(np.mean(clusters[i], axis = 0))
-        print 'mean'
-        print np.mean(clusters[i], axis = 0)
-    print "new c"
-    print newCentroids
+    #     print 'mean'
+    #     print np.mean(clusters[i], axis = 0)
+    # print "new c"
+    # print newCentroids
     return newCentroids
 
 def converge(old_centroids, centroids):
@@ -86,7 +87,7 @@ def converge(old_centroids, centroids):
         if np.any(old_centroids[i] != centroids[i]):
             converge = False
             break
-    print converge
+    # print converge
     return converge
 
 def k_means(X, k):
@@ -96,20 +97,20 @@ def k_means(X, k):
     old_centroids = rm.sample(X, k)
 
     while not converge(old_centroids, centroids):
-        print "old"
-        print old_centroids
-        print "new"
-        print centroids
+        # print "old"
+        # print old_centroids
+        # print "new"
+        # print centroids
         old_centroids = centroids
         aux = makeCluster(X, centroids, k)
         clusters = aux[0]
         clusters_index = aux[1]
         # print clusters
         centroids = getNewCentroid(clusters,centroids)
-        print "old"
-        print old_centroids
-        print "new"
-        print centroids
+        # print "old"
+        # print old_centroids
+        # print "new"
+        # print centroids
         # print len(centroids)
         # break
     return {'centroids' : centroids, 'clusters' : clusters, 'clusters_index' : clusters_index}

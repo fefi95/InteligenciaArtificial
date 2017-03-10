@@ -19,7 +19,8 @@ import pandas as pd    # This provides access to function for data manipulation
                        # and analysis.
 # .----------------------------------------------------------------------------.
 
-
+statsF = statsF = open("datasets/data_iris.txt_stats.csv", 'w')
+statsF.write("# de clusters, Etiqueta del cluster, Aciertos, Fallos\n")
 numericClass = {"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2}
 
 """
@@ -33,12 +34,12 @@ def readData(dataSetName):
     data = pd.read_csv(dataSetName, sep=",", header = None)
 
     # Get the min and max values for each column.
-    # minValues = []
-    # maxValues = []
-    # for i in range(0, len(data.columns)-1):
-    #     mini = data[i].min()
-    #     maxi = data[i].max()
-    #     data[i] = (data[i] - mini) / (maxi - mini)
+    minValues = []
+    maxValues = []
+    for i in range(0, len(data.columns)-1):
+        mini = data[i].min()
+        maxi = data[i].max()
+        data[i] = (data[i] - mini) / (maxi - mini)
 
     df = data.values
     x = []
@@ -78,41 +79,46 @@ def getConfusionMatrix(data, clusters, clusters_index, K):
         clusters_tags.append([])
         for index in clusters_index[k]:
             clusters_tags[k].append(data['y'][index])
-    print clusters_tags
+    # print clusters_tags
 
-    matrix = []
+    # matrix = []
+    error = 0
+    print "\tnumero de clusters: " + str(K)
     for k in range(0, K):
         correct = 0
         incorrect = 0
         md = mode(clusters_tags[k])
-        print mode(clusters_tags[k])
+        # print mode(clusters_tags[k])
         for tag in clusters_tags[k]:
             if tag == md:
                 correct += 1
             else:
                 incorrect += 1
-        matrix.append([correct, incorrect])
+        error += incorrect
+        # matrix.append([correct, incorrect])
+        print "\t\t" + "etiqueta del cluster " + str(k) + ": " + md
+        print "\t\t" + str(correct) + " aciertos y " + str(incorrect) + " fallos"
+        statsF.write(str(K) + ", " + md + ", " + str(correct) + ", " + str(incorrect) + "\n")
 
-    print matrix
-    return matrix
+    error = float(error)/len(data['x'])
+    print "\t\t" + "error total: " + str(error)
+    statsF.write(str(K) + ", " + "error total, " + str(error) + "\n")
+
+    # return matrix
 
 def main():
 
     data = readData("datasets/data_iris.txt")
-    for k in range(3, 4):
+    for k in range(2, 6):
         print "--------------------------------------------------------------------------------"
         result = km.k_means(data['x'], k)
-        print "sol"
-        print result['clusters']
-        print result['clusters_index']
+        # print "sol"
+        # print result['clusters']
+        # print result['clusters_index']
         getConfusionMatrix(data, result['clusters'], result['clusters_index'], k)
-        # para comparar que los resultados cuadren iba a asignar a cada cluster la
-        # etiqueta del centroide, luego buscar en la data original cada punto y ver
-        # su etiqueta en el vector "y" luego chequear si lo clasifico correctamente
-        # pero eso implica varias busquedas y es medio ineficiente.
-        # Si se les ocurre una mejor manera...
         print "--------------------------------------------------------------------------------"
 
+    statsF.close()
 
 # .----------------------------------------------------------------------------.
 
