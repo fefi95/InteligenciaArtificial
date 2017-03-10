@@ -27,16 +27,18 @@ import random as rm
 
 def makeCluster(X, centroids, K):
     clusters = []
+    clusters_index = []
     for k in range(0, K):
         clusters.append([])
-        clusters[k].append(centroids[k])
+        clusters_index.append([])
+        # clusters[k].append(centroids[k])
 
-    for x in X:
+    for i in range(0, len(X)):
         best_cluster = 0
-        old_distance = np.linalg.norm(x - centroids[0])
+        old_distance = np.linalg.norm(X[i] - centroids[0])
         # get best centroid
         for k in range(1, K):
-            distance = np.linalg.norm(x - centroids[k])
+            distance = np.linalg.norm(X[i] - centroids[k])
             if (old_distance > distance):
                 best_cluster = k
 
@@ -44,13 +46,16 @@ def makeCluster(X, centroids, K):
         # print best_cluster
         # print clusters[best_cluster]
         # print x
-        clusters[best_cluster].append(x)
+        clusters[best_cluster].append(X[i])
+        clusters_index[best_cluster].append(i)
         # break
         # Insert new value to the closest centroid for x
     # print "cluster"
     # print clusters
     clusters = np.asarray(clusters)
-    return clusters
+    print clusters.shape
+    print len(clusters_index)
+    return [clusters, clusters_index]
 
 """
     Description:
@@ -92,7 +97,9 @@ def k_means(X, k):
         print "new"
         print centroids
         old_centroids = centroids
-        clusters = makeCluster(X, centroids, k)
+        aux = makeCluster(X, centroids, k)
+        clusters = aux[0]
+        clusters_index = aux[1]
         # print clusters
         centroids = getNewCentroid(clusters)
         print "old"
@@ -101,4 +108,4 @@ def k_means(X, k):
         print centroids
         # print len(centroids)
         # break
-    return {'centroids' : centroids, 'clusters' : clusters}
+    return {'centroids' : centroids, 'clusters' : clusters, 'clusters_index' : clusters_index}
