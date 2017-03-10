@@ -21,7 +21,6 @@ import pandas as pd    # This provides access to function for data manipulation
 
 statsF = statsF = open("datasets/data_iris.txt_stats.csv", 'w')
 statsF.write("# de clusters, Etiqueta del cluster, Aciertos, Fallos\n")
-numericClass = {"Iris-setosa": 0, "Iris-versicolor": 1, "Iris-virginica": 2}
 
 """
     Description:
@@ -53,26 +52,27 @@ def readData(dataSetName):
 
     return { 'x': x, 'y' : y}
 
-def find(data, example):
-    for i in range(0, len(data)):
-        print "find"
-        print data[i]
-        print example
-        # if np.all(abs(data[i] - example) < 0.1):
-        # found = True
-        for j in range(0, len(data[0])):
-            if (abs(data[i][j] - example[j]) > 0.1):
-                found = False
-        if found:
-            return i
-    return len(data) + 1
-
+"""
+    Description:
+        Caculates wich tag appears the must in a cluster
+    Params:
+        @param cluster_tags: all of the tags within a cluster
+"""
 def mode(cluster_tags):
     mode, indices = np.unique(cluster_tags, return_inverse=True)
     # print mode
     # print mode[np.argmax(np.bincount(indices))]
     return mode[np.argmax(np.bincount(indices))]
 
+"""
+    Description:
+        Gets the confusion matrix for the data
+    Params:
+        @param data           : the original dataset
+        @param clusters       : the cluster of the dataset
+        @param clusters_index : the index of every example in the dataset
+        @param K              : the numer of clusters
+"""
 def getConfusionMatrix(data, clusters, clusters_index, K):
     clusters_tags = []
     for k in range(0, K):
@@ -112,9 +112,6 @@ def main():
     for k in range(2, 6):
         print "--------------------------------------------------------------------------------"
         result = km.k_means(data['x'], k)
-        # print "sol"
-        # print result['clusters']
-        # print result['clusters_index']
         getConfusionMatrix(data, result['clusters'], result['clusters_index'], k)
         print "--------------------------------------------------------------------------------"
 

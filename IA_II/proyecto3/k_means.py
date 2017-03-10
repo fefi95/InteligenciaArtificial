@@ -24,10 +24,13 @@ np.random.seed(1)
     Params:
         @param X         : all examples of the problem
         @param centroids : k centroids of the clusters
+        @param K         : number of clusters
 """
 
 def makeCluster(X, centroids, K):
+    # Store every created cluster
     clusters = []
+    # Store the index of every example on the cluster
     clusters_index = []
     for k in range(0, K):
         clusters.append([])
@@ -37,7 +40,7 @@ def makeCluster(X, centroids, K):
     for i in range(0, len(X)):
         best_cluster = 0
         old_distance = np.linalg.norm(X[i] - centroids[0])
-        # get best centroid
+        # get best cluster for the example
         for k in range(1, K):
             distance = np.linalg.norm(X[i] - centroids[k])
             if (old_distance > distance):
@@ -47,16 +50,11 @@ def makeCluster(X, centroids, K):
         # print "best"
         # print best_cluster
         # print clusters[best_cluster]
-        # print x
         clusters[best_cluster].append(X[i])
         clusters_index[best_cluster].append(i)
-        # break
-        # Insert new value to the closest centroid for x
     # print "cluster"
     # print clusters
     clusters = np.asarray(clusters)
-    # print clusters.shape
-    # print len(clusters_index)
     return [clusters, clusters_index]
 
 """
@@ -64,9 +62,10 @@ def makeCluster(X, centroids, K):
         Calculates the new centroids of a k given cluster
     Params:
         @param clusters : K clusters
+        @param centroids : K centroids
 """
 
-def getNewCentroid(clusters,centroids):
+def getNewCentroid(clusters, centroids):
     newCentroids = []
     # print clusters
     # print clusters.shape
@@ -81,6 +80,13 @@ def getNewCentroid(clusters,centroids):
     # print newCentroids
     return newCentroids
 
+"""
+    Description:
+        Test whether the algorithm has converge
+    Params:
+        @param old_centroids : K old centroids
+        @param centroids     : K new centroids
+"""
 def converge(old_centroids, centroids):
     converge = True
     for i in range(0, len(centroids)):
@@ -90,6 +96,13 @@ def converge(old_centroids, centroids):
     # print converge
     return converge
 
+"""
+    Description:
+        Calculates the new centroids of a k given cluster
+    Params:
+        @param X : orginal examples
+        @param K : number of clusters
+"""
 def k_means(X, k):
     # Initialize centroids
     centroids = rm.sample(X, k)
@@ -112,5 +125,4 @@ def k_means(X, k):
         # print "new"
         # print centroids
         # print len(centroids)
-        # break
     return {'centroids' : centroids, 'clusters' : clusters, 'clusters_index' : clusters_index}
