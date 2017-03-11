@@ -34,20 +34,23 @@ def main():
 	data = np.zeros((hImg, wImg, 3), dtype=np.uint8)
 
 	i = 0
-	for h in range(0, hImg):
-		for w in range(0, wImg):
+	for w in range(0, wImg):
+		for h in range(0, hImg):
 			pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h] 	
 			i += 1
 
 	result = km.k_means(pixMatrix, 2)
-	newPixels = result['centroids']
+	print result['clusters']
+
+	for i in range(0, len(result['clusters'])):
+		print result['clusters'][i][0]
 
 	i = 0
-	for h in range(0, hImg):
-		for w in range(0, wImg):
-			data[w,h] = newPixels[i]
+	for w in range(0, wImg):
+		for h in range(0, hImg):
+			data[h,w] = pixMatrix[i]
 			i += 1
-
+	
 	# Draw the new image.
 	newImg = Image.fromarray(data, 'RGB')
 	newImg.save('test.png')
