@@ -22,44 +22,55 @@ from PIL import Image       #
 # .----------------------------------------------------------------------------.
 
 def main():
-	# Open the image.
-	originalIm = Image.open("Imagen2.jpg")
-	wImg, hImg = originalIm.size  
-	pix = originalIm.load()      # Get the image info.
+    # Open the image.
+    originalIm = Image.open("Imagen.jpg")
+    wImg, hImg = originalIm.size  
+    pix = originalIm.load()      # Get the image info.
 
-	kClusters = [2,4,8,16,32,64,128]
+    kClusters = [2,4,8,16,32,64,128]
 
-	for k in kClusters:
-		print "Cantidad de clusters a usar: " + str(k)
-		# Create the matrix to store the pixel data.
-		# Each row will be the form: [x,y,z]
-		pixMatrix = np.zeros((wImg * hImg, 3))
+    for k in kClusters:
+        print "Cantidad de clusters a usar: " + str(k)
+        # Create the matrix to store the pixel data.
+        # Each row will be the form: [x,y,z]
+        pixMatrix = np.zeros((wImg * hImg, 3))
 
-		data = np.zeros((hImg, wImg, 3), dtype=np.uint8)
+        data = np.zeros((hImg, wImg, 3), dtype=np.uint8)
 
-		i = 0
-		for w in range(0, wImg):
-			for h in range(0, hImg):
-				pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h] 	
-				i += 1
+        i = 0
+        for w in range(0, wImg):
+            for h in range(0, hImg):
+                pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h]    
+                i += 1
 
-		print "Se usa k-means"
-		result = km.k_means(pixMatrix, k)
+        # print "Se usa k-means"
+        # result = km.k_means(pixMatrix, k)
+        # print "hola"
+        # j = 0
+        # for w in range(0, wImg):
+        #     for h in range(0, hImg):
+        #         for i in range(0, len(result['clusters'])):
+        #             if len(result['clusters_index'][i]) == 0:
+        #                 continue
+        #             elif result['clusters_index'][i][0] == j:
+        #                 data[h,w] = result['centroids'][i]
+        #                 result['clusters_index'][i] = result['clusters_index'][i][1:]
+        #                 break
+        #         j += 1
 
-		j = 0
-		for w in range(0, wImg):
-			for h in range(0, hImg):
-				for i in range(0, len(result['clusters'])):
-					if np.any(result['clusters'][i] == pixMatrix[j]):	
-						data[h,w] = result['centroids'][i]
-						break
-				j += 1
-		
+        print "Se usa k-means"
+        result = km.k_means2(pixMatrix, k)
+        print "hola"
+        j = 0
+        for w in range(0, wImg):
+            for h in range(0, hImg):
+                data[h,w] = result['clusters_index'][j]
+                j += 1
 
-		# Draw the new image.
-		print "Se crea la nueva imagen con " + str(k) + " colores \n"
-		newImg = Image.fromarray(data, 'RGB')
-		newImg.save('Imagen_' + str(k) + ".png")
+        # Draw the new image.
+        print "Se crea la nueva imagen con " + str(k) + " colores \n"
+        newImg = Image.fromarray(data, 'RGB')
+        newImg.save('Imagen_' + str(k) + ".png")
 
 # .----------------------------------------------------------------------------.
 
