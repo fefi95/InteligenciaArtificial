@@ -16,7 +16,7 @@ import numpy as np              # This provides access to an efficient
 import random as rm
 # .----------------------------------------------------------------------------.
 
-np.random.seed(7)
+np.random.seed(1)
 
 """
     Description:
