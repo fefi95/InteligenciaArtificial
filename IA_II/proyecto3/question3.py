@@ -17,14 +17,14 @@ import numpy as np          # This provides access to an efficient
                             # multi-dimensional container of generic data.
 import pandas as pd         # This provides access to function for data manipulation
                             # and analysis.
-from PIL import Image       # 
+from PIL import Image       #
 
 # .----------------------------------------------------------------------------.
 
 def main():
     # Open the image.
     originalIm = Image.open("Imagen.jpg")
-    wImg, hImg = originalIm.size  
+    wImg, hImg = originalIm.size
     pix = originalIm.load()      # Get the image info.
 
     kClusters = [2,4,8,16,32,64,128]
@@ -40,7 +40,7 @@ def main():
         i = 0
         for w in range(0, wImg):
             for h in range(0, hImg):
-                pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h]    
+                pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h]
                 i += 1
 
         # print "Se usa k-means"
@@ -59,12 +59,12 @@ def main():
         #         j += 1
 
         print "Se usa k-means"
-        result = km.k_means2(pixMatrix, k)
+        result = km.k_means(pixMatrix, k)
         print "hola"
         j = 0
         for w in range(0, wImg):
             for h in range(0, hImg):
-                data[h,w] = result['clusters_index'][j]
+                data[h,w] = result['clusters_tags'][j]
                 j += 1
 
         # Draw the new image.
