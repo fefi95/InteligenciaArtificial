@@ -18,12 +18,13 @@ import numpy as np          # This provides access to an efficient
 import pandas as pd         # This provides access to function for data manipulation
                             # and analysis.
 from PIL import Image       #
+import sys
 
 # .----------------------------------------------------------------------------.
 
 def main():
     # Open the image.
-    originalIm = Image.open("Imagen.jpg")
+    originalIm = Image.open(sys.argv[1])
     wImg, hImg = originalIm.size
     pix = originalIm.load()      # Get the image info.
 
@@ -70,7 +71,7 @@ def main():
         # Draw the new image.
         print "Se crea la nueva imagen con " + str(k) + " colores \n"
         newImg = Image.fromarray(data, 'RGB')
-        newImg.save('Imagen_' + str(k) + ".png")
+        newImg.save(sys.argv[1][:-4] + '_' + str(k) + ".png")
 
 # .----------------------------------------------------------------------------.
 

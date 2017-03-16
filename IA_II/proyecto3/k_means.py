@@ -111,8 +111,7 @@ def k_means(X,k):
     old_centroids = rm.sample(X, k)
 
     i = 1
-    while not converge(old_centroids, centroids):
-        # print "old"
+    while (not converge(old_centroids, centroids)) and (i < 21):
         # print old_centroids
         # print "new"
         # print centroids
