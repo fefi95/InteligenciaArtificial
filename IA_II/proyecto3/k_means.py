@@ -47,14 +47,9 @@ def makeCluster(X, centroids, K):
                 best_cluster = k
                 old_distance = distance
 
-        # print "best"
-        # print best_cluster
-        # print clusters[best_cluster]
         clusters[best_cluster].append(X[i])
         clusters_tags.append(centroids[best_cluster])
         clusters_index[best_cluster].append(i)
-    # print "cluster"
-    # print clusters
     clusters = np.asarray(clusters)
     return [clusters, clusters_index, clusters_tags]
 
@@ -75,10 +70,6 @@ def getNewCentroid(clusters, centroids):
             newCentroids.append(centroids[i])
         else:
             newCentroids.append(np.mean(clusters[i], axis = 0))
-    #     print 'mean'
-    #     print np.mean(clusters[i], axis = 0)
-    # print "new c"
-    # print newCentroids
     return newCentroids
 
 """
@@ -112,9 +103,6 @@ def k_means(X,k):
 
     i = 1
     while (not converge(old_centroids, centroids)) and (i < 21):
-        # print old_centroids
-        # print "new"
-        # print centroids
         old_centroids = centroids
         aux = makeCluster(X, centroids, k)
         clusters = aux[0]
@@ -124,9 +112,4 @@ def k_means(X,k):
         centroids = getNewCentroid(clusters,centroids)
         print i
         i += 1
-        # print "old"
-        # print old_centroids
-        # print "new"
-        # print centroids
-        # print len(centroids)
     return {'centroids' : centroids, 'clusters' : clusters, 'clusters_index' : clusters_index, 'clusters_tags' : clusters_tags}
