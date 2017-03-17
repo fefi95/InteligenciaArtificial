@@ -110,6 +110,6 @@ def k_means(X,k):
         clusters_tags = aux[2]
         # print clusters
         centroids = getNewCentroid(clusters,centroids)
-        print i
+        # print i
         i += 1
     return {'centroids' : centroids, 'clusters' : clusters, 'clusters_index' : clusters_index, 'clusters_tags' : clusters_tags}

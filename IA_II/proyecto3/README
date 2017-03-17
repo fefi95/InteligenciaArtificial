@@ -1,0 +1,26 @@
+#
+#    Universidad Simon Bolivar
+#    CI-5438 - Inteligencia Artificial II
+#    Edward Fernandez 10-11121
+#    Stefani Castellanos 11-11394
+#    Carlos Ferreira 11-10323
+
+ARCHIVOS.
+    enunciado_proyecto3.pdf - Archivo con el enunciado del proyecto
+    k_means.py - Implementación del algoritmo k-means.
+    question2.py - Implementación de la respuesta 2 usando k-means y
+                   el dataset Iris que se encuentra en la carpeta "datasets".
+    question3.py - Implementación de la respuesta 2 usando k-means y las
+                   imagenes en la carpeta "Charlie_Brown", "Charlie_Brown2",
+                   "Imagen_up" y "Rick_and_Morty".
+
+CARPETAS
+    Charlie_Brown - Carpeta con las imagenes de la pregunta 3 usando
+                    "Charlie_Brown.jpg" sin limite de iteraciones y sin K = 128.
+    Charlie_Brown2 - Carpeta con las imagenes de la pregunta 3 usando
+                     "Charlie_Brown2.jpg" con limite de iteraciones
+                     (misma imagen del anterior).
+    Imagen_up - Carpeta con las imagenes de la pregunta 3 usando
+                "Imagen_up.jpg" sin limite de iteraciones.
+    Rick_and_Morty - Carpeta con las imagenes de la pregunta 3 usando
+                    "Rick_and_Morty.jpg" sin limite de iteraciones.
