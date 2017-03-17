@@ -44,21 +44,6 @@ def main():
                 pixMatrix[i][0], pixMatrix[i][1], pixMatrix[i][2] = pix[w,h]
                 i += 1
 
-        # print "Se usa k-means"
-        # result = km.k_means(pixMatrix, k)
-        # print "hola"
-        # j = 0
-        # for w in range(0, wImg):
-        #     for h in range(0, hImg):
-        #         for i in range(0, len(result['clusters'])):
-        #             if len(result['clusters_index'][i]) == 0:
-        #                 continue
-        #             elif result['clusters_index'][i][0] == j:
-        #                 data[h,w] = result['centroids'][i]
-        #                 result['clusters_index'][i] = result['clusters_index'][i][1:]
-        #                 break
-        #         j += 1
-
         print "Se usa k-means"
         result = km.k_means(pixMatrix, k)
         print "hola"
