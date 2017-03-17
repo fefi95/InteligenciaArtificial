@@ -46,7 +46,6 @@ def main():
 
         print "Se usa k-means"
         result = km.k_means(pixMatrix, k)
-        print "hola"
         j = 0
         for w in range(0, wImg):
             for h in range(0, hImg):
@@ -56,7 +55,7 @@ def main():
         # Draw the new image.
         print "Se crea la nueva imagen con " + str(k) + " colores \n"
         newImg = Image.fromarray(data, 'RGB')
-        newImg.save(sys.argv[1][:-4] + '_' + str(k) + ".png")
+        newImg.save(sys.argv[1][:-4] + 'K' + str(k) + ".png")
 
 # .----------------------------------------------------------------------------.
 
