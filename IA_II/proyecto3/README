@@ -13,6 +13,7 @@ ARCHIVOS.
     question3.py - Implementación de la respuesta 2 usando k-means y las
                    imagenes en la carpeta "Charlie_Brown", "Charlie_Brown2",
                    "Imagen_up" y "Rick_and_Morty".
+   proyecto3_IA2.pdf - Informe del proyecto.
 
 CARPETAS
     Charlie_Brown - Carpeta con las imagenes de la pregunta 3 usando
@@ -22,5 +23,7 @@ CARPETAS
                      (misma imagen del anterior).
     Imagen_up - Carpeta con las imagenes de la pregunta 3 usando
                 "Imagen_up.jpg" sin limite de iteraciones.
+    Pokemon - Carpeta con las imagenes de la pregunta 3 usando
+              "Pokemon.jpg" sin limite de iteraciones.
     Rick_and_Morty - Carpeta con las imagenes de la pregunta 3 usando
                     "Rick_and_Morty.jpg" sin limite de iteraciones.
