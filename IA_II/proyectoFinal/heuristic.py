@@ -69,16 +69,18 @@ def holes(board):
 	This function identifies any holes and returns them as a [(x,y)]
 	"""
     holes = []
+    len_holes = 0
     block_in_col = False
     for x in range(len(board[0])):
         for y in range(len(board)):
             if block_in_col and isEmpty(board[y][x]):
                 holes.append((x,y))
+                len_holes += 1
             elif isBlock(board[y][x]):
                 block_in_col = True
         block_in_col = False
 
-    return len(holes)
+    return len_holes
 
 def bumpiness(board):
     bumpiness = 0
