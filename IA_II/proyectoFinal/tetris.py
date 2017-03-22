@@ -1,5 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #-*- coding: utf-8 -*-
+
+# Based off: https://gist.github.com/kch42/565419/download
 
 # NOTE FOR WINDOWS USERS:
 # You can download a "exefied" version of this game at:
@@ -39,29 +41,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from random import randrange as rand
+from random import randrange
 import pygame, sys
+from copy import deepcopy
+from threading import Lock
 
-# The configuration
-cell_size =	18
-cols =		10
-rows =		22
-maxfps = 	30
+# Config
+CELL_SIZE =	20
+COLS = 10
+ROWS = 22
+MAX_FPS = 30
+DROP_TIME = 20
+DRAW = True
 
-colors = [
-(0,   0,   0  ),
-(255, 85,  85),
-(100, 200, 115),
-(120, 108, 245),
-(255, 140, 50 ),
-(50,  120, 52 ),
-(146, 202, 73 ),
-(150, 161, 218 ),
-(35,  35,  35) # Helper color for background grid
+COLORS = [
+	(0,   0,   0),
+	(255, 85,  85),
+	(100, 200, 115),
+	(120, 108, 245),
+	(255, 140, 50),
+	(50,  120, 52),
+	(146, 202, 73),
+	(150, 161, 218),
+	(35,  35,  35)
 ]
 
-# Define the shapes of the single parts
-tetris_shapes = [
+STONES = [
 	[[1, 1, 1],
 	 [0, 1, 0]],
 
@@ -85,15 +90,15 @@ tetris_shapes = [
 
 def rotate_clockwise(shape):
 	return [ [ shape[y][x]
-			for y in xrange(len(shape)) ]
-		for x in xrange(len(shape[0]) - 1, -1, -1) ]
+		for y in range(len(shape)) ]
+		for x in range(len(shape[0])-1, -1, -1) ]
 
 def check_collision(board, shape, offset):
 	off_x, off_y = offset
 	for cy, row in enumerate(shape):
 		for cx, cell in enumerate(row):
 			try:
-				if cell and board[ cy + off_y ][ cx + off_x ]:
+				if cell and board[cy + off_y][cx + off_x]:
 					return True
 			except IndexError:
 				return True
@@ -101,70 +106,67 @@ def check_collision(board, shape, offset):
 
 def remove_row(board, row):
 	del board[row]
-	return [[0 for i in xrange(cols)]] + board
+	return [[0 for i in range(COLS)]] + board
 
-def join_matrixes(mat1, mat2, mat2_off):
+def join_matrices(mat1, mat2, mat2_off):
+	mat3 = deepcopy(mat1)
 	off_x, off_y = mat2_off
 	for cy, row in enumerate(mat2):
 		for cx, val in enumerate(row):
-			mat1[cy+off_y-1	][cx+off_x] += val
-	return mat1
+			mat3[cy+off_y-1][cx+off_x] += val
+	return mat3
 
 def new_board():
-	board = [ [ 0 for x in xrange(cols) ]
-			for y in xrange(rows) ]
-	board += [[ 1 for x in xrange(cols)]]
+	board = [[0 for x in range(COLS)] for y in range(ROWS)]
+	board += [[1 for x in range(COLS)]]
 	return board
 
 class TetrisApp(object):
-	def __init__(self):
+	def __init__(self, runner=None):
+		self.DROPEVENT = pygame.USEREVENT + 1
+
 		pygame.init()
+		pygame.display.set_caption("Tetris AI")
 		pygame.key.set_repeat(250,25)
-		self.width = cell_size*(cols+6)
-		self.height = cell_size*rows
-		self.rlim = cell_size*cols
-		self.bground_grid = [[ 8 if x%2==y%2 else 0 for x in xrange(cols)] for y in xrange(rows)]
-
-		self.default_font =  pygame.font.Font(
-			pygame.font.get_default_font(), 12)
-
+		self.width = CELL_SIZE * (COLS+10)
+		self.height = CELL_SIZE * ROWS
+		self.rlim = CELL_SIZE * COLS
+		self.bground_grid = [[ 8 if x%2==y%2 else 0 for x in range(COLS)] for y in range(ROWS)]
+		self.default_font = pygame.font.Font(pygame.font.get_default_font(), 11)
 		self.screen = pygame.display.set_mode((self.width, self.height))
-		pygame.event.set_blocked(pygame.MOUSEMOTION) # We do not need
-		                                             # mouse movement
-		                                             # events, so we
-		                                             # block them.
-		self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
+		self.next_stone = STONES[randrange(len(STONES))]
+		self.gameover = False
+		self.runner = runner
+		self.ai = None
+		self.lock = Lock()
 		self.init_game()
+		# Used in genetic algorithms
+		self.games_run = 5
+		self.fitness = 0
+		self.genetic = False
 
 	def new_stone(self):
-		self.stone = self.next_stone[:]
-		self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
-		self.stone_x = int(cols / 2 - len(self.stone[0])/2)
+		self.stone = self.next_stone
+		self.next_stone = STONES[randrange(len(STONES))]
+		self.stone_x = COLS//2 - len(self.stone[0])//2
 		self.stone_y = 0
+		self.score += 0
 
-		if check_collision(self.board,
-		                   self.stone,
-		                   (self.stone_x, self.stone_y)):
+		if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
 			self.gameover = True
+			if self.runner:
+				self.runner.on_game_over(self.score)
 
 	def init_game(self):
 		self.board = new_board()
-		self.new_stone()
-		self.level = 1
 		self.score = 0
-		self.lines = 0
-		pygame.time.set_timer(pygame.USEREVENT+1, 1000)
+		self.new_stone()
+		pygame.time.set_timer(self.DROPEVENT, DROP_TIME)
 
 	def disp_msg(self, msg, topleft):
 		x,y = topleft
 		for line in msg.splitlines():
-			self.screen.blit(
-				self.default_font.render(
-					line,
-					False,
-					(255,255,255),
-					(0,0,0)),
-				(x,y))
+			self.screen.blit(self.default_font.render(line, False, (255,255,255), (0,0,0)), (x,y))
 			y+=14
 
 	def center_msg(self, msg):
@@ -185,146 +187,147 @@ class TetrisApp(object):
 		for y, row in enumerate(matrix):
 			for x, val in enumerate(row):
 				if val:
-					pygame.draw.rect(
-						self.screen,
-						colors[val],
-						pygame.Rect(
-							(off_x+x) *
-							  cell_size,
-							(off_y+y) *
-							  cell_size,
-							cell_size,
-							cell_size),0)
+					try:
+						pygame.draw.rect(self.screen, COLORS[val],
+							pygame.Rect((off_x+x)*CELL_SIZE, (off_y+y)*CELL_SIZE, CELL_SIZE, CELL_SIZE), 0)
+					except IndexError:
+						print("Corrupted board") # TODO: pretty sure this is now fixed.
+						print(self.board)
 
 	def add_cl_lines(self, n):
-		linescores = [0, 40, 100, 300, 1200]
-		self.lines += n
-		self.score += linescores[n] * self.level
-		if self.lines >= self.level*6:
-			self.level += 1
-			newdelay = 1000-50*(self.level-1)
-			newdelay = 100 if newdelay < 100 else newdelay
-			pygame.time.set_timer(pygame.USEREVENT+1, newdelay)
+		linescores = [0, 1, 2, 3, 4]
+		self.score += linescores[n]
+
+	def move_to(self, x):
+		self.move(x - self.stone_x)
 
 	def move(self, delta_x):
-		if not self.gameover and not self.paused:
+		if not self.gameover:
 			new_x = self.stone_x + delta_x
 			if new_x < 0:
 				new_x = 0
-			if new_x > cols - len(self.stone[0]):
-				new_x = cols - len(self.stone[0])
-			if not check_collision(self.board,
-			                       self.stone,
-			                       (new_x, self.stone_y)):
+			if new_x > COLS - len(self.stone[0]):
+				new_x = COLS - len(self.stone[0])
+			if not check_collision(self.board, self.stone, (new_x, self.stone_y)):
 				self.stone_x = new_x
-	def quit(self):
-		self.center_msg("Exiting...")
-		pygame.display.update()
-		sys.exit()
 
-	def drop(self, manual):
-		if not self.gameover and not self.paused:
-			self.score += 1 if manual else 0
+	def drop(self):
+		self.lock.acquire()
+		if not self.gameover:
 			self.stone_y += 1
-			if check_collision(self.board,
-			                   self.stone,
-			                   (self.stone_x, self.stone_y)):
-				self.board = join_matrixes(
-				  self.board,
-				  self.stone,
-				  (self.stone_x, self.stone_y))
+			if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
+				self.board = join_matrices(self.board, self.stone, (self.stone_x, self.stone_y))
 				self.new_stone()
 				cleared_rows = 0
-				while True:
-					for i, row in enumerate(self.board[:-1]):
-						if 0 not in row:
-							self.board = remove_row(
-							  self.board, i)
-							cleared_rows += 1
-							break
-					else:
-						break
+				for i, row in enumerate(self.board[:-1]):
+					if 0 not in row:
+						self.board = remove_row(self.board, i)
+						cleared_rows += 1
 				self.add_cl_lines(cleared_rows)
+
+				self.lock.release()
+				if self.ai:
+					self.ai.make_move()
+
 				return True
+		self.lock.release()
 		return False
 
 	def insta_drop(self):
-		if not self.gameover and not self.paused:
-			while(not self.drop(True)):
+		if not self.gameover:
+			while not self.drop():
 				pass
 
 	def rotate_stone(self):
-		if not self.gameover and not self.paused:
+		if not self.gameover:
 			new_stone = rotate_clockwise(self.stone)
-			if not check_collision(self.board,
-			                       new_stone,
-			                       (self.stone_x, self.stone_y)):
+			if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
 				self.stone = new_stone
-
-	def toggle_pause(self):
-		self.paused = not self.paused
 
 	def start_game(self):
 		if self.gameover:
 			self.init_game()
 			self.gameover = False
 
+	def ai_toggle_instant_play(self):
+		if self.ai:
+			self.ai.instant_play = not self.ai.instant_play
+
+	def genetic_toggle(self, games):
+		self.genetic = not self.genetic
+		self.games_run = games
+
 	def run(self):
 		key_actions = {
-			'ESCAPE':	self.quit,
-			'LEFT':		lambda:self.move(-1),
-			'RIGHT':	lambda:self.move(+1),
-			'DOWN':		lambda:self.drop(True),
-			'UP':		self.rotate_stone,
-			'p':		self.toggle_pause,
-			'SPACE':	self.start_game,
-			'RETURN':	self.insta_drop
+			'ESCAPE':	sys.exit,
+			'LEFT': lambda: self.move(-1),
+			'RIGHT': lambda: self.move(+1),
+			'DOWN': self.drop,
+			'UP': self.rotate_stone,
+			'SPACE': self.start_game,
+			'RETURN': self.insta_drop,
+			'p': self.ai_toggle_instant_play,
 		}
 
-		self.gameover = False
-		self.paused = False
-
-		dont_burn_my_cpu = pygame.time.Clock()
-		while 1:
-			self.screen.fill((0,0,0))
-			if self.gameover:
-				self.center_msg("""Game Over!\nYour score: %d
-Press space to continue""" % self.score)
-			else:
-				if self.paused:
-					self.center_msg("Paused")
+		clock = pygame.time.Clock()
+		while True:
+			if DRAW:
+				self.screen.fill((0,0,0))
+				if self.gameover:
+					self.center_msg("Game Over!\nYour score: %d\nPress space to continue" % self.score)
+					self.fitness += self.score
+					key_actions['SPACE']()
+					# Uses genetic algorithm for training
+					if self.genetic:
+						self.games_run -= 1
+						if self.games_run == 0:
+							raise Exception(self.fitness)
+							# key_actions['ESCAPE']()
+				elif self.genetic and self.score == 100:
+					self.gameover = True
+					self.fitness += self.score
+					key_actions['SPACE']()
+					self.games_run -= 1
+					if self.games_run == 0:
+						raise Exception(self.fitness)
 				else:
-					pygame.draw.line(self.screen,
-						(255,255,255),
-						(self.rlim+1, 0),
-						(self.rlim+1, self.height-1))
-					self.disp_msg("Next:", (
-						self.rlim+cell_size,
-						2))
-					self.disp_msg("Score: %d\n\nLevel: %d\
-\nLines: %d" % (self.score, self.level, self.lines),
-						(self.rlim+cell_size, cell_size*5))
+					pygame.draw.line(self.screen, (255,255,255),
+						(self.rlim+1, 0), (self.rlim+1, self.height-1))
+					self.disp_msg("Next:", (self.rlim+CELL_SIZE, 2))
+					self.disp_msg("Score: %d" % self.score, (self.rlim+CELL_SIZE, CELL_SIZE*5))
+					if self.ai and self.runner:
+						pass
+						# chromosome = self.runner.population[self.runner.current_chromosome]
+						# self.disp_msg("Discontentment: %d" % -self.ai.utility(self.board), (self.rlim+CELL_SIZE, CELL_SIZE*10))
+						# self.disp_msg("Generation: %s" % self.runner.current_generation, (self.rlim+CELL_SIZE, CELL_SIZE*11))
+						# self.disp_msg("Chromosome: %d" % chromosome.name, (self.rlim+CELL_SIZE, CELL_SIZE*12))
+						# self.disp_msg("\n  %s: %s\n  %s: %s\n  %s: %s\n  %s: %s\n  %s: %s\n  %s: %s" % (
+						# 	"aggregateHeight", chromosome.heuristics[aggregateHeight],
+						# 	"completeLines", chromosome.heuristics[completeLines],
+						# 	"holes", chromosome.heuristics[holes],
+						# 	"bumpiness", chromosome.heuristics[bumpiness],
+						# ), (self.rlim+CELL_SIZE, CELL_SIZE*12.1))
 					self.draw_matrix(self.bground_grid, (0,0))
 					self.draw_matrix(self.board, (0,0))
-					self.draw_matrix(self.stone,
-						(self.stone_x, self.stone_y))
-					self.draw_matrix(self.next_stone,
-						(cols+1,2))
-			pygame.display.update()
+					self.draw_matrix(self.stone, (self.stone_x, self.stone_y))
+					self.draw_matrix(self.next_stone, (COLS+1,2))
+				pygame.display.update()
 
 			for event in pygame.event.get():
-				if event.type == pygame.USEREVENT+1:
-					self.drop(False)
+				if event.type == self.DROPEVENT:
+					self.drop()
 				elif event.type == pygame.QUIT:
-					self.quit()
+					sys.exit()
 				elif event.type == pygame.KEYDOWN:
 					for key in key_actions:
-						if event.key == eval("pygame.K_"
-						+key):
+						if event.key == eval("pygame.K_" + key):
 							key_actions[key]()
 
-			dont_burn_my_cpu.tick(maxfps)
+			clock.tick(MAX_FPS)
 
-if __name__ == '__main__':
-	App = TetrisApp()
-	App.run()
+if __name__ == "__main__":
+	from ai import AI
+	app = TetrisApp()
+	app.ai = AI(app)
+	app.ai.instant_play = True
+	app.run()

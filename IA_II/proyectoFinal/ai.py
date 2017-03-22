@@ -16,13 +16,13 @@ from collections import namedtuple
 Move = namedtuple('Move', ['x_pos', 'rotation', 'result'])
 
 class AI(object):
-	def __init__(self, tetris):
+	def __init__(self, tetris, aH = 0, cL = 0, hl = 0, bp = 0):
 		self.tetris = tetris
 		self.heuristics = {
-            heuristic.aggregateHeight : 0,
-            heuristic.completeLines : 0,
-            heuristic.holes : 0,
-            heuristic.bumpiness : 0
+            heuristic.aggregateHeight : aH,
+            heuristic.completeLines   : cL,
+            heuristic.holes           : hl,
+            heuristic.bumpiness       : bp
 		}
 		self.instant_play = True
 
