@@ -1,3 +1,14 @@
+"""
+    Universidad Simon Bolivar
+    CI-5438 - Inteligencia Artificial
+    Edward Fernandez 10-11121
+    Carlos Ferreira 11-10323
+    Stefani Castellanos 11-11394
+
+    Description:
+
+"""
+
 import unittest
 from heuristic import *
 

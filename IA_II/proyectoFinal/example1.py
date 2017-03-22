@@ -5,6 +5,35 @@ from pyevolve import Statistics
 from pyevolve import DBAdapters
 import pyevolve
 
+# The step callback function, this function
+# will be called every step (generation) of the GA evolution
+def evolve_callback(ga_engine):
+    generation = ga_engine.getCurrentGeneration()
+    pop = ga.getPopulation()
+    if generation == 0:
+        popFR = open("population.txt", 'r')
+        i = -1 # number of the individual
+        #Initilize population
+        for line in popFR:
+            if i != -1: #is not te generation information
+                print line
+                # PARSEAR LINEA Y CAMBIAR EL INDIVIDUO
+                # pop[i].genomeList = ?
+            i += 1
+        popFR.close()
+
+    if generation % 20 == 0:
+        popF = open("population.txt", 'w')
+        print "Current generation: %d" % (generation,)
+        popF.write("Generacion: " + str(generation,) + "\n")
+        for ind in pop:
+            #Save population
+            # popF.write(str(ind.getRawScore()) + "\n")
+            # popF.write(str(ind.getFitnessScore()) + "\n")
+            popF.write(str(ind.genomeList) + "\n")
+        popF.close()
+    return False
+
 # This function is the evaluation function, we want
 # to give high score to more zero'ed chromosomes
 def eval_func(chromosome):
@@ -38,13 +67,8 @@ ga = GSimpleGA.GSimpleGA(genome)
 ga.selector.set(Selectors.GRouletteWheel)
 ga.setGenerations(500)
 ga.terminationCriteria.set(GSimpleGA.ConvergenceCriteria)
-
-# Sets the DB Adapter, the resetDB flag will make the Adapter recreate
-# the database and erase all data every run, you should use this flag
-# just in the first time, after the pyevolve.db was created, you can
-# omit it.
-# sqlite_adapter = DBAdapters.DBSQLite(identify="ex1", resetDB=True)
-# ga.setDBAdapter(sqlite_adapter)
+ga.setPopulationSize(80)
+ga.stepCallback.set(evolve_callback)
 
 # Using CSV Adapter
 csvfile_adapter = DBAdapters.DBFileCSV(frequency = 10)
