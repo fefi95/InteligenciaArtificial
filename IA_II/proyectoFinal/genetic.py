@@ -11,6 +11,7 @@
 
 from tetris import TetrisApp
 from ai import AI
+from random import randint as rand_randint
 from pyevolve import G1DList
 from pyevolve import GSimpleGA
 from pyevolve import Selectors
@@ -22,7 +23,8 @@ import pyevolve
 NUM_HEURISTIC = 4
 GENERATIONS = 500
 POPULATION = 10 #1000
-SURVIVORS = 1 #100
+SURVIVORS = 1 #100 #10%
+MUTATION_RATE = 0.05 #5%
 FREQ_STATS = 10
 GAMES = 5#100
 
@@ -84,6 +86,7 @@ genome.setParams(rangemin=-100, rangemax=100)
 
 # The evaluator function (evaluation function)
 genome.evaluator.set(fitness)
+# genome.crossover.set(weightedCrossover)
 
 # Genetic Algorithm Instance
 ga = GSimpleGA.GSimpleGA(genome)
@@ -96,6 +99,7 @@ ga.setElitismReplacement(SURVIVORS)
 ga.setGenerations(GENERATIONS)
 ga.terminationCriteria.set(GSimpleGA.ConvergenceCriteria)
 ga.setPopulationSize(POPULATION)
+ga.setMutationRate(MUTATION_RATE)
 ga.stepCallback.set(evolve_callback)
 
 # Using CSV Adapter

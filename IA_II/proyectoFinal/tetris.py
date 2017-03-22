@@ -283,7 +283,7 @@ class TetrisApp(object):
 						if self.games_run == 0:
 							raise Exception(self.fitness)
 							# key_actions['ESCAPE']()
-				elif self.genetic and self.score == 100:
+				elif self.genetic and self.score > 100:
 					self.gameover = True
 					self.fitness += self.score
 					key_actions['SPACE']()
