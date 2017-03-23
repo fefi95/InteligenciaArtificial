@@ -26,7 +26,7 @@ POPULATION = 10 #1000
 SURVIVORS = 1 #100 #10%
 MUTATION_RATE = 0.05 #5%
 FREQ_STATS = 10
-GAMES = 5#100
+GAMES = 1#100
 
 # The step callback function, this function
 # will be called every step (generation) of the GA evolution
@@ -38,12 +38,15 @@ def evolve_callback(ga_engine):
         i = -1 # number of the individual
         #Initilize population
         for line in popFR:
-            if i != -1: #is not te generation information
-                print line
-                # PARSEAR LINEA Y CAMBIAR EL INDIVIDUO
-                # pop[i].genomeList = ?
+            if i != -1 and i != POPULATION: #is not te generation information
+                print "line" + line
+                ind = line[1:-2].split(',')
+                print ind
+                for j in range(NUM_HEURISTIC):
+                    pop[i].genomeList[j] = int(ind[j])
             i += 1
         popFR.close()
+        ga.internalPop = pop
 
     if generation % 20 == 0:
         popF = open("population.txt", 'w')
