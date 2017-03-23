@@ -26,7 +26,7 @@ POPULATION = 10 #1000
 SURVIVORS = 1 #100 #10%
 MUTATION_RATE = 0.05 #5%
 FREQ_STATS = 10
-GAMES = 1#100
+GAMES = 5#100
 
 # The step callback function, this function
 # will be called every step (generation) of the GA evolution
@@ -48,7 +48,7 @@ def evolve_callback(ga_engine):
         popFR.close()
         ga.internalPop = pop
 
-    if generation % 20 == 0:
+    if generation % FREQ_STATS == 0:
         popF = open("population.txt", 'w')
         print "Current generation: %d" % (generation,)
         popF.write("Generacion: " + str(generation,) + "\n")
@@ -106,7 +106,7 @@ ga.setMutationRate(MUTATION_RATE)
 ga.stepCallback.set(evolve_callback)
 
 # Using CSV Adapter
-csvfile_adapter = DBAdapters.DBFileCSV(frequency = FREQ_STATS)
+csvfile_adapter = DBAdapters.DBFileCSV(frequency = FREQ_STATS, reset = False)
 ga.setDBAdapter(csvfile_adapter)
 
 # Do the evolution, with stats dump
