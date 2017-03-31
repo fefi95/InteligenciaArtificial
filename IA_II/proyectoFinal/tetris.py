@@ -328,6 +328,6 @@ class TetrisApp(object):
 if __name__ == "__main__":
 	from ai import AI
 	app = TetrisApp()
-	app.ai = AI(app)
+	app.ai = AI(app, 67, 40, -71, -1)
 	app.ai.instant_play = True
 	app.run()
