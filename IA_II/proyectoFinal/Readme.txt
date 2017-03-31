@@ -16,13 +16,13 @@ pyevolve:
 
     Para correr el algoritmo evolutivo se ejecuta el archivo genetic
 
-./genetic.py
+    python genetic.py
 
-    Si se quiere empezar desde 0 se debe eliminar el archivo population.txt
-para que inicialice la primera población en random, si se quiere seguir desde
-un punto anterior la población se salva automáticamente en el archivo 
-population.txt, con tal que este archivo exista con la población correcta
-el seguirá su corrida desde la última iteración salvadada.
+    Si se quiere empezar desde el comienzo se debe eliminar el archivo 
+population.txt para que inicialice la primera población en random, si se quiere 
+seguir desde un punto anterior la población se salva automáticamente en el 
+archivo population.txt, con tal que este archivo exista con la población 
+correcta el seguirá su corrida desde la última iteración salvadada.
 
     Para correr el resultado con el mejor fitness se busca el individio con
 mejor fitness en population.txt (última línea) y se coloca en tetris.py, 
@@ -32,7 +32,8 @@ por
     app.ai = AI(<mejor individuo>)
 
 y se ejecuta el archivo tetris.py
-    ./tetris.py
+
+    python tetris.py
 
     Al jugar el tetris se puede bajar la velocidad con la que bajan las piezas
 cambiando el atributo de app.ai.instant_play de True a False. Esto no es 
